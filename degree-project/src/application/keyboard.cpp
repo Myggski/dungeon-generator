@@ -26,6 +26,19 @@ namespace application
         return keys.contains(scancode);
     }
 
+    bool keyboard::is_key_pressed_once(const SDL_Scancode scancode)
+    {
+        if (!is_key_pressed(scancode))
+        {
+            return false;
+        }
+
+        keys.at(scancode).number_of_repeats += 1;
+
+        return is_key_pressed(scancode) && keys.at(scancode).number_of_repeats == 1;
+    }
+
+
     bool keyboard::is_key_released(const SDL_Scancode scancode) const
     {
         return !is_key_pressed(scancode);

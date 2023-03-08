@@ -20,7 +20,8 @@ namespace level_generation
 		left = 3
 	};
 
-	constexpr int MIN_ROOM_SIZE = 2;
+	constexpr int MIN_ROOM_SIZE = 3;
+	constexpr int ROOM_TILE_SIZE = 32;
 
 	class room
 	{
@@ -38,7 +39,7 @@ namespace level_generation
 		void draw_room(application::renderer& renderer, SDL_Rect rect);
 
 	private:
-		SDL_Rect room_rect; // for the room only
+		SDL_Rect room_rect; // for the room
 		SDL_Rect full_rect; // for the room and fragments
 		SDL_Texture* floor_texture;
 		std::array<std::optional<room_fragment>, 4> fragment_rooms;

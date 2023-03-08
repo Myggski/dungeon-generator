@@ -33,8 +33,8 @@ namespace application
 			"Degree Project",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			800,
-			600,
+			1280,
+			720,
 			0
 		);
 
@@ -51,10 +51,7 @@ namespace application
 		is_running = true;
 		time.init();
 
-		auto room_s = level_generation::room_factory::get_small_room({ 0, 0, 5, 5 });
-		auto room_m = level_generation::room_factory::get_medium_room({ 0, 0, 5, 5 });
-		auto room_l = level_generation::room_factory::get_large_room({ 0, 0, 5, 5 });
-		auto room_xl = level_generation::room_factory::get_extra_large_room({ 3, 3, 5, 6 });
+		std::optional<level_generation::room> room_xl;
 
 		while (is_running)
 		{
@@ -63,9 +60,17 @@ namespace application
 			time.refresh_dt();
 			events.pull();
 
-			// Update logic
-			room_xl.draw(renderer);
+			if (keyboard.is_key_pressed_once(SDL_SCANCODE_SPACE))
+			{
+				// TODO: Some sort of fragment bug when it creates small rooms
+				room_xl = level_generation::room_factory::get_small_room({ 17, 8 });
+			}
 
+			// Update logic
+			if (room_xl.has_value())
+			{
+				room_xl.value().draw(renderer);
+			}
 
 			renderer.draw_canvas();
 		}

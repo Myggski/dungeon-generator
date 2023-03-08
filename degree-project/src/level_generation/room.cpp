@@ -6,8 +6,6 @@
 
 namespace level_generation
 {
-	constexpr int room_tile_size = 32;
-
 	room::room(SDL_Rect rect)
 		: room_rect(rect),
 		fragment_rooms({}) { }
@@ -66,6 +64,12 @@ namespace level_generation
 				});
 			}
 		}
+
+		renderer.set_draw_color(255, 0, 0);
+		renderer.draw_rectangle(room_rect);
+
+		renderer.set_draw_color(94, 169, 190);
+		renderer.draw_rectangle(full_rect);
 	}
 
 	SDL_Point room::get_fragment_position(fragment_position fragment_position)
@@ -94,7 +98,7 @@ namespace level_generation
 			break;
 		case fragment_position::left:
 			position.x -= fragment.value().get_width();
-			position.y -= fragment.value().get_offset();
+			position.y += fragment.value().get_offset();
 			break;
 		}
 
@@ -149,13 +153,16 @@ namespace level_generation
 			for (int y = 0; y < rect.h; y++)
 			{
 				SDL_Rect texture_rect{
-					(rect.x + x) * room_tile_size,
-					(rect.y + y) * room_tile_size,
-					room_tile_size,
-					room_tile_size
+					(rect.x + x) * ROOM_TILE_SIZE,
+					(rect.y + y) * ROOM_TILE_SIZE,
+					ROOM_TILE_SIZE,
+					ROOM_TILE_SIZE
 				};
 
 				renderer.draw_texture(floor_texture, texture_rect, 0);
+
+				renderer.set_draw_color(23, 23, 23);
+				renderer.draw_rectangle({ rect.x + x, rect.y + y, 1, 1 });
 			}
 		}
 	}

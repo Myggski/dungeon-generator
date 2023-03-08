@@ -24,6 +24,7 @@ namespace application
         void on_key_pressed(SDL_Event event);
         void on_key_released(SDL_Event event);
         bool is_key_pressed(const SDL_Scancode scancode) const;
+        bool is_key_pressed_once(const SDL_Scancode scancode);
         bool is_key_released(const SDL_Scancode scancode) const;
         bool is_key_held(const SDL_Scancode scancode) const;
 

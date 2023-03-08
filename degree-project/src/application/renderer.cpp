@@ -8,7 +8,6 @@ namespace application
 	void renderer::init(SDL_Window* window)
 	{
 		SDL_renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
-		SDL_SetRenderDrawColor(SDL_renderer, 203, 225, 239, 255);
 	}
 
 	void renderer::clear()
@@ -37,6 +36,7 @@ namespace application
 
 	void renderer::draw_canvas() const
 	{
+		SDL_SetRenderDrawColor(SDL_renderer, 203, 225, 239, 255);
 		SDL_RenderPresent(SDL_renderer);
 	}
 
@@ -44,6 +44,24 @@ namespace application
 	{
 		SDL_RenderClear(SDL_renderer);
 	}
+
+	void renderer::set_draw_color(Uint8 r, Uint8 g, Uint8 b) const
+	{
+		SDL_SetRenderDrawColor(SDL_renderer, r, g, b, 255);
+	}
+
+	void renderer::draw_rectangle(const SDL_Rect& rect) const
+	{
+		SDL_Rect draw_rect{
+			rect.x * 32,
+			rect.y * 32,
+			rect.w * 32,
+			rect.h * 32,
+		};
+
+		SDL_RenderDrawRect(SDL_renderer, &draw_rect);
+	}
+
 
 	SDL_Texture* renderer::get_image(const std::string& file_path)
 	{
