@@ -1,35 +1,36 @@
 
-#include "application.h"
+#include "Application.h"
 #include <cassert>
 #include <SDL.h>
 
-#include "level_generation/room_factory.h"
+#include "LevelGeneration/RoomFactory.h"
+#include "CommandStack/CommandStack.h"
 
-namespace application
+namespace Application
 {
-	application::application()
-		: events({}),
-		keyboard({}),
-		time({}),
-		renderer({}),
-		exit_application([&](SDL_Event)
+	Application::Application()
+		: Events({}),
+		Keyboard({}),
+		Time({}),
+		Renderer({}),
+		ExitApplication([&](SDL_Event)
 		{
-			is_running = false;
+			bIsRunning = false;
 		}),
-		on_key_down([&](SDL_Event event)
+		OnKeyDown([&](SDL_Event Event)
 		{
-			keyboard.on_key_pressed(event);
+			Keyboard.OnKeyPressed(Event);
 		}),
-		on_key_released([&](SDL_Event event)
+		OnKeyReleased([&](SDL_Event Event)
 		{
-			keyboard.on_key_released(event);
+			Keyboard.OnKeyReleased(Event);
 		}) { }
 
-	void application::init()
+	void Application::Init()
 	{
 		assert(SDL_Init(SDL_INIT_EVERYTHING) == 0);
 
-		window = SDL_CreateWindow(
+		Window = SDL_CreateWindow(
 			"Degree Project",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
@@ -38,53 +39,54 @@ namespace application
 			0
 		);
 
-		SDL_RaiseWindow(window);
-		renderer.init(window);
+		SDL_RaiseWindow(Window);
+		Renderer.Init(Window);
+		Command::CommandStack::CreateInstance(10000);
 
-		events.add_listener(SDL_QUIT, &exit_application);
-		events.add_listener(SDL_KEYDOWN, &on_key_down);
-		events.add_listener(SDL_KEYUP, &on_key_released);
+		Events.AddListener(SDL_QUIT, &ExitApplication);
+		Events.AddListener(SDL_KEYDOWN, &OnKeyDown);
+		Events.AddListener(SDL_KEYUP, &OnKeyReleased);
 	}
 
-	void application::run()
+	void Application::Run()
 	{
-		is_running = true;
-		time.init();
+		bIsRunning = true;
+		Time.Init();
 
-		std::optional<level_generation::room> room_xl;
+		std::optional<LevelGeneration::Room> RoomXL;
 
-		while (is_running)
+		while (bIsRunning)
 		{
-			renderer.clear_canvas();
+			Renderer.ClearCanvas();
 
-			time.refresh_dt();
-			events.pull();
+			Time.RefreshDT();
+			Events.Pull();
 
-			if (keyboard.is_key_pressed_once(SDL_SCANCODE_SPACE))
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_SPACE))
 			{
-				// TODO: Some sort of fragment bug when it creates small rooms
-				room_xl = level_generation::room_factory::get_small_room({ 17, 8 });
+				RoomXL = LevelGeneration::RoomFactory::CreateRoom({ 23, 12 }, LevelGeneration::RoomType::Large);
 			}
 
 			// Update logic
-			if (room_xl.has_value())
+			if (RoomXL.has_value())
 			{
-				room_xl.value().draw(renderer);
+				RoomXL.value().Draw(Renderer);
 			}
 
-			renderer.draw_canvas();
+			Renderer.DrawCanvas();
 		}
 
-		exit();
+		Exit();
 	}
 
-	void application::exit()
+	void Application::Exit()
 	{
-		events.clear();
-		renderer.clear();
+		Events.Clear();
+		Renderer.Clear();
+		Command::CommandStack::DestroyInstance();
 
-		SDL_DestroyWindow(window);
-		window = nullptr;
+		SDL_DestroyWindow(Window);
+		Window = nullptr;
 
 		SDL_Quit();
 	}

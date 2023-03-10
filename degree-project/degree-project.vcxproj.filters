@@ -18,60 +18,93 @@
     <ClCompile Include="src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\application.cpp">
+    <ClCompile Include="src\Application\Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\events.cpp">
+    <ClCompile Include="src\Application\Events.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\keyboard.cpp">
+    <ClCompile Include="src\Application\Keyboard.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\timer.cpp">
+    <ClCompile Include="src\Application\Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\application\renderer.cpp">
+    <ClCompile Include="src\Application\Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\level_generation\room.cpp">
+    <ClCompile Include="src\LevelGeneration\Room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\utils\random_generator.cpp">
+    <ClCompile Include="src\Utils\RandomGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\level_generation\room_fragment.cpp">
+    <ClCompile Include="src\LevelGeneration\RoomFragment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\level_generation\room_factory.cpp">
+    <ClCompile Include="src\LevelGeneration\RoomFactory.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\CommandStack.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.h">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\CreateRoomCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\RoomRepository.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\application\application.h">
+    <ClInclude Include="src\Application\Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\events.h">
+    <ClInclude Include="src\Application\Events.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\keyboard.h">
+    <ClInclude Include="src\Application\Keyboard.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\timer.h">
+    <ClInclude Include="src\Application\Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\application\renderer.h">
+    <ClInclude Include="src\Application\Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\level_generation\room.h">
+    <ClInclude Include="src\LevelGeneration\Room.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\random_generator.h">
+    <ClInclude Include="src\Utils\RandomGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\level_generation\room_fragment.h">
+    <ClInclude Include="src\LevelGeneration\RoomFragment.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\level_generation\room_factory.h">
+    <ClInclude Include="src\LevelGeneration\RoomFactory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\CommandStack.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Command.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\RoomType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\FragmentPosition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\RoomRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

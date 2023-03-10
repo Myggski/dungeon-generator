@@ -1,24 +1,24 @@
-#include "timer.h"
+#include "Timer.h"
 
 #include <SDL_timer.h>
 
-namespace application
+namespace Application
 {
-	timer::timer()
-		: delta_time(dt),
-		previous_ticks(0),
-		dt(0) { }
+	Timer::Timer()
+		: DeltaTime(DT),
+		PreviousTicks(0),
+		DT(0) { }
 
-	void timer::init()
+	void Timer::Init()
 	{
-		previous_ticks = SDL_GetPerformanceCounter();
+		PreviousTicks = SDL_GetPerformanceCounter();
 	}
 
-	void timer::refresh_dt()
+	void Timer::RefreshDT()
 	{
-		const Uint64 ticks = SDL_GetPerformanceCounter();
-		const Uint64 delta_ticks = ticks - previous_ticks;
-		previous_ticks = ticks;
-		dt = static_cast<float>(delta_ticks) / static_cast<float>(SDL_GetPerformanceFrequency());
+		const Uint64 Ticks = SDL_GetPerformanceCounter();
+		const Uint64 NewDeltaTime = Ticks - PreviousTicks;
+		PreviousTicks = Ticks;
+		DT = static_cast<float>(NewDeltaTime) / static_cast<float>(SDL_GetPerformanceFrequency());
 	};
 }

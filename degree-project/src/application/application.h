@@ -1,36 +1,35 @@
 #pragma once
 
 #include <SDL_video.h>
+#include "Events.h"
+#include "Keyboard.h"
+#include "Renderer.h"
+#include "Timer.h"
 
-#include "events.h"
-#include "keyboard.h"
-#include "renderer.h"
-#include "timer.h"
-
-namespace application
+namespace Application
 {
-	class application
+	class Application
 	{
 	public:
-		explicit application();
+		explicit Application();
 
-		void init();
-		void run();
-
-	private:
-		void exit();
+		void Init();
+		void Run();
 
 	private:
-		bool is_running{};
+		void Exit();
 
-		SDL_Window* window{};
-		events events;
-		keyboard keyboard;
-		timer time;
-		renderer renderer;
+	private:
+		bool bIsRunning{};
 
-		event_callback exit_application;
-		event_callback on_key_down;
-		event_callback on_key_released;
+		SDL_Window* Window{};
+		Events Events;
+		Keyboard Keyboard;
+		Timer Time;
+		Renderer Renderer;
+
+		EventCallback ExitApplication;
+		EventCallback OnKeyDown;
+		EventCallback OnKeyReleased;
 	};
 }

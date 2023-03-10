@@ -1,51 +1,51 @@
-#include "keyboard.h"
+#include "Keyboard.h"
 
-namespace application
+namespace Application
 {
-    keyboard_key_data::keyboard_key_data(SDL_Scancode scancode) : scancode(scancode) { }
+    KeyboardKeyData::KeyboardKeyData(SDL_Scancode Scancode) : Scancode(Scancode) { }
 
-    void keyboard::on_key_pressed(SDL_Event event)
+    void Keyboard::OnKeyPressed(SDL_Event Event)
     {
-        if (is_key_released(event.key.keysym.scancode))
+        if (IsKeyReleased(Event.key.keysym.scancode))
         {
-            keys[event.key.keysym.scancode] = keyboard_key_data(event.key.keysym.scancode);
+            Keys[Event.key.keysym.scancode] = KeyboardKeyData(Event.key.keysym.scancode);
         }
         else
         {
-            keys.at(event.key.keysym.scancode).number_of_repeats += 1;
+            Keys.at(Event.key.keysym.scancode).NumberOfRepeats += 1;
         }
     }
 
-    void keyboard::on_key_released(SDL_Event event)
+    void Keyboard::OnKeyReleased(SDL_Event Event)
     {
-        keys.erase(event.key.keysym.scancode);
+        Keys.erase(Event.key.keysym.scancode);
     }
 
-    bool keyboard::is_key_pressed(const SDL_Scancode scancode) const
+    bool Keyboard::IsKeyPressed(const SDL_Scancode Scancode) const
     {
-        return keys.contains(scancode);
+        return Keys.contains(Scancode);
     }
 
-    bool keyboard::is_key_pressed_once(const SDL_Scancode scancode)
+    bool Keyboard::IsKeyPressedOnce(const SDL_Scancode Scancode)
     {
-        if (!is_key_pressed(scancode))
+        if (!IsKeyPressed(Scancode))
         {
             return false;
         }
 
-        keys.at(scancode).number_of_repeats += 1;
+        Keys.at(Scancode).NumberOfRepeats += 1;
 
-        return is_key_pressed(scancode) && keys.at(scancode).number_of_repeats == 1;
+        return IsKeyPressed(Scancode) && Keys.at(Scancode).NumberOfRepeats == 1;
     }
 
 
-    bool keyboard::is_key_released(const SDL_Scancode scancode) const
+    bool Keyboard::IsKeyReleased(const SDL_Scancode Scancode) const
     {
-        return !is_key_pressed(scancode);
+        return !IsKeyPressed(Scancode);
     }
 
-    bool keyboard::is_key_held(const SDL_Scancode scancode) const
+    bool Keyboard::IsKeyHeld(const SDL_Scancode Scancode) const
     {
-        return keys.contains(scancode);
+        return Keys.contains(Scancode);
     }
 }

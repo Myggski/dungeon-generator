@@ -4,26 +4,25 @@
 #include <unordered_map>
 #include <SDL_events.h>
 
-namespace application
+namespace Application
 {
-	using event_callback = std::function<void(const SDL_Event&)>;
-	using event_map = std::unordered_map<SDL_EventType, std::vector<event_callback*>>;
+	using EventCallback = std::function<void(const SDL_Event&)>;
+	using EventMap = std::unordered_map<SDL_EventType, std::vector<EventCallback*>>;
 
-	class events final
+	class Events final
 	{
-		;
 	public:
-		events();
+		Events();
 
-		void pull() const;
-		void add_listener(const SDL_EventType& eventType, event_callback* callback);
-		void remove_listener(const SDL_EventType& eventType, event_callback* callback);
-		void clear();
-
-	private:
-		void trigger_event(const SDL_Event& event) const;
+		void Pull() const;
+		void AddListener(const SDL_EventType& EventType, EventCallback* Callback);
+		void remove_listener(const SDL_EventType& EventType, EventCallback* Callback);
+		void Clear();
 
 	private:
-		event_map registered_events;
+		void TriggerEvent(const SDL_Event& Event) const;
+
+	private:
+		EventMap RegisteredEvents;
 	};
 }

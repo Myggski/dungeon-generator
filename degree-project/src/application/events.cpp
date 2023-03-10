@@ -1,80 +1,80 @@
-#include "events.h"
+#include "Events.h"
 
-namespace application
+namespace Application
 {
-	events::events() : registered_events(event_map()) { }
+	Events::Events() : RegisteredEvents(EventMap()) { }
 
-	void events::pull() const
+	void Events::Pull() const
 	{
-		SDL_Event ev;
-		while (SDL_PollEvent(&ev)) {
-			trigger_event(ev);
+		SDL_Event Event;
+		while (SDL_PollEvent(&Event)) {
+			TriggerEvent(Event);
 		}
 	}
 
-	void events::trigger_event(const SDL_Event& event) const
+	void Events::TriggerEvent(const SDL_Event& Event) const
 	{
-		if (registered_events.empty())
+		if (RegisteredEvents.empty())
 		{
 			return;
 		}
 
-		const auto& it = registered_events.find(static_cast<SDL_EventType>(event.type));
-		if (it != registered_events.end())
+		const auto& Iterator = RegisteredEvents.find(static_cast<SDL_EventType>(Event.type));
+		if (Iterator != RegisteredEvents.end())
 		{
-			const std::vector<event_callback*>& callbacks = registered_events.at(static_cast<SDL_EventType>(event.type));
-			for (const event_callback* callback : callbacks)
+			const std::vector<EventCallback*>& Callbacks = RegisteredEvents.at(static_cast<SDL_EventType>(Event.type));
+			for (const EventCallback* Callback : Callbacks)
 			{
-				(*callback)(event);
+				(*Callback)(Event);
 			}
 		}
 	}
 
-	void events::add_listener(const SDL_EventType& eventType, event_callback* callback) {
-		if (!registered_events.count(eventType))
+	void Events::AddListener(const SDL_EventType& EventType, EventCallback* Callback) {
+		if (!RegisteredEvents.contains(EventType))
 		{
-			registered_events.insert(std::make_pair(eventType, std::vector<event_callback*>(1, { callback })));
+			RegisteredEvents.insert(std::make_pair(EventType, std::vector<EventCallback*>(1, { Callback })));
 		}
 		else
 		{
-			registered_events.at(eventType).push_back(callback);
+			RegisteredEvents.at(EventType).push_back(Callback);
 		}
 	}
 
-	void events::remove_listener(const SDL_EventType& eventType, event_callback* callback) {
+	void Events::remove_listener(const SDL_EventType& EventType, EventCallback* Callback) {
 
-		std::vector<event_callback*>& callbacks = registered_events[eventType];
+		std::vector<EventCallback*>& Callbacks = RegisteredEvents[EventType];
 
-		auto is_same_callback = [&](const event_callback* event_data) {
-			return (*event_data).target<event_callback>() == (*callback).target<event_callback>();
+		auto IsSameEvent = [&](const EventCallback* EventData) {
+			return (*EventData).target<EventCallback>() == (*Callback).target<EventCallback>();
 		};
 
-		callbacks.erase(
-			std::remove_if(callbacks.begin(), callbacks.end(), is_same_callback), callbacks.end());
+		Callbacks.erase(
+			std::remove_if(Callbacks.begin(), Callbacks.end(), IsSameEvent), Callbacks.end());
 
 		// Remove event if there's no callbacks
-		if (callbacks.empty())
+		if (Callbacks.empty())
 		{
-			registered_events.erase(registered_events.find(eventType));
+			RegisteredEvents.erase(RegisteredEvents.find(EventType));
 		}
 	}
 
-	void events::clear()
+	void Events::Clear()
 	{
-		if (registered_events.empty())
+		if (RegisteredEvents.empty())
 		{
 			return;
 		}
 
-		while (!registered_events.empty())
+		while (!RegisteredEvents.empty())
 		{
-			auto& registered_event = *registered_events.begin();
-			for (const auto& callback : registered_event.second)
+			auto& RegisteredEvent = *RegisteredEvents.begin();
+			for (const auto& Callback : RegisteredEvent.second)
 			{
-				remove_listener(registered_event.first, callback);
+				remove_listener(RegisteredEvent.first, Callback);
 			}
 		}
 
-		registered_events.clear();
+		RegisteredEvents.clear();
 	}
 }

@@ -131,27 +131,38 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="src\application\application.cpp" />
-    <ClCompile Include="src\application\events.cpp" />
-    <ClCompile Include="src\application\keyboard.cpp" />
-    <ClCompile Include="src\application\renderer.cpp" />
-    <ClCompile Include="src\application\timer.cpp" />
-    <ClCompile Include="src\level_generation\room.cpp" />
-    <ClCompile Include="src\level_generation\room_factory.cpp" />
-    <ClCompile Include="src\level_generation\room_fragment.cpp" />
+    <ClCompile Include="src\Application\Application.cpp" />
+    <ClCompile Include="src\Application\Events.cpp" />
+    <ClCompile Include="src\Application\Keyboard.cpp" />
+    <ClCompile Include="src\Application\Renderer.cpp" />
+    <ClCompile Include="src\Application\Timer.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\CreateRoomCommand.cpp" />
+    <ClCompile Include="src\LevelGeneration\Room.cpp" />
+    <ClCompile Include="src\LevelGeneration\RoomFactory.cpp" />
+    <ClCompile Include="src\LevelGeneration\RoomFragment.cpp" />
+    <ClCompile Include="src\LevelGeneration\RoomRepository.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\utils\random_generator.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.h" />
+    <ClCompile Include="src\CommandStack\CommandStack.cpp" />
+    <ClCompile Include="src\Utils\RandomGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\application\application.h" />
-    <ClInclude Include="src\application\events.h" />
-    <ClInclude Include="src\application\keyboard.h" />
-    <ClInclude Include="src\application\renderer.h" />
-    <ClInclude Include="src\application\timer.h" />
-    <ClInclude Include="src\level_generation\room.h" />
-    <ClInclude Include="src\level_generation\room_factory.h" />
-    <ClInclude Include="src\level_generation\room_fragment.h" />
-    <ClInclude Include="src\utils\random_generator.h" />
+    <ClInclude Include="src\Application\Application.h" />
+    <ClInclude Include="src\Application\Events.h" />
+    <ClInclude Include="src\Application\Keyboard.h" />
+    <ClInclude Include="src\Application\Renderer.h" />
+    <ClInclude Include="src\Application\Timer.h" />
+    <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
+    <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
+    <ClInclude Include="src\LevelGeneration\Room.h" />
+    <ClInclude Include="src\LevelGeneration\RoomFactory.h" />
+    <ClInclude Include="src\LevelGeneration\RoomFragment.h" />
+    <ClInclude Include="src\CommandStack\Commands\Command.h" />
+    <ClInclude Include="src\CommandStack\CommandStack.h" />
+    <ClInclude Include="src\LevelGeneration\RoomRepository.h" />
+    <ClInclude Include="src\LevelGeneration\RoomType.h" />
+    <ClInclude Include="src\Utils\RandomGenerator.h" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\floor.png" />

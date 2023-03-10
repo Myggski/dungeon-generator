@@ -5,22 +5,22 @@
 #include <SDL_video.h>
 #include <SDL.h>
 
-namespace application
+namespace Application
 {
-	class renderer
+	class Renderer
 	{
 	public:
-		void init(SDL_Window* window);
-		void clear();
-		void draw_texture(SDL_Texture* texture, const SDL_Rect& image_rect, double angle = 0) const;
-		void draw_canvas() const;
-		void clear_canvas() const;
-		void set_draw_color(Uint8 r, Uint8 g, Uint8 b) const;
-		void draw_rectangle(const SDL_Rect& rect) const;
-		SDL_Texture* get_image(const std::string& file_path);
+		void Init(SDL_Window* Window);
+		void Clear();
+		void DrawTexture(SDL_Texture* Texture, const SDL_Rect& ImageRect, double Angle = 0) const;
+		void DrawCanvas() const;
+		void ClearCanvas() const;
+		void SetDrawColor(Uint8 R, Uint8 G, Uint8 B) const;
+		void DrawRectangle(const SDL_Rect& Rect) const;
+		SDL_Texture* GetImage(const std::string& FilePath);
 
 	private:
-		SDL_Renderer* SDL_renderer;
-		std::unordered_map<std::string, SDL_Texture*> textures;
+		SDL_Renderer* SDLRenderer = nullptr;
+		std::unordered_map<std::string, SDL_Texture*> Textures;
 	};
 }

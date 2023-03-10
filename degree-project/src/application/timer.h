@@ -2,20 +2,20 @@
 
 #include <SDL_stdinc.h>
 
-namespace application
+namespace Application
 {
-	struct timer final {
+	struct Timer final {
 	public:
-		timer();
+		Timer();
 
-		void init();
-		void refresh_dt();
+		void Init();
+		void RefreshDT();
 
 	public:
-		const float& delta_time;
+		const float& DeltaTime;
 
 	private:
-		Uint64 previous_ticks;
-		float dt;
+		Uint64 PreviousTicks;
+		float DT;
 	};
 }

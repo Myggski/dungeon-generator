@@ -1,13 +1,13 @@
 #define SDL_MAIN_HANDLED
 
-#include "application/application.h"
+#include "Application/Application.h"
 
 int main(int argc, char* args[])
 {
-	application::application app {  };
+	Application::Application App {  };
 
-	app.init();
-	app.run();
+	App.Init();
+	App.Run();
 
 	return 0;
 }
