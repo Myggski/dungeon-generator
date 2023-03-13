@@ -60,6 +60,15 @@
     <ClCompile Include="src\LevelGeneration\RoomRepository.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -105,6 +114,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\LevelGeneration\RoomRepository.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
