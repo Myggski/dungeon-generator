@@ -27,12 +27,12 @@ namespace Cyclic
 	class CyclicRule
 	{
 	public:
-		CyclicRule(std::string RuleName, std::array<CyclicInsertionPoint&, 2> InsertionPoints, GoalType GoalType);
+		CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, GoalType GoalType);
 
 	private:
 		std::string RuleName;
 		GoalType GoalType;
-		std::array<CyclicInsertionPoint&, 2> InsertionPoints;
+		std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints;
 
 		friend CyclicRuleRepository;
 	};

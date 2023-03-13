@@ -14,7 +14,7 @@ namespace Cyclic
 
 	void CyclicRuleRepository::Add(const CyclicRule&& Rule)
 	{
-		ListOfRules.emplace_back(std::move(Rule));
+		ListOfRules.emplace_back(Rule);
 	}
 
 	void CyclicRuleRepository::Remove(const CyclicRule& RuleToRemove)

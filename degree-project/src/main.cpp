@@ -2,6 +2,7 @@
 
 #include "Application/Application.h"
 #include "LevelGeneration/Cyclic/CyclicInsertionPoint.h"
+#include "LevelGeneration/Cyclic/CyclicRule.h"
 #include "LevelGeneration/Cyclic/CyclicRuleRepository.h"
 
 int main(int argc, char* args[])
@@ -20,7 +21,7 @@ int main(int argc, char* args[])
 
 	RuleRepository.Add({
 		"Two Locks and Keys - Short",
-		{  ShortLockKey, ShortLockKey },
+		{  std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey), std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey) },
 		Cyclic::GoalType::KillTarget
 	});
 

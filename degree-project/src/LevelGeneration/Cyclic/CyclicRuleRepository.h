@@ -11,7 +11,7 @@ namespace Cyclic
 	public:
 		CyclicRuleRepository(int NumberOfRules);
 
-		void Add(CyclicRule&& Rule);
+		void Add(const CyclicRule&& Rule);
 		void Remove(const CyclicRule& RuleName);
 		const CyclicRule& GetRandomRule();
 

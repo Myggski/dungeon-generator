@@ -3,9 +3,10 @@
 #include <cstdint>
 #include <optional>
 
+#include "CyclicRule.h"
+
 namespace Cyclic
 {
-	class CyclicRule;
 
 	enum class InsertionType : uint8_t
 	{
@@ -27,7 +28,7 @@ namespace Cyclic
 	{
 	public:
 		CyclicInsertionPoint(ArcType ArcType = ArcType::None, InsertionType InsertionType = InsertionType::None);
-		void AddMinorRule(CyclicRule Rule);
+		void AddMinorRule(std::optional<CyclicRule> Rule);
 		bool HasMinorRule() const;
 
 	private:

@@ -10,9 +10,9 @@ namespace Cyclic
 		  InsertionType(InsertionType),
 		  MinorRule(std::nullopt) { }
 
-	void CyclicInsertionPoint::AddMinorRule(CyclicRule& Rule)
+	void CyclicInsertionPoint::AddMinorRule(std::optional<CyclicRule> Rule)
 	{
-		MinorRule = std::make_optional(Rule);
+		MinorRule = std::move(Rule);
 	}
 
 	bool CyclicInsertionPoint::HasMinorRule() const

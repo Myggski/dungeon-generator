@@ -4,8 +4,8 @@
 
 namespace Cyclic
 {
-	CyclicRule::CyclicRule(std::string RuleName, std::array<CyclicInsertionPoint&, 2> InsertionPoints, enum GoalType GoalType)
+	CyclicRule::CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, enum GoalType GoalType)
 		: RuleName(std::move(RuleName)),
 		GoalType(GoalType),
-		InsertionPoints(InsertionPoints) { }
+		InsertionPoints(std::move(InsertionPoints)) { }
 }
