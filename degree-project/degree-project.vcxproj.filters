@@ -125,6 +125,9 @@
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\LevelGeneration\CyclicGraph.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\floor.png">

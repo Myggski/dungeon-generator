@@ -1,12 +1,11 @@
 #pragma once
 
 #include <cstdint>
-#include <optional>
-
-#include "CyclicRule.h"
+#include <memory>
 
 namespace Cyclic
 {
+	class CyclicRule;
 
 	enum class InsertionType : uint8_t
 	{
@@ -28,12 +27,14 @@ namespace Cyclic
 	{
 	public:
 		CyclicInsertionPoint(ArcType ArcType = ArcType::None, InsertionType InsertionType = InsertionType::None);
-		void AddMinorRule(std::optional<CyclicRule> Rule);
+		CyclicInsertionPoint(const CyclicInsertionPoint& other);
+
+		void AddMinorRule(std::unique_ptr<CyclicRule> Rule);
 		bool HasMinorRule() const;
 
 	private:
 		ArcType ArcType;
 		InsertionType InsertionType;
-		std::optional<CyclicRule> MinorRule;
+		std::unique_ptr<CyclicRule> MinorRule;
 	};
 }

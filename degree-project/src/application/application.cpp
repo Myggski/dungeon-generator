@@ -5,6 +5,7 @@
 
 #include "LevelGeneration/RoomFactory.h"
 #include "CommandStack/CommandStack.h"
+#include "utils/RandomGenerator.h"
 
 namespace Application
 {
@@ -41,6 +42,8 @@ namespace Application
 
 		SDL_RaiseWindow(Window);
 		Renderer.Init(Window);
+
+		Utils::RandomGenerator::CreateInstance();
 		Command::CommandStack::CreateInstance(10000);
 
 		Events.AddListener(SDL_QUIT, &ExitApplication);
@@ -83,7 +86,6 @@ namespace Application
 	{
 		Events.Clear();
 		Renderer.Clear();
-		Command::CommandStack::DestroyInstance();
 
 		SDL_DestroyWindow(Window);
 		Window = nullptr;

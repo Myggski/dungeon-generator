@@ -4,7 +4,7 @@
 
 namespace Command
 {
-	CommandStack* CommandStack::StackInstance = nullptr;
+	std::unique_ptr<CommandStack> CommandStack::StackInstance = nullptr;
 
 	CommandStack::CommandStack(int NumberOfCommandsToReserve) : CurrentIndex(-1)
 	{
@@ -17,28 +17,17 @@ namespace Command
 			throw std::logic_error("Instance of CommandStack is already created!");
 		}
 
-		StackInstance = new CommandStack(NumberOfCommandsToReserve);
+		StackInstance = std::make_unique<CommandStack>(CommandStack(NumberOfCommandsToReserve));
 	}
 
-	void CommandStack::DestroyInstance()
-	{
-		if (StackInstance == nullptr)
-		{
-			return;
-		}
-
-		delete StackInstance;
-		StackInstance = nullptr;
-	}
-
-	CommandStack* CommandStack::GetInstance()
+	CommandStack& CommandStack::GetInstance()
 	{
 		if (StackInstance == nullptr)
 		{
 			throw std::logic_error("Instance of CommandStack has not been created yet, or has been destroyed!");
 		}
 
-		return StackInstance;
+		return *StackInstance;
 	}
 
 	void CommandStack::ExecuteCommand(std::unique_ptr<Command> Command)

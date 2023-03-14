@@ -8,14 +8,12 @@
 int main(int argc, char* args[])
 {
 	Application::Application App {  };
-
 	App.Init();
-	App.Run();
 
-	Cyclic::CyclicInsertionPoint LongLockKey { Cyclic::ArcType::Long, Cyclic::InsertionType::LockKey };
-	Cyclic::CyclicInsertionPoint ShortLockKey { Cyclic::ArcType::Short, Cyclic::InsertionType::LockKey };
-	Cyclic::CyclicInsertionPoint ShortMiniBoss { Cyclic::ArcType::Short, Cyclic::InsertionType::MiniBoss };
-	Cyclic::CyclicInsertionPoint ShortTraps { Cyclic::ArcType::Short, Cyclic::InsertionType::Traps };
+	Cyclic::CyclicInsertionPoint LongLockKey{ Cyclic::ArcType::Long, Cyclic::InsertionType::LockKey };
+	Cyclic::CyclicInsertionPoint ShortLockKey{ Cyclic::ArcType::Short, Cyclic::InsertionType::LockKey };
+	Cyclic::CyclicInsertionPoint ShortMiniBoss{ Cyclic::ArcType::Short, Cyclic::InsertionType::MiniBoss };
+	Cyclic::CyclicInsertionPoint ShortTraps{ Cyclic::ArcType::Short, Cyclic::InsertionType::Traps };
 
 	Cyclic::CyclicRuleRepository RuleRepository{ 4 };
 
@@ -25,23 +23,27 @@ int main(int argc, char* args[])
 		Cyclic::GoalType::KillTarget
 	});
 
-	/*RuleRepository.Add({
+	RuleRepository.Add({
 		"Two Locks and Keys - Long",
-		{ LongLockKey, LongLockKey },
+		{ std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey), std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey) },
 		Cyclic::GoalType::KillTarget | Cyclic::GoalType::SecretDocuments | Cyclic::GoalType::Treasure
 	});
 
 	RuleRepository.Add({
-		"Two Locks and Keys - Short and Long",
-		{ LongLockKey, ShortLockKey },
-		Cyclic::GoalType::KillTarget
+		"Two Locks and Keys - ShortLong",
+		{ std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey), std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey) },
+		Cyclic::GoalType::SecretDocuments
 	});
 
 	RuleRepository.Add({
-		"MiniBossOrTrap - Short and Short",
-		{ ShortTraps, ShortMiniBoss },
+		"MiniBossTrap - ShortShort",
+		{ std::make_unique<Cyclic::CyclicInsertionPoint>(ShortTraps), std::make_unique<Cyclic::CyclicInsertionPoint>(ShortMiniBoss) },
 		Cyclic::GoalType::Treasure | Cyclic::GoalType::SecretDocuments,
-	});*/
+	});
+
+	auto SelectedRule = RuleRepository.GetRandomRule();
+
+	App.Run();
 
 	return 0;
 }

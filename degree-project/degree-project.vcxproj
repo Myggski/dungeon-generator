@@ -157,6 +157,7 @@
     <ClInclude Include="src\Application\Renderer.h" />
     <ClInclude Include="src\Application\Timer.h" />
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
+    <ClInclude Include="src\LevelGeneration\CyclicGraph.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h" />

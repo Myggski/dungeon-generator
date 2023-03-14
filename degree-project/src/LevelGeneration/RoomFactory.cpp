@@ -10,7 +10,7 @@ namespace LevelGeneration
 	{
 		for (int Index = 0; Index < NumberOfFragments; Index++)
 		{
-			Command::CommandStack::GetInstance()->ExecuteCommand(std::make_unique<Command::AddRoomFragmentCommand>(Room));
+			Command::CommandStack::GetInstance().ExecuteCommand(std::make_unique<Command::AddRoomFragmentCommand>(Room));
 		}
 	}
 

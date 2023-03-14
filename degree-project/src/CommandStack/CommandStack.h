@@ -10,8 +10,7 @@ namespace Command
 	{
 	public:
 		static void CreateInstance(int NumberOfCommandsToReserve);
-		static CommandStack* GetInstance();
-		static void DestroyInstance();
+		static CommandStack& GetInstance();
 		void ExecuteCommand(std::unique_ptr<Command> Command);
 		void Undo();
 		bool IsEmpty() const;
@@ -20,7 +19,7 @@ namespace Command
 		CommandStack(int NumberOfCommandsToReserve);
 
 	private:
-		static CommandStack* StackInstance;
+		static std::unique_ptr<CommandStack> StackInstance;
 		std::vector<std::unique_ptr<Command>> Commands;
 		int CurrentIndex;
 	};

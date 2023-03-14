@@ -13,18 +13,14 @@ namespace Utils
 			std::is_integral_v<T>,
 			std::uniform_int_distribution<T>,
 			void
-			>
-        >;
+		>
+    >;
 
     class RandomGenerator
     {
     public:
-        static RandomGenerator& GetInstance()
-        {
-            static RandomGenerator Instance;
-            return Instance;
-        }
-        
+        static void CreateInstance();
+        static RandomGenerator& GetInstance();
         uint32_t GetSeed() const;
         void SetSeed(uint32_t NewSeed);
         void RandomizeSeed();
@@ -38,6 +34,7 @@ namespace Utils
         RandomGenerator();
 
     private:
+        static std::unique_ptr<RandomGenerator> Instance;
         uint32_t Seed;
         std::mt19937 RandomEngine;
     };
