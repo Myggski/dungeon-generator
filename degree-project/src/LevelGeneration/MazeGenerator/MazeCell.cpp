@@ -2,33 +2,33 @@
 
 namespace MazeGenerator
 {
+	MazeCell::MazeCell()
+		: Position({ -1, -1 }),
+		  EntranceFlag(DirectionType::None),
+	      bHasBeenVisited(false) { }
+
 	MazeCell::MazeCell(SDL_Point Position)
 		: Position(Position),
-		bIsRoom(false),
-		bHasBeenVisited(false) { }
+	      EntranceFlag(DirectionType::None),
+		  bHasBeenVisited(false) { }
 
-	void MazeCell::SetToRoom()
+	void MazeCell::CarveEntrance(DirectionType Direction)
 	{
-		bIsRoom = true;
+		EntranceFlag = (EntranceFlag | Direction);
 	}
 
-	void MazeCell::SetToWall()
+	void MazeCell::SetVisited(bool bVisited)
 	{
-		bIsRoom = false;
-	}
-
-	void MazeCell::SetToVisited()
-	{
-		bHasBeenVisited = true;
-	}
-
-	bool MazeCell::IsRoom() const
-	{
-		return bIsRoom;
+		bHasBeenVisited = bVisited;
 	}
 
 	bool MazeCell::IsVisited() const
 	{
 		return bHasBeenVisited;
+	}
+
+	DirectionType MazeCell::GetEntranceFlag() const
+	{
+		return EntranceFlag;
 	}
 }

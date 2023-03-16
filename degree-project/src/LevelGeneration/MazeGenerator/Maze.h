@@ -1,88 +1,187 @@
 #pragma once
-#include <array>
-#include <optional>
 #include <SDL_rect.h>
+#include <stack>
+#include <unordered_map>
 
 #include "MazeCell.h"
 #include "utils/RandomGenerator.h"
+#include "DirectionType.h"
 
 namespace MazeGenerator
 {
-	template<size_t Width, size_t Height>
+
+
+    const std::unordered_map<DirectionType, DirectionType> OppositeDirection
+    {
+        { DirectionType::North, DirectionType::South },
+        { DirectionType::East, DirectionType::West },
+        { DirectionType::South, DirectionType::North },
+        { DirectionType::West, DirectionType::East },
+    };
+
+    const std::unordered_map<DirectionType, int> DirectionX
+    {
+        { DirectionType::North, 0 },
+        { DirectionType::East, 1 },
+        { DirectionType::South, 0 },
+        { DirectionType::West, -1 },
+    };
+
+    const std::unordered_map<DirectionType, int> DirectionY
+    {
+        { DirectionType::North, -1 },
+        { DirectionType::East, 0 },
+        { DirectionType::South, 1 },
+        { DirectionType::West, 0 },
+    };
+
 	class Maze
 	{
 	public:
-		Maze() { }
+        Maze(int Width, int Height) : Width(Width), Height(Height), CurrentCell(nullptr)
+        {
+            Grid = std::vector<std::vector<MazeCell>>();
+            Grid.resize(Width);
 
-		void Generate()
-		{
-            SDL_Point CurrentCellPosition = GetRandomStartPosition();
-            std::vector<SDL_Point> Visited;
-            Visited.push_back(CurrentCellPosition);
+	        for (int GridX = 0; GridX < Width; GridX++)
+	        {
+                Grid[GridX].resize(Height);
 
-            while (Visited.size() < Width * Height) {
-                std::vector<SDL_Point> UnvisitedNeighbors = GetUnvisitedNeighbors(CurrentCellPosition);
+                for (int GridY = 0; GridY < Height; GridY++)
+                {
+                    Grid[GridX][GridY] = MazeCell(SDL_Point{GridX, GridY});
+                }
+	        }
 
-                if (!UnvisitedNeighbors.empty()) {
-                    // Pick a random unvisited neighbor
-                    SDL_Point NextCellPosition = UnvisitedNeighbors[Utils::RandomGenerator::GetRandom<int>(0, UnvisitedNeighbors.size() - 1)];
+            CurrentCell = &GetRandomStartCell();
+            CurrentCell->SetVisited(true);
+
+            VisitedStack.push(CurrentCell);
+        }
+
+        std::vector<std::vector<MazeCell>> GetGrid()
+        {
+            return Grid;
+        }
+
+        MazeCell& GetCurrent()
+        {
+            return *CurrentCell;
+        }
+
+        void CarvePassage()
+        {
+            if (VisitedStack.empty())
+            {
+                return;
+            }
+
+            const DirectionType RandomDirection = GetRandomDirection();
+
+            if (RandomDirection != DirectionType::None)
+            {
+                const int NeighborX = CurrentCell->GetPosition().x + DirectionX.at(RandomDirection);
+                const int NeighborY = CurrentCell->GetPosition().y + DirectionY.at(RandomDirection);
+                MazeCell* NeighborCell = &Grid[NeighborX][NeighborY];
+
+                CurrentCell->CarveEntrance(RandomDirection);
+
+                NeighborCell->SetVisited(true);
+                NeighborCell->CarveEntrance(OppositeDirection.at(RandomDirection));
+
+                CurrentCell = NeighborCell;
+                VisitedStack.push(CurrentCell);
+            } else
+            {
+                VisitedStack.pop();
+
+                if (!VisitedStack.empty())
+                {
+                    CurrentCell = VisitedStack.top();
                 }
             }
-		}
+        }
 
 	private:
-        SDL_Point GetRandomStartPosition()
+        DirectionType GetDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell) const
         {
-            const int GridSide = Utils::RandomGenerator::GetRandom<int>(0, 3);
+            const int DirectionX = NeighborCell.GetPosition().x - CurrentCell.GetPosition().x;
 
-            switch (GridSide) {
-            case 0: // Top side
-                return { Utils::RandomGenerator::GetRandom<int>(0, Width - 1), 0 };
-            case 1: // Right side
-                return { Width - 1,Utils::RandomGenerator::GetRandom<int>(0, Height - 1) };
-            case 2: // Bottom side
-                return { Utils::RandomGenerator::GetRandom<int>(0, Width - 1), Height - 1 };
-            case 3: // Left side
+            if (DirectionX != 0)
+            {
+                return DirectionX < 0
+            		? DirectionType::West
+            		: DirectionType::East;
+            }
+
+            return NeighborCell.GetPosition().y - CurrentCell.GetPosition().y < 0
+        		? DirectionType::North
+        		: DirectionType::South;
+        }
+
+        MazeCell& GetRandomStartCell()
+        {
+            // Which side of the grid should the start position be
+            const DirectionType GridStartSide = static_cast<DirectionType>(Utils::RandomGenerator::GetInstance().GetRandom<int>(0, 3));
+
+            switch (GridStartSide) {
+            case DirectionType::North:
+                return Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][0];
+            case DirectionType::East:
+                return Grid[Width - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
+            case DirectionType::South:
+                return Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][Height - 1];
+            case DirectionType::West:
             default:
-                return { 0,Utils::RandomGenerator::GetRandom<int>(0, Height - 1) };
+                return Grid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
             }
         }
 
-        // Returns a list of unvisited neighbors for the given cell
-        std::vector<SDL_Point> GetUnvisitedNeighbors(SDL_Point Cell) {
-            std::vector<SDL_Point> UnvisitedNeighbors;
-            UnvisitedNeighbors.reserve(4);
+        DirectionType GetRandomDirection()
+        {
+            std::array<DirectionType, 4> Directions =
+            {
+                DirectionType::North,
+                DirectionType::East,
+                DirectionType::South,
+                DirectionType::West
+            };
 
-            const MazeCell Top = Grid[Cell.x][Cell.y - 1];
-            const MazeCell Right = Grid[Cell.x + 1][Cell.y];
-            const MazeCell Bottom = Grid[Cell.x][Cell.y + 1];
-            const MazeCell Left = Grid[Cell.x - 1][Cell.y];
+            std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+            DirectionType RandomDirection = DirectionType::None;
 
-            // Check left
-            if (Cell.x > 0 && !Left.IsRoom() && !Left.IsVisited()) {
-                UnvisitedNeighbors.emplace_back(Left.GetPosition());
+            for (const auto& CurrentDirection : Directions)
+            {
+                const int NeighborX = CurrentCell->GetPosition().x + DirectionX.at(CurrentDirection);
+                const int NeighborY = CurrentCell->GetPosition().y + DirectionY.at(CurrentDirection);
+
+                if (IsOutOfBound(NeighborX, NeighborY))
+                {
+                    continue;
+                }
+
+                if (Grid[NeighborX][NeighborY].IsVisited())
+                {
+	                continue;
+                }
+
+                RandomDirection = CurrentDirection;
             }
 
-            // Check right
-            if (Cell.x < Width - 1 && !Right.IsRoom() && !Right.IsVisited()) {
-                UnvisitedNeighbors.emplace_back(Right.GetPosition());
-            }
+            return RandomDirection;
+        }
 
-            // Check up
-            if (Cell.y > 0 && !Top.IsRoom() && !Top.IsVisited()) {
-                UnvisitedNeighbors.emplace_back(Top.GetPosition());
-            }
-
-            // Check down
-            if (Cell.y < Height - 1 && !Bottom.IsRoom() && !Bottom.IsVisited()) {
-                UnvisitedNeighbors.emplace_back(Bottom.GetPosition());
-            }
-
-            return UnvisitedNeighbors;
+        bool IsOutOfBound(int PositionX, int PositionY) const
+        {
+            return (PositionX < 0 || PositionX > Width - 1) || (PositionY < 0 || PositionY > Height - 1);
         }
 
 	private:
-		std::array<std::optional<MazeCell>> Grid[Width][Height];
+        int Width;
+        int Height;
+        MazeCell* CurrentCell;
+        std::vector<std::vector<MazeCell>> Grid;
+        std::stack<MazeCell*> VisitedStack;
 
 	};
 }

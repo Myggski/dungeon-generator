@@ -137,9 +137,54 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\floor.png">
+    <Image Include="resources\0.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\2.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\3.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\4.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\5.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\6.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\8.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\9.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\10.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\12.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\7.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\11.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\13.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\14.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

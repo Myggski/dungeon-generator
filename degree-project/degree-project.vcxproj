@@ -163,6 +163,7 @@
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h" />
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />
     <ClInclude Include="src\LevelGeneration\Room.h" />
@@ -175,7 +176,21 @@
     <ClInclude Include="src\Utils\RandomGenerator.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="resources\floor.png" />
+    <Image Include="resources\0.png" />
+    <Image Include="resources\1.png" />
+    <Image Include="resources\10.png" />
+    <Image Include="resources\11.png" />
+    <Image Include="resources\12.png" />
+    <Image Include="resources\13.png" />
+    <Image Include="resources\14.png" />
+    <Image Include="resources\2.png" />
+    <Image Include="resources\3.png" />
+    <Image Include="resources\4.png" />
+    <Image Include="resources\5.png" />
+    <Image Include="resources\6.png" />
+    <Image Include="resources\7.png" />
+    <Image Include="resources\8.png" />
+    <Image Include="resources\9.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

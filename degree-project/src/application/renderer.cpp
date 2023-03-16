@@ -53,10 +53,10 @@ namespace Application
 	void Renderer::DrawRectangle(const SDL_Rect& Rect) const
 	{
 		SDL_Rect DrawRect{
-			Rect.x * 24,
-			Rect.y * 24,
-			Rect.w * 24,
-			Rect.h * 24,
+			Rect.x * 32,
+			Rect.y * 32,
+			Rect.w * 32,
+			Rect.h * 32,
 		};
 
 		SDL_RenderDrawRect(SDLRenderer, &DrawRect);

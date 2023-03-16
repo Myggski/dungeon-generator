@@ -33,6 +33,10 @@ namespace Utils
         return *Instance;
     }
 
+    std::mt19937& RandomGenerator::GetEngine()
+    {
+        return RandomEngine;
+    }
 
     uint32_t RandomGenerator::GetSeed() const
     {

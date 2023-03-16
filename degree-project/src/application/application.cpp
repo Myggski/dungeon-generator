@@ -5,6 +5,8 @@
 
 #include "LevelGeneration/RoomFactory.h"
 #include "CommandStack/CommandStack.h"
+#include "LevelGeneration/MazeGenerator/DirectionType.h"
+#include "LevelGeneration/MazeGenerator/Maze.h"
 #include "utils/RandomGenerator.h"
 
 namespace Application
@@ -56,6 +58,9 @@ namespace Application
 		bIsRunning = true;
 		Time.Init();
 
+		MazeGenerator::Maze Maze{ 6, 6 };
+		
+
 		std::optional<LevelGeneration::Room> RoomXL;
 
 		while (bIsRunning)
@@ -67,7 +72,8 @@ namespace Application
 
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_SPACE))
 			{
-				RoomXL = LevelGeneration::RoomFactory::CreateRoom({ 23, 12 }, LevelGeneration::RoomType::Large);
+				//RoomXL = LevelGeneration::RoomFactory::CreateRoom({ 23, 12 }, LevelGeneration::RoomType::Large);
+				Maze.CarvePassage();
 			}
 
 			// Update logic
@@ -76,6 +82,34 @@ namespace Application
 				RoomXL.value().Draw(Renderer);
 			}
 
+			auto grid = Maze.GetGrid();
+
+			for (int x = 0; x < 6; x++)
+			{
+				for (int y = 0; y < 6; y++)
+				{
+					DirectionType flags = grid[x][y].GetEntranceFlag();
+					int a = static_cast<int>(grid[x][y].GetEntranceFlag());
+
+					SDL_Rect TextureRect{
+							x * 32,
+							y * 32,
+							32,
+							32
+					};
+
+					if (grid[x][y].GetEntranceFlag() != DirectionType::None || Maze.GetCurrent().GetPosition().x == x && Maze.GetCurrent().GetPosition().y == y)
+					{
+						auto* image = Maze.GetCurrent().GetPosition().x == x && Maze.GetCurrent().GetPosition().y == y ? Renderer.GetImage("resources/" + std::to_string(0) + ".png") : Renderer.GetImage("resources/" + std::to_string(static_cast<int>(flags)) + ".png");
+						Renderer.DrawTexture(image, TextureRect, 0);
+					}
+					
+
+				}
+			}
+
+			Renderer.SetDrawColor(0, 0, 0);
+			Renderer.DrawRectangle({ 0, 0, 6, 6 });
 			Renderer.DrawCanvas();
 		}
 

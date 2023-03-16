@@ -21,6 +21,7 @@ namespace Utils
     public:
         static void CreateInstance();
         static RandomGenerator& GetInstance();
+        std::mt19937& GetEngine();
         uint32_t GetSeed() const;
         void SetSeed(uint32_t NewSeed);
         void RandomizeSeed();

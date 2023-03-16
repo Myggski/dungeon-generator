@@ -15,9 +15,9 @@ namespace Cyclic
 
 	enum class GoalType : uint8_t
 	{
-		Treasure = 0x00,
-		SecretDocuments = 0x01,
-		KillTarget = 0x02,
+		Treasure = 1 << 0,
+		SecretDocuments = 1 << 1,
+		KillTarget = 1 << 2,
 	};
 
 	inline GoalType operator|(GoalType lhs, GoalType rhs)
