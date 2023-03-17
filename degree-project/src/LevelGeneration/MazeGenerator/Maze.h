@@ -1,8 +1,11 @@
 #pragma once
+#include <bitset>
 #include <iostream>
 #include <SDL_rect.h>
+#include <set>
 #include <stack>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "MazeCell.h"
 #include "utils/RandomGenerator.h"
