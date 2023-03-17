@@ -183,6 +183,7 @@
     <Image Include="resources\12.png" />
     <Image Include="resources\13.png" />
     <Image Include="resources\14.png" />
+    <Image Include="resources\15.png" />
     <Image Include="resources\2.png" />
     <Image Include="resources\3.png" />
     <Image Include="resources\4.png" />
@@ -191,6 +192,7 @@
     <Image Include="resources\7.png" />
     <Image Include="resources\8.png" />
     <Image Include="resources\9.png" />
+    <Image Include="resources\goal.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

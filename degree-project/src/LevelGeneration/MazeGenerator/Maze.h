@@ -1,4 +1,5 @@
 #pragma once
+#include <iostream>
 #include <SDL_rect.h>
 #include <stack>
 #include <unordered_map>
@@ -9,8 +10,6 @@
 
 namespace MazeGenerator
 {
-
-
     const std::unordered_map<DirectionType, DirectionType> OppositeDirection
     {
         { DirectionType::North, DirectionType::South },
@@ -19,7 +18,7 @@ namespace MazeGenerator
         { DirectionType::West, DirectionType::East },
     };
 
-    const std::unordered_map<DirectionType, int> DirectionX
+    const std::unordered_map<DirectionType, int> DirectionToGridStepX
     {
         { DirectionType::North, 0 },
         { DirectionType::East, 1 },
@@ -27,7 +26,7 @@ namespace MazeGenerator
         { DirectionType::West, -1 },
     };
 
-    const std::unordered_map<DirectionType, int> DirectionY
+    const std::unordered_map<DirectionType, int> DirectionToGridStepY
     {
         { DirectionType::North, -1 },
         { DirectionType::East, 0 },
@@ -38,25 +37,32 @@ namespace MazeGenerator
 	class Maze
 	{
 	public:
-        Maze(int Width, int Height) : Width(Width), Height(Height), CurrentCell(nullptr)
+        Maze(int Width, int Height)
+			: Width(Width),
+			Height(Height),
+			bGoalHasBeenReached(false),
+			CurrentCell(nullptr),
+			StartCell(nullptr),
+			GoalCell(nullptr)
         {
-            Grid = std::vector<std::vector<MazeCell>>();
-            Grid.resize(Width);
+	        Grid.resize(Width);
 
 	        for (int GridX = 0; GridX < Width; GridX++)
 	        {
-                Grid[GridX].resize(Height);
+		        Grid[GridX].resize(Height);
 
-                for (int GridY = 0; GridY < Height; GridY++)
-                {
-                    Grid[GridX][GridY] = MazeCell(SDL_Point{GridX, GridY});
-                }
+		        for (int GridY = 0; GridY < Height; GridY++)
+		        {
+			        Grid[GridX][GridY] = MazeCell(SDL_Point{GridX, GridY});
+		        }
 	        }
 
-            CurrentCell = &GetRandomStartCell();
-            CurrentCell->SetVisited(true);
+	        SetStartAndGoalCells();
 
-            VisitedStack.push(CurrentCell);
+	        CurrentCell = StartCell;
+	        CurrentCell->SetVisited(true);
+            
+	        VisitedStack.push(CurrentCell);
         }
 
         std::vector<std::vector<MazeCell>> GetGrid()
@@ -64,80 +70,132 @@ namespace MazeGenerator
             return Grid;
         }
 
-        MazeCell& GetCurrent()
+        MazeCell& GetCurrentCell() const
         {
             return *CurrentCell;
         }
 
-        void CarvePassage()
+        MazeCell& GetStartCell() const
+        {
+            return *StartCell;
+        }
+
+        MazeCell& GetGoalCell() const
+        {
+            return *GoalCell;
+        }
+
+        void CarveCellPassage()
         {
             if (VisitedStack.empty())
             {
                 return;
             }
 
-            const DirectionType RandomDirection = GetRandomDirection();
+            const DirectionType AvailableDirection = GetAvailableRandomDirection();
 
-            if (RandomDirection != DirectionType::None)
+            // If there are any neighboring maze cells left that are unvisited
+            if (AvailableDirection != DirectionType::None && !bGoalHasBeenReached)
             {
-                const int NeighborX = CurrentCell->GetPosition().x + DirectionX.at(RandomDirection);
-                const int NeighborY = CurrentCell->GetPosition().y + DirectionY.at(RandomDirection);
+                const int NeighborX = CurrentCell->GetPosition().x + DirectionToGridStepX.at(AvailableDirection);
+                const int NeighborY = CurrentCell->GetPosition().y + DirectionToGridStepY.at(AvailableDirection);
                 MazeCell* NeighborCell = &Grid[NeighborX][NeighborY];
 
-                CurrentCell->CarveEntrance(RandomDirection);
+                CurrentCell->CarveEntrance(AvailableDirection);
 
                 NeighborCell->SetVisited(true);
-                NeighborCell->CarveEntrance(OppositeDirection.at(RandomDirection));
+                NeighborCell->CarveEntrance(OppositeDirection.at(AvailableDirection));
 
                 CurrentCell = NeighborCell;
                 VisitedStack.push(CurrentCell);
-            } else
+
+                std::cout << "Total steps: " << VisitedStack.size() << " StepsX: " << abs(CurrentCell->GetPosition().x - GoalCell->GetPosition().x) << " StepsY: " << abs(CurrentCell->GetPosition().y - GoalCell->GetPosition().y) << "\n";
+
+                if (CurrentCell == GoalCell)
+                {
+                    bGoalHasBeenReached = true;
+				}
+
+                return;
+            }
+
+            if (!VisitedStack.empty())
             {
+                if (bGoalHasBeenReached)
+                {
+                Pathway.push_back(VisitedStack.top());
+                }
+
                 VisitedStack.pop();
 
                 if (!VisitedStack.empty())
-                {
+            {
                     CurrentCell = VisitedStack.top();
                 }
             }
         }
 
+        std::vector<MazeCell*> GetPathway()
+        {
+            return Pathway;
+        }
+
 	private:
-        DirectionType GetDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell) const
+        std::pair<DirectionType, DirectionType> GetCellDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell)
         {
             const int DirectionX = NeighborCell.GetPosition().x - CurrentCell.GetPosition().x;
+            const int DirectionY = NeighborCell.GetPosition().y - CurrentCell.GetPosition().y < 0;
+
+            DirectionType DirectionHorisontal = DirectionType::None;
+            DirectionType DirectionVertical = DirectionType::None;
 
             if (DirectionX != 0)
             {
-                return DirectionX < 0
+                DirectionHorisontal = DirectionX < 0
             		? DirectionType::West
             		: DirectionType::East;
             }
 
-            return NeighborCell.GetPosition().y - CurrentCell.GetPosition().y < 0
+            if (DirectionY != 0)
+				DirectionVertical =  DirectionY < 0
         		? DirectionType::North
         		: DirectionType::South;
+
+            return { DirectionHorisontal, DirectionVertical };
         }
 
-        MazeCell& GetRandomStartCell()
+        /*
+         * TODO: The goal should be dependent on the main rule.
+         * If there are any short paths, put the goal closer to the start
+         */
+        void SetStartAndGoalCells()
         {
             // Which side of the grid should the start position be
-            const DirectionType GridStartSide = static_cast<DirectionType>(Utils::RandomGenerator::GetInstance().GetRandom<int>(0, 3));
+            const DirectionType StartPositionDirection = GetRandomDirection();
 
-            switch (GridStartSide) {
+            StartCell = GetRandomEdgeCell(StartPositionDirection);
+            GoalCell = GetRandomEdgeCell(OppositeDirection.at(StartPositionDirection));
+        }
+
+        // Get random maze cell from the edge of the grid
+        MazeCell* GetRandomEdgeCell(DirectionType Direction)
+        {
+            switch (Direction)
+            {
             case DirectionType::North:
-                return Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][0];
+                return &Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][0];
             case DirectionType::East:
-                return Grid[Width - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
+                return &Grid[Width - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
+                break;
             case DirectionType::South:
-                return Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][Height - 1];
+                return &Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Width - 1)][Height - 1];
             case DirectionType::West:
             default:
-                return Grid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
+                return &Grid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, Height - 1)];
             }
         }
 
-        DirectionType GetRandomDirection()
+        std::array<DirectionType, 4> GetRandomDirections() const
         {
             std::array<DirectionType, 4> Directions =
             {
@@ -148,12 +206,24 @@ namespace MazeGenerator
             };
 
             std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+            return Directions;
+        }
+
+        DirectionType GetRandomDirection() const
+        {
+            return GetRandomDirections()[0];
+        }
+
+        DirectionType GetAvailableRandomDirection() const
+        {
+	        const std::array<DirectionType, 4> Directions = GetRandomDirections();
             DirectionType RandomDirection = DirectionType::None;
 
             for (const auto& CurrentDirection : Directions)
             {
-                const int NeighborX = CurrentCell->GetPosition().x + DirectionX.at(CurrentDirection);
-                const int NeighborY = CurrentCell->GetPosition().y + DirectionY.at(CurrentDirection);
+                const int NeighborX = CurrentCell->GetPosition().x + DirectionToGridStepX.at(CurrentDirection);
+                const int NeighborY = CurrentCell->GetPosition().y + DirectionToGridStepY.at(CurrentDirection);
 
                 if (IsOutOfBound(NeighborX, NeighborY))
                 {
@@ -169,7 +239,7 @@ namespace MazeGenerator
             }
 
             return RandomDirection;
-        }
+        }  
 
         bool IsOutOfBound(int PositionX, int PositionY) const
         {
@@ -179,9 +249,13 @@ namespace MazeGenerator
 	private:
         int Width;
         int Height;
+        bool bGoalHasBeenReached;
         MazeCell* CurrentCell;
+        MazeCell* StartCell;
+        MazeCell* GoalCell;
         std::vector<std::vector<MazeCell>> Grid;
         std::stack<MazeCell*> VisitedStack;
+        std::vector<MazeCell*> Pathway;
 
 	};
 }

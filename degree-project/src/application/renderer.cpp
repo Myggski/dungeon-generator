@@ -32,6 +32,7 @@ namespace Application
 			static_cast<float>(ImageRect.h),
 		};
 		SDL_RenderCopyExF(SDLRenderer, Texture, nullptr, &Rect, Angle, &Center, SDL_FLIP_NONE);
+		SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
 	}
 
 	void Renderer::DrawCanvas() const

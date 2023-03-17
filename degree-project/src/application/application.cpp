@@ -57,8 +57,10 @@ namespace Application
 	{
 		bIsRunning = true;
 		Time.Init();
+		const int GridSizeX = 7;
+		const int GridSizeY = 5;
 
-		MazeGenerator::Maze Maze{ 6, 6 };
+		MazeGenerator::Maze Maze{ GridSizeX, GridSizeY };
 		
 
 		std::optional<LevelGeneration::Room> RoomXL;
@@ -73,7 +75,12 @@ namespace Application
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_SPACE))
 			{
 				//RoomXL = LevelGeneration::RoomFactory::CreateRoom({ 23, 12 }, LevelGeneration::RoomType::Large);
-				Maze.CarvePassage();
+				Maze.CarveCellPassage();
+			}
+
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_R))
+			{
+				Maze = { GridSizeX, GridSizeY };
 			}
 
 			// Update logic
@@ -84,9 +91,9 @@ namespace Application
 
 			auto grid = Maze.GetGrid();
 
-			for (int x = 0; x < 6; x++)
+			for (int x = 0; x < GridSizeX; x++)
 			{
-				for (int y = 0; y < 6; y++)
+				for (int y = 0; y < GridSizeY; y++)
 				{
 					DirectionType flags = grid[x][y].GetEntranceFlag();
 					int a = static_cast<int>(grid[x][y].GetEntranceFlag());
@@ -98,18 +105,56 @@ namespace Application
 							32
 					};
 
-					if (grid[x][y].GetEntranceFlag() != DirectionType::None || Maze.GetCurrent().GetPosition().x == x && Maze.GetCurrent().GetPosition().y == y)
+					if (grid[x][y].GetEntranceFlag() != DirectionType::None)
 					{
-						auto* image = Maze.GetCurrent().GetPosition().x == x && Maze.GetCurrent().GetPosition().y == y ? Renderer.GetImage("resources/" + std::to_string(0) + ".png") : Renderer.GetImage("resources/" + std::to_string(static_cast<int>(flags)) + ".png");
+						auto* image = Renderer.GetImage("resources/" + std::to_string(static_cast<int>(flags)) + ".png");
 						Renderer.DrawTexture(image, TextureRect, 0);
 					}
-					
 
+					if (Maze.GetCurrentCell().GetPosition().x == x && Maze.GetCurrentCell().GetPosition().y == y)
+					{
+						auto* image = Renderer.GetImage("resources/" + std::to_string(0) + ".png");
+						Renderer.DrawTexture(image, TextureRect, 0);
+					}
+
+					if (Maze.GetStartCell().GetPosition().x == x && Maze.GetStartCell().GetPosition().y == y)
+					{
+						auto* image = Renderer.GetImage("resources/start.png");
+						Renderer.DrawTexture(image, TextureRect, 0);
+					}
+
+					if (Maze.GetGoalCell().GetPosition().x == x && Maze.GetGoalCell().GetPosition().y == y)
+					{
+						auto* image = Renderer.GetImage("resources/goal.png");
+						Renderer.DrawTexture(image, TextureRect, 0);
+					}
+				}
+			}
+
+			if (!Maze.GetPathway().empty())
+			{
+				for (auto* maze : Maze.GetPathway())
+				{
+					SDL_Rect TextureRect{
+						maze->GetPosition().x * 32,
+						maze->GetPosition().y * 32,
+						32,
+						32
+					};
+
+					auto* image = Renderer.GetImage("resources/visited.png");
+					Renderer.DrawTexture(image, TextureRect, 0);
+
+					if (Maze.GetGoalCell().GetPosition().x == maze->GetPosition().x && Maze.GetGoalCell().GetPosition().y == maze->GetPosition().y)
+					{
+						auto* image = Renderer.GetImage("resources/goal.png");
+						Renderer.DrawTexture(image, TextureRect, 0);
+					}
 				}
 			}
 
 			Renderer.SetDrawColor(0, 0, 0);
-			Renderer.DrawRectangle({ 0, 0, 6, 6 });
+			Renderer.DrawRectangle({ 0, 0, GridSizeX, GridSizeY });
 			Renderer.DrawCanvas();
 		}
 
