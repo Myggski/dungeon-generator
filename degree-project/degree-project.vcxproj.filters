@@ -72,6 +72,9 @@
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

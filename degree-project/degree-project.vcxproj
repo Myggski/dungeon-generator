@@ -141,6 +141,7 @@
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp" />
+    <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp" />
     <ClCompile Include="src\LevelGeneration\Room.cpp" />
     <ClCompile Include="src\LevelGeneration\RoomFactory.cpp" />
     <ClCompile Include="src\LevelGeneration\RoomFragment.cpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h" />
     <ClInclude Include="src\LevelGeneration\Room.h" />
     <ClInclude Include="src\LevelGeneration\RoomFactory.h" />
     <ClInclude Include="src\LevelGeneration\RoomFragment.h" />

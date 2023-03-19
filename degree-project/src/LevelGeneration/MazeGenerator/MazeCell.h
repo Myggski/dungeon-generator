@@ -9,6 +9,11 @@ namespace MazeGenerator
 	public:
 		MazeCell();
 		MazeCell(SDL_Point Position);
+		bool operator==(const MazeCell& other)
+		{
+			return Position.x == other.Position.x
+				&& Position.y == other.Position.y;
+		}
 
 		inline SDL_Point GetPosition() const
 		{
