@@ -75,6 +75,18 @@
     <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelGeneration\MazeGenerator\Maze.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommandData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -146,6 +158,18 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Application\Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\NavigationalDirections.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommandData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\0.png">
@@ -199,5 +223,14 @@
     <Image Include="resources\15.png">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="resources\start.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\visited.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\Silver.ttf" />
   </ItemGroup>
 </Project>

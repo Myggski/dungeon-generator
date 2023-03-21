@@ -21,6 +21,7 @@ namespace MazeGenerator
 		}
 
 		void CarveEntrance(DirectionType Direction);
+		void CollapseEntrance(DirectionType Direction);
 		void SetVisited(bool bVisited);
 		bool IsVisited() const;
 		DirectionType GetEntranceFlag() const;

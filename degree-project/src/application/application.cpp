@@ -8,6 +8,7 @@
 #include "LevelGeneration/MazeGenerator/DirectionType.h"
 #include "LevelGeneration/MazeGenerator/Maze.h"
 #include "utils/RandomGenerator.h"
+#include "Application/Font.h"
 
 namespace Application
 {
@@ -47,10 +48,13 @@ namespace Application
 
 		Utils::RandomGenerator::CreateInstance();
 		Command::CommandStack::CreateInstance(10000);
-
+		Font::CreateInstance(Renderer);
+		
 		Events.AddListener(SDL_QUIT, &ExitApplication);
 		Events.AddListener(SDL_KEYDOWN, &OnKeyDown);
 		Events.AddListener(SDL_KEYUP, &OnKeyReleased);
+
+		Font::GetInstance().Load("Default", "resources/fonts/Silver.ttf", 32);
 	}
 
 	void Application::Run()
@@ -61,7 +65,6 @@ namespace Application
 		const int GridSizeY = 5;
 
 		MazeGenerator::Maze Maze{ GridSizeX, GridSizeY };
-		
 
 		std::optional<LevelGeneration::Room> RoomXL;
 
@@ -78,8 +81,20 @@ namespace Application
 				Maze.CarveCellPassage();
 			}
 
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_LEFT))
+			{
+				Command::CommandStack::GetInstance().Undo();
+			}
+
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_RIGHT))
+			{
+				Command::CommandStack::GetInstance().Redo();
+			}
+
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_R))
 			{
+				Command::CommandStack::GetInstance().Clear();
+				Utils::RandomGenerator::GetInstance().RandomizeSeed();
 				Maze = { GridSizeX, GridSizeY };
 			}
 
@@ -152,6 +167,8 @@ namespace Application
 					}
 				}
 			}
+
+			Maze.DrawDebugText();
 
 			Renderer.SetDrawColor(0, 0, 0);
 			Renderer.DrawRectangle({ 0, 0, GridSizeX, GridSizeY });

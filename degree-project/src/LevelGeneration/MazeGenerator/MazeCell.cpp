@@ -17,6 +17,11 @@ namespace MazeGenerator
 		EntranceFlag = (EntranceFlag | Direction);
 	}
 
+	void MazeCell::CollapseEntrance(DirectionType Direction)
+	{
+		EntranceFlag = (EntranceFlag & ~Direction);
+	}
+
 	void MazeCell::SetVisited(bool bVisited)
 	{
 		bHasBeenVisited = bVisited;

@@ -104,14 +104,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;$(SolutionDir)\external\SDL2_image\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;$(SolutionDir)\external\SDL2_ttf\include;$(SolutionDir)\external\SDL2_image\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SolutionDir)\external\SDL2_image\lib\x64;$(SolutionDir)\external\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\SDL2_image\lib\x64;$(SolutionDir)\external\SDL2_ttf\lib\x64;$(SolutionDir)\external\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -133,13 +133,17 @@
   <ItemGroup>
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\Events.cpp" />
+    <ClCompile Include="src\Application\Font.cpp" />
     <ClCompile Include="src\Application\Keyboard.cpp" />
     <ClCompile Include="src\Application\Renderer.cpp" />
     <ClCompile Include="src\Application\Timer.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommand.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommandData.cpp" />
     <ClCompile Include="src\CommandStack\Commands\CreateRoomCommand.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp" />
+    <ClCompile Include="src\LevelGeneration\MazeGenerator\Maze.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp" />
     <ClCompile Include="src\LevelGeneration\Room.cpp" />
@@ -155,9 +159,12 @@
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\Events.h" />
+    <ClInclude Include="src\Application\Font.h" />
     <ClInclude Include="src\Application\Keyboard.h" />
     <ClInclude Include="src\Application\Renderer.h" />
     <ClInclude Include="src\Application\Timer.h" />
+    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommand.h" />
+    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommandData.h" />
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
     <ClInclude Include="src\LevelGeneration\CyclicGraph.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h" />
@@ -168,6 +175,7 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h" />
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\NavigationalDirections.h" />
     <ClInclude Include="src\LevelGeneration\Room.h" />
     <ClInclude Include="src\LevelGeneration\RoomFactory.h" />
     <ClInclude Include="src\LevelGeneration\RoomFragment.h" />
@@ -195,6 +203,11 @@
     <Image Include="resources\8.png" />
     <Image Include="resources\9.png" />
     <Image Include="resources\goal.png" />
+    <Image Include="resources\start.png" />
+    <Image Include="resources\visited.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="resources\fonts\Silver.ttf" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,4 +1,6 @@
-#include "DirectionType.h"
+#pragma once
+
+#include "NavigationalDirections.h"
 
 namespace MazeGenerator
 {
@@ -13,7 +15,6 @@ namespace MazeGenerator
         int StepsToGoalY;
         int MinSteps;
         int MaxSteps;
-        DirectionType DirectionToGoalX;
-        DirectionType DirectionToGoalY;
+        NavigationalDirections DirectionsToGoal;
     };
 }

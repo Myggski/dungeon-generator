@@ -7,6 +7,8 @@
 
 namespace Application
 {
+	class Font;
+
 	class Renderer
 	{
 	public:
@@ -22,5 +24,7 @@ namespace Application
 	private:
 		SDL_Renderer* SDLRenderer = nullptr;
 		std::unordered_map<std::string, SDL_Texture*> Textures;
+
+		friend class Font;
 	};
 }

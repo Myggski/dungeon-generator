@@ -19,3 +19,8 @@ inline DirectionType operator&(DirectionType lhs, DirectionType rhs)
 {
     return static_cast<DirectionType>(static_cast<uint8_t>(lhs) & static_cast<uint8_t>(rhs));
 }
+
+inline DirectionType operator~(const DirectionType& value)
+{
+    return static_cast<DirectionType>(~static_cast<int>(value));
+}

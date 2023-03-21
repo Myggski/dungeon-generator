@@ -43,12 +43,26 @@ namespace Command
 
 	void CommandStack::Undo()
 	{
-		if (IsEmpty())
+ 		if (IsEmpty())
 		{
 			return;
 		}
 
 		Commands[CurrentIndex--]->Undo();
+	}
+
+	void CommandStack::Redo()
+	{
+		if (CurrentIndex < static_cast<int>(Commands.size() - 1))
+		{
+			Commands[++CurrentIndex]->Execute();
+		}
+	}
+
+	void CommandStack::Clear()
+	{
+		Commands.clear();
+		CurrentIndex = -1;
 	}
 
 	bool CommandStack::IsEmpty() const

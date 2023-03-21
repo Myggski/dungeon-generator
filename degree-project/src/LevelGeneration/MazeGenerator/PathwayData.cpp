@@ -8,6 +8,5 @@ namespace MazeGenerator
 		StepsToGoalY(0),
 		MinSteps(0),
 		MaxSteps(0),
-		DirectionToGoalX(DirectionType::None),
-		DirectionToGoalY(DirectionType::None) { }
+		DirectionsToGoal({ DirectionType::None, DirectionType::None }) { }
 }
