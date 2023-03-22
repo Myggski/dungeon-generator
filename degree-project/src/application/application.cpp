@@ -9,6 +9,10 @@
 #include "LevelGeneration/MazeGenerator/Maze.h"
 #include "utils/RandomGenerator.h"
 #include "Application/Font.h"
+#include "Application/Configuration.h"
+#include "imgui.h"
+#include "imgui_impl_sdl2.h"
+#include "imgui_impl_sdlrenderer.h"
 
 namespace Application
 {
@@ -38,8 +42,8 @@ namespace Application
 			"Degree Project",
 			SDL_WINDOWPOS_UNDEFINED,
 			SDL_WINDOWPOS_UNDEFINED,
-			1280,
-			720,
+			Configuration::WindowWidth,
+			Configuration::WindowHeight,
 			0
 		);
 
@@ -59,21 +63,27 @@ namespace Application
 
 	void Application::Run()
 	{
+		// Our state
+		bool show_demo_window = true;
+		bool show_another_window = false;
+		ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
 		bIsRunning = true;
 		Time.Init();
-		const int GridSizeX = 7;
-		const int GridSizeY = 5;
+		int GridSizeY = 6;
+		int GridSizeX = static_cast<int>(static_cast<float>(GridSizeY) * Configuration::GridAspectRatio);
 
+		Utils::RandomGenerator::GetInstance().RandomizeSeed();
 		MazeGenerator::Maze Maze{ GridSizeX, GridSizeY };
 
 		std::optional<LevelGeneration::Room> RoomXL;
 
 		while (bIsRunning)
 		{
-			Renderer.ClearCanvas();
-
 			Time.RefreshDT();
 			Events.Pull();
+
+			Renderer.ClearCanvas();
 
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_SPACE))
 			{
@@ -96,6 +106,34 @@ namespace Application
 				Command::CommandStack::GetInstance().Clear();
 				Utils::RandomGenerator::GetInstance().RandomizeSeed();
 				Maze = { GridSizeX, GridSizeY };
+			}
+
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_KP_PLUS))
+			{
+				if (GridSizeX < Configuration::MaxGridSize && GridSizeY < Configuration::MaxGridSize)
+				{
+					GridSizeX += 1;
+					GridSizeY += 1;
+
+					Command::CommandStack::GetInstance().Clear();
+					Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
+
+					Maze = { GridSizeX, GridSizeY };
+				}
+			}
+
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_KP_MINUS))
+			{
+				if (GridSizeX > Configuration::MinGridSize && GridSizeY > Configuration::MinGridSize)
+				{
+					GridSizeX -= 1;
+					GridSizeY -= 1;
+
+					Command::CommandStack::GetInstance().Clear();
+					Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
+
+					Maze = { GridSizeX, GridSizeY };
+				}
 			}
 
 			// Update logic
@@ -171,6 +209,23 @@ namespace Application
 			Maze.DrawDebugText();
 
 			Renderer.SetDrawColor(0, 0, 0);
+
+			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+			{
+				ImGui::SetNextWindowPos({ static_cast<float>(Configuration::WindowWidth - 160 - 16), static_cast<float>(Configuration::WindowHeight - 140 - 16) });
+				ImGui::SetNextWindowSize({ 160, 140 }, 0);
+				ImGui::Begin("Controls");
+
+				ImGui::Text("Step - [Space]");
+				ImGui::Text("Undo - [Left]");
+				ImGui::Text("Redo - [Right]");
+				ImGui::Text("Restart - [R]");
+				ImGui::Text("Shrink Grid - [-]");
+				ImGui::Text("Expand Grid - [+]");
+
+				ImGui::End();
+			}
+
 			Renderer.DrawRectangle({ 0, 0, GridSizeX, GridSizeY });
 			Renderer.DrawCanvas();
 		}
@@ -185,6 +240,10 @@ namespace Application
 
 		SDL_DestroyWindow(Window);
 		Window = nullptr;
+
+		ImGui_ImplSDLRenderer_Shutdown();
+		ImGui_ImplSDL2_Shutdown();
+		ImGui::DestroyContext();
 
 		SDL_Quit();
 	}

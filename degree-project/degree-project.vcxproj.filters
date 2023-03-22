@@ -81,10 +81,34 @@
     <ClCompile Include="src\Application\Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommand.cpp">
+    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommandData.cpp">
+    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdl2.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdlrenderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -164,11 +188,41 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\NavigationalDirections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommand.h">
+    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommandData.h">
+    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Application\Configuration.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imconfig.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imgui.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imgui_internal.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imstb_rectpack.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imstb_textedit.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\imstb_truetype.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\backends\imgui_impl_sdl2.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\external\Imgui\backends\imgui_impl_sdlrenderer.h">
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -227,6 +281,9 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\visited.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\controls.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

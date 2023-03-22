@@ -1,7 +1,5 @@
 #pragma once
 
-
-#include <queue>
 #include <stack>
 #include <unordered_map>
 
@@ -37,15 +35,14 @@ namespace MazeGenerator
         std::vector<MazeCell*> GetPathway();
 
 	private:
-        /// <summary>
-        /// Goes back in the maze cell stack of visited positions
-        /// </summary>
-        void BacktrackVisitedPath();
-
+        
         /// <summary>
         /// Flag that goal has been reached and preparing the pathway vector
         /// </summary>
         void SetGoalReached();
+
+        MazeCell* GetNeighborCell(MazeCell* From, DirectionType Direction);
+
 
         /// <summary>
         /// Trying to find available neighbors and create a path between current cell to neighbor cell

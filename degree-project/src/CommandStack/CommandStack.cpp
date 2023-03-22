@@ -59,6 +59,14 @@ namespace Command
 		}
 	}
 
+	void CommandStack::RedoAll()
+	{
+		while (CurrentIndex < static_cast<int>(Commands.size() - 1))
+		{
+			Commands[++CurrentIndex]->Execute();
+		}
+	}
+
 	void CommandStack::Clear()
 	{
 		Commands.clear();

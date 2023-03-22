@@ -1,5 +1,7 @@
 #include "Events.h"
 
+#include "imgui_impl_sdl2.h"
+
 namespace Application
 {
 	Events::Events() : RegisteredEvents(EventMap()) { }
@@ -8,6 +10,7 @@ namespace Application
 	{
 		SDL_Event Event;
 		while (SDL_PollEvent(&Event)) {
+			ImGui_ImplSDL2_ProcessEvent(&Event);
 			TriggerEvent(Event);
 		}
 	}

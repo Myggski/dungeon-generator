@@ -1,7 +1,5 @@
 #define SDL_MAIN_HANDLED
 
-#include <iostream>
-
 #include "Application/Application.h"
 #include "LevelGeneration/Cyclic/CyclicInsertionPoint.h"
 #include "LevelGeneration/Cyclic/CyclicRule.h"
@@ -13,7 +11,7 @@ int main(int argc, char* args[])
 	Application::Application App {  };
 	App.Init();
 
-	Cyclic::CyclicInsertionPoint LongLockKey{ Cyclic::ArcType::Long, Cyclic::InsertionType::LockKey };
+	/*Cyclic::CyclicInsertionPoint LongLockKey{ Cyclic::ArcType::Long, Cyclic::InsertionType::LockKey };
 	Cyclic::CyclicInsertionPoint ShortLockKey{ Cyclic::ArcType::Short, Cyclic::InsertionType::LockKey };
 	Cyclic::CyclicInsertionPoint ShortMiniBoss{ Cyclic::ArcType::Short, Cyclic::InsertionType::MiniBoss };
 	Cyclic::CyclicInsertionPoint ShortTraps{ Cyclic::ArcType::Short, Cyclic::InsertionType::Traps };
@@ -44,7 +42,7 @@ int main(int argc, char* args[])
 		Cyclic::GoalType::Treasure | Cyclic::GoalType::SecretDocuments,
 	});
 
-	auto SelectedRule = RuleRepository.GetRandomRule();
+	auto SelectedRule = RuleRepository.GetRandomRule();*/
 
 
 	App.Run();

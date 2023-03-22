@@ -104,7 +104,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;$(SolutionDir)\external\SDL2_ttf\include;$(SolutionDir)\external\SDL2_image\include;$(SolutionDir)\external\SDL2\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;$(SolutionDir)\external\SDL2_ttf\include;$(SolutionDir)\external\SDL2_image\include;$(SolutionDir)\external\SDL2\include;$(SolutionDir)\external\imgui\backends;$(SolutionDir)\external\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -131,14 +131,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdl2.cpp" />
+    <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdlrenderer.cpp" />
+    <ClCompile Include="..\external\Imgui\imgui.cpp" />
+    <ClCompile Include="..\external\Imgui\imgui_demo.cpp" />
+    <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
+    <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
+    <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\Events.cpp" />
     <ClCompile Include="src\Application\Font.cpp" />
     <ClCompile Include="src\Application\Keyboard.cpp" />
     <ClCompile Include="src\Application\Renderer.cpp" />
     <ClCompile Include="src\Application\Timer.cpp" />
-    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommand.cpp" />
-    <ClCompile Include="src\CommandStack\Commands\CarvePassageCommandData.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommand.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.cpp" />
     <ClCompile Include="src\CommandStack\Commands\CreateRoomCommand.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
@@ -157,14 +165,24 @@
     <ClCompile Include="src\Utils\RandomGenerator.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\external\Imgui\backends\imgui_impl_sdl2.h" />
+    <ClInclude Include="..\external\Imgui\backends\imgui_impl_sdlrenderer.h" />
+    <ClInclude Include="..\external\Imgui\imconfig.h" />
+    <ClInclude Include="..\external\Imgui\imgui.h" />
+    <ClInclude Include="..\external\Imgui\imgui_internal.h" />
+    <ClInclude Include="..\external\Imgui\imstb_rectpack.h" />
+    <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
+    <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\Events.h" />
     <ClInclude Include="src\Application\Font.h" />
     <ClInclude Include="src\Application\Keyboard.h" />
     <ClInclude Include="src\Application\Renderer.h" />
+    <ClInclude Include="src\Application\Configuration.h" />
     <ClInclude Include="src\Application\Timer.h" />
-    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommand.h" />
-    <ClInclude Include="src\CommandStack\Commands\CarvePassageCommandData.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommand.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.h" />
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
     <ClInclude Include="src\LevelGeneration\CyclicGraph.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h" />
@@ -202,6 +220,7 @@
     <Image Include="resources\7.png" />
     <Image Include="resources\8.png" />
     <Image Include="resources\9.png" />
+    <Image Include="resources\controls.png" />
     <Image Include="resources\goal.png" />
     <Image Include="resources\start.png" />
     <Image Include="resources\visited.png" />

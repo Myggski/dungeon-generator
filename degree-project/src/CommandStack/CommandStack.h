@@ -14,6 +14,7 @@ namespace Command
 		void ExecuteCommand(std::unique_ptr<Command> Command);
 		void Undo();
 		void Redo();
+		void RedoAll();
 		void Clear();
 		bool IsEmpty() const;
 

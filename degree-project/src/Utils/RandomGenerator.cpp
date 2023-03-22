@@ -16,11 +16,8 @@ namespace Utils
         if (Instance != nullptr) {
             throw std::logic_error("Instance of CommandStack is already created!");
         }
-
-        auto rnd = RandomGenerator();
-        rnd.RandomizeSeed();
-
-        Instance = std::make_unique<RandomGenerator>(rnd);
+        
+        Instance = std::make_unique<RandomGenerator>(RandomGenerator());
     }
 
     RandomGenerator& RandomGenerator::GetInstance()

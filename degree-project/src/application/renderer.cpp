@@ -1,6 +1,8 @@
 #include "Renderer.h"
 
 #include <cassert>
+#include <imgui_impl_sdl2.h>
+#include <imgui_impl_sdlrenderer.h>
 #include <SDL_image.h>
 
 namespace Application
@@ -8,6 +10,16 @@ namespace Application
 	void Renderer::Init(SDL_Window* Window)
 	{
 		SDLRenderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
+
+		// Setup Dear ImGui context
+		IMGUI_CHECKVERSION();
+		ImGui::CreateContext();
+		ImGuiIO& io = ImGui::GetIO(); (void)io;
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+
+		ImGui::StyleColorsDark();
+		ImGui_ImplSDL2_InitForSDLRenderer(Window, SDLRenderer);
+		ImGui_ImplSDLRenderer_Init(SDLRenderer);
 	}
 
 	void Renderer::Clear()
@@ -37,13 +49,18 @@ namespace Application
 
 	void Renderer::DrawCanvas() const
 	{
-		SDL_SetRenderDrawColor(SDLRenderer, 203, 225, 239, 255);
+		ImGui::Render();
+		SDL_SetRenderDrawColor(SDLRenderer, 199, 220, 208, 255);
+		ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
 		SDL_RenderPresent(SDLRenderer);
 	}
 
 	void Renderer::ClearCanvas() const
 	{
 		SDL_RenderClear(SDLRenderer);
+		ImGui_ImplSDLRenderer_NewFrame();
+		ImGui_ImplSDL2_NewFrame();
+		ImGui::NewFrame();
 	}
 
 	void Renderer::SetDrawColor(Uint8 R, Uint8 G, Uint8 B) const

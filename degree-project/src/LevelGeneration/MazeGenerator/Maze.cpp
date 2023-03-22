@@ -2,9 +2,12 @@
 
 #include <array>
 
+#include "imgui.h"
+#include "Application/Configuration.h"
 #include "Application/Font.h"
 #include "CommandStack/CommandStack.h"
-#include "CommandStack/Commands/CarvePassageCommand.h"
+#include "CommandStack/Commands/Maze/CarvePassageCommand.h"
+#include "CommandStack/Commands/Maze/BacktrackPassageCommand.h"
 
 namespace Command
 {
@@ -68,7 +71,19 @@ namespace MazeGenerator
 		// Backtrack if there's no new path that has been created
 		if (!bNewPathCreated)
 		{
-			BacktrackVisitedPath();
+			Command::CommandStack::GetInstance().ExecuteCommand(
+				std::make_unique<Command::BacktrackPassageCommand>(
+					CurrentCell,
+					VisitedStack,
+					Pathway,
+					bGoalHasBeenReached,
+					[&](MazeCell* NewCurrentCell)
+					{
+						CurrentCell = NewCurrentCell;
+						CalculateStepsLeft();
+					}
+				)
+			);
 		} // If a new path has been created, check if goal has been reached
 		else if (CurrentCell == GoalCell)
 		{
@@ -88,14 +103,20 @@ namespace MazeGenerator
 
 	void Maze::DrawDebugText()
 	{
-		const std::string GoalReached = bGoalHasBeenReached ? "True" : "False";
-		Application::Font::GetInstance().Draw("Default", "Random Seed: " + std::to_string(Utils::RandomGenerator::GetInstance().GetSeed()), 8, 720 - 32 * 7);
-		Application::Font::GetInstance().Draw("Default", "Goal Reached: " + GoalReached, 8, 720 - 32 * 6);
-		Application::Font::GetInstance().Draw("Default", "Number Of Steps Taken: " + std::to_string(PathwayCalculationData.NumberOfStepsTaken), 8, 720 - 32 * 5 );
-		Application::Font::GetInstance().Draw("Default", "Steps To Goal X: " + std::to_string(PathwayCalculationData.StepsToGoalX), 8, 720 - 32 * 4);
-		Application::Font::GetInstance().Draw("Default", "Steps To Goal Y: " + std::to_string(PathwayCalculationData.StepsToGoalY), 8, 720 - 32 * 3);
-		Application::Font::GetInstance().Draw("Default", "Min Steps: " + std::to_string(PathwayCalculationData.MinSteps), 8, 720 - 32 * 2);
-		Application::Font::GetInstance().Draw("Default", "Max Steps: " + std::to_string(PathwayCalculationData.MaxSteps), 8, 720 - 32);
+		ImGui::SetNextWindowSize({ 208, 156 });
+		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 156 - 16) });
+
+		ImGui::Begin("Debug");
+
+		ImGui::Text("Seed: %d", Utils::RandomGenerator::GetInstance().GetSeed());
+		ImGui::Text("Goal Reached: %s", bGoalHasBeenReached ? "True" : "False");
+		ImGui::Text("Number Of Steps Taken: %d", PathwayCalculationData.NumberOfStepsTaken);
+		ImGui::Text("Steps To Goal X: %d", PathwayCalculationData.StepsToGoalX);
+		ImGui::Text("Steps To Goal Y: %d", PathwayCalculationData.StepsToGoalY);
+		ImGui::Text("Min Steps: %d", PathwayCalculationData.MinSteps);
+		ImGui::Text("Max Steps: %d", PathwayCalculationData.MaxSteps);
+
+		ImGui::End();
 	}
 
 	std::vector<std::vector<MazeCell>> Maze::GetGrid()
@@ -128,29 +149,20 @@ namespace MazeGenerator
 		return Pathway;
 	}
 
-	void Maze::BacktrackVisitedPath()
-	{
-		// If goal has been reached, save pathway on the way back
-		if (bGoalHasBeenReached)
-		{
-			Pathway.emplace_back(VisitedStack.top());
-		}
-
-		// Go back to the visited stack
-		VisitedStack.pop();
-
-		if (!VisitedStack.empty())
-		{
-			CurrentCell = VisitedStack.top();
-		}
-	}
-
 	void Maze::SetGoalReached()
 	{
 		bGoalHasBeenReached = true;
 		Pathway.reserve(VisitedStack.size());
 		CalculateStepsLeft();
 	}
+
+	MazeCell* Maze::GetNeighborCell(MazeCell* From, DirectionType Direction)
+	{
+		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
+		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);
+		return &Grid[NeighborX][NeighborY];
+	}
+
 
 	bool Maze::TryMakePathToNeighbor()
 	{
@@ -166,28 +178,26 @@ namespace MazeGenerator
 			return false;
 		}
 
-		const int NeighborX = CurrentCell->GetPosition().x + MazeGenerator::DirectionToGridStepX.at(NextDirection);
-		const int NeighborY = CurrentCell->GetPosition().y + MazeGenerator::DirectionToGridStepY.at(NextDirection);
-		MazeCell* MoveTowardsCell = &Grid[NeighborX][NeighborY];
-
 		const std::function SetCurrentCellCallback = [&](MazeCell* NewCurrentCell)
 		{
 			CurrentCell = NewCurrentCell;
-			VisitedStack.push(CurrentCell);
-			PreviousDirection = NextDirection;
+			CalculateStepsLeft();
 		};
 
 		Command::CommandStack::GetInstance().ExecuteCommand(
 			std::make_unique<Command::CarvePassageCommand>(
 				Command::CarvePassageCommandData {
 					CurrentCell,
-					MoveTowardsCell,
+					GetNeighborCell(CurrentCell, NextDirection),
 					NextDirection,
 					PreviousDirection,
+					VisitedStack,
 					SetCurrentCellCallback
 				}
 			)
 		);
+
+		PreviousDirection = NextDirection;
 
 		return true;
 	}
@@ -313,7 +323,7 @@ namespace MazeGenerator
 		CalculateStepsLeft();
 
 		PathwayCalculationData.MinSteps = static_cast<int>(static_cast<float>(PathwayCalculationData.StepsToGoalX + PathwayCalculationData.StepsToGoalY) * 1.25f);
-		PathwayCalculationData.MaxSteps = static_cast<int>(static_cast<float>(PathwayCalculationData.MinSteps) * 1.5f);
+		PathwayCalculationData.MaxSteps = static_cast<int>(static_cast<float>(PathwayCalculationData.MinSteps) * 1.75f);
 	}
 
 	void Maze::CalculateStepsLeft()
