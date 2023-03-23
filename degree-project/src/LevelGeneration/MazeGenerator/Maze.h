@@ -5,6 +5,7 @@
 
 #include "MazeCell.h"
 #include "DirectionType.h"
+#include "MazeStateData.h"
 #include "PathwayData.h"
 #include "NavigationalDirections.h"
 
@@ -21,9 +22,9 @@ namespace MazeGenerator
 	public:
         Maze(int Width, int Height);
 
-        void CarveCellPassage();
-        void SetCurrentCell(MazeCell* NewCurrentCell);
+        MazeActionType Step();
         void DrawDebugText();
+        std::vector<MazeCell*> GetPathway();
 
         // Probably temporary getter funcions for debugging
         std::vector<std::vector<MazeCell>> GetGrid();
@@ -31,24 +32,15 @@ namespace MazeGenerator
         MazeCell& GetStartCell() const;
         MazeCell& GetGoalCell() const;
         MazeCell* GetCell(int PositionX, int PositionY);
-        
-        std::vector<MazeCell*> GetPathway();
 
 	private:
+        const MazeCell* GetNeighborCell(MazeCell* From, DirectionType Direction) const;
         
-        /// <summary>
-        /// Flag that goal has been reached and preparing the pathway vector
-        /// </summary>
-        void SetGoalReached();
-
-        MazeCell* GetNeighborCell(MazeCell* From, DirectionType Direction);
-
-
         /// <summary>
         /// Trying to find available neighbors and create a path between current cell to neighbor cell
         /// </summary>
         /// <returns>True if valid neighbor is found, false if there's no available paths to go</returns>
-        bool TryMakePathToNeighbor();
+        void TryCarvePassage();
 
         DirectionType CalculateNextDirection() const;
         
@@ -62,13 +54,19 @@ namespace MazeGenerator
         /// <param name="NeighborCell"></param>
         /// <returns></returns>
         NavigationalDirections GetCellDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell) const;
-        
+
+        static bool IsOutOfBound(const MazeStateData& StateData, int PositionX, int PositionY);
+
+        void InitializeStateData();
+
         /// <summary>
         /// Setting up the start and goal cells. 
         /// TODO: The goal should be dependent on the main rule.
         /// If there are any short paths, put the goal closer to the start
         /// </summary>
-        void InitializePath();
+        void InitializeMaze();
+
+        void CreateNewPath();
 
         void CalculateStepsLeft();
 
@@ -81,19 +79,8 @@ namespace MazeGenerator
 
         std::vector<DirectionType> GetAvailableRandomDirections() const;
 
-        bool IsOutOfBound(int PositionX, int PositionY) const;
-
 	private:
-        int Width;
-        int Height;
-        bool bGoalHasBeenReached;
-        MazeCell* CurrentCell;
-        MazeCell* StartCell;
-        MazeCell* GoalCell;
-        std::vector<std::vector<MazeCell>> Grid;
-        std::stack<MazeCell*> VisitedStack;
-        std::vector<MazeCell*> Pathway;
+        MazeStateData StateData;
         PathwayData PathwayCalculationData;
-        DirectionType PreviousDirection;
 	};
 }

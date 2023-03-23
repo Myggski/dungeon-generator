@@ -3,44 +3,42 @@
 #include <utility>
 #include <vector>
 
+#include "LevelGeneration/MazeGenerator/MazeStateData.h"
+
 namespace Command
 {
-	BacktrackPassageCommand::BacktrackPassageCommand(MazeGenerator::MazeCell* CurrentCell, std::stack<MazeGenerator::MazeCell*>& VisitedStack, std::vector<MazeGenerator::MazeCell*>& Pathway, bool bGoalHasBeenReached, std::function<void(MazeGenerator::MazeCell*)> SetCurrentCellCallback)
-		: bGoalHasBeenReached(bGoalHasBeenReached),
-		CurrentCell(CurrentCell),
-		PreviousCell(nullptr),
-		VisitedStack(VisitedStack),
-		Pathway(Pathway),
-		SetCurrentCellCallback(std::move(SetCurrentCellCallback))
-	{ }
+	BacktrackPassageCommand::BacktrackPassageCommand(MazeGenerator::MazeStateData& StateData)
+		: StateData(StateData),
+		PreviousCell(nullptr) { }
 
 	void BacktrackPassageCommand::Execute()
 	{
-		// If goal has been reached, save pathway on the way back
- 		if (bGoalHasBeenReached)
+		PreviousCell = StateData.CurrentCell;
+		StateData.AddCellToPathway(StateData.VisitedCellStack.top());
+		StateData.VisitedCellStack.pop();
+
+		if (!StateData.VisitedCellStack.empty())
 		{
-			Pathway.emplace_back(VisitedStack.top());
-		}
-
-		// Go back to the visited stack
-		VisitedStack.pop();
-
-		if (!VisitedStack.empty())
+			StateData.CurrentCell = StateData.VisitedCellStack.top();
+		} else if (StateData.CurrentCell == StateData.StartCell)
 		{
-			SetCurrentCellCallback(VisitedStack.top());
+			StateData.CurrentAction = StateData.CurrentPathwayIndex > 0
+				? MazeGenerator::MazeActionType::Done
+				: MazeGenerator::MazeActionType::CreateNewPath;
 		}
-
-		PreviousCell = CurrentCell;
 	}
 
 	void BacktrackPassageCommand::Undo()
 	{
-		if (!Pathway.empty())
+		if (!StateData.IsPathwayEmpty())
 		{
-			VisitedStack.push(Pathway[Pathway.size() - 1]);
-			Pathway.erase(Pathway.end() - 1);
+			const std::vector<MazeGenerator::MazeCell*>& CurrentPathway = StateData.GetCurrentPathway();
+			MazeGenerator::MazeCell* LastCellInPath = CurrentPathway[CurrentPathway.size() - 1];
+
+			StateData.VisitedCellStack.push(LastCellInPath);
+			StateData.RemoveLastCellFromPathway();
 		}
 		
-		SetCurrentCellCallback(PreviousCell);
+		StateData.CurrentCell = PreviousCell;
 	}
 }

@@ -76,7 +76,10 @@ namespace Application
 		Utils::RandomGenerator::GetInstance().RandomizeSeed();
 		MazeGenerator::Maze Maze{ GridSizeX, GridSizeY };
 
-		std::optional<LevelGeneration::Room> RoomXL;
+		bool bLevelDone = false;
+		bool bGenerateLevel = false;
+		float WaitStepInSeconds = 0.f;
+		float SinceLastStepInSeconds = 0.f;
 
 		while (bIsRunning)
 		{
@@ -85,10 +88,29 @@ namespace Application
 
 			Renderer.ClearCanvas();
 
+			if (!bLevelDone && bGenerateLevel && SinceLastStepInSeconds > WaitStepInSeconds)
+			{
+				auto MazeStep = Maze.Step();
+
+				if (MazeStep == MazeGenerator::MazeActionType::CarvePassageFailed)
+				{
+					Command::CommandStack::GetInstance().Clear();
+					Maze = { GridSizeX, GridSizeY };
+				}
+
+				if (MazeStep == MazeGenerator::MazeActionType::Done)
+				{
+					bLevelDone = true;
+				}
+
+				SinceLastStepInSeconds = 0.f;
+			}
+
+			SinceLastStepInSeconds += Time.DeltaTime;
+
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_SPACE))
 			{
-				//RoomXL = LevelGeneration::RoomFactory::CreateRoom({ 23, 12 }, LevelGeneration::RoomType::Large);
-				Maze.CarveCellPassage();
+				bGenerateLevel = !bGenerateLevel;
 			}
 
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_LEFT))
@@ -103,8 +125,17 @@ namespace Application
 
 			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_R))
 			{
-				Command::CommandStack::GetInstance().Clear();
+				bLevelDone = false;
 				Utils::RandomGenerator::GetInstance().RandomizeSeed();
+				Command::CommandStack::GetInstance().Clear();
+				Maze = { GridSizeX, GridSizeY };
+			}
+
+			if (Keyboard.IsKeyPressedOnce(SDL_SCANCODE_P))
+			{
+				bLevelDone = false;
+				Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
+				Command::CommandStack::GetInstance().Clear();
 				Maze = { GridSizeX, GridSizeY };
 			}
 
@@ -134,12 +165,6 @@ namespace Application
 
 					Maze = { GridSizeX, GridSizeY };
 				}
-			}
-
-			// Update logic
-			if (RoomXL.has_value())
-			{
-				RoomXL.value().Draw(Renderer);
 			}
 
 			auto grid = Maze.GetGrid();
@@ -210,18 +235,31 @@ namespace Application
 
 			Renderer.SetDrawColor(0, 0, 0);
 
-			// 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
 			{
-				ImGui::SetNextWindowPos({ static_cast<float>(Configuration::WindowWidth - 160 - 16), static_cast<float>(Configuration::WindowHeight - 140 - 16) });
-				ImGui::SetNextWindowSize({ 160, 140 }, 0);
-				ImGui::Begin("Controls");
+				ImGui::SetNextWindowPos({ static_cast<float>(Configuration::WindowWidth - 176 - 16), static_cast<float>(Configuration::WindowHeight - 216 - 16) });
+				ImGui::SetNextWindowSize({ 176, 216 }, 0);
+				ImGui::Begin("Shortcuts");
 
-				ImGui::Text("Step - [Space]");
+				ImGui::Text("%s - [Space]", bGenerateLevel ? "Pause" : "Play");
+				ImGui::Text("Restart - [R]");
+				ImGui::Text("Replay - [P]");
+
+				ImGui::Spacing();
+				ImGui::Spacing();
+
 				ImGui::Text("Undo - [Left]");
 				ImGui::Text("Redo - [Right]");
-				ImGui::Text("Restart - [R]");
+
+				ImGui::Spacing();
+				ImGui::Spacing();
+
 				ImGui::Text("Shrink Grid - [-]");
 				ImGui::Text("Expand Grid - [+]");
+
+				ImGui::Spacing();
+				ImGui::Spacing();
+				ImGui::Text("Speed: ");
+				ImGui::SliderFloat(" ", &WaitStepInSeconds, 0.f, 1.f);
 
 				ImGui::End();
 			}

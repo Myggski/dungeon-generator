@@ -32,7 +32,7 @@ namespace Command
 
 	void CommandStack::ExecuteCommand(std::unique_ptr<Command> Command)
 	{
-		for (size_t Index = Commands.size() - 1; Index > CurrentIndex; --Index)
+		while (Commands.size() - 1 != CurrentIndex)
 		{
 			Commands.pop_back();
 		}

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "CarvePassageCommandData.h"
 #include "CommandStack/Commands/Command.h"
+#include "LevelGeneration/MazeGenerator/MazeStateData.h"
 
 enum class DirectionType : uint8_t;
 
@@ -17,13 +17,17 @@ namespace Command
 	class CarvePassageCommand final : public Command
 	{
 	public:
-		CarvePassageCommand(CarvePassageCommandData Data);
+		CarvePassageCommand(MazeGenerator::MazeStateData& StateData, DirectionType MoveTowardsDirection);
 		~CarvePassageCommand() override;
 
 		void Execute() override;
 		void Undo() override;
 
 	private:
-		CarvePassageCommandData Data;
+		MazeGenerator::MazeStateData& StateData;
+		MazeGenerator::MazeCell* CarvedFromCell;
+		MazeGenerator::MazeCell* CarvedToCell;
+		DirectionType MoveTowardsDirection;
+		MazeGenerator::MazeActionType PreviousAction;
 	};
 }

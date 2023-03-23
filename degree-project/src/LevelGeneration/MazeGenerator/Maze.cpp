@@ -8,6 +8,7 @@
 #include "CommandStack/CommandStack.h"
 #include "CommandStack/Commands/Maze/CarvePassageCommand.h"
 #include "CommandStack/Commands/Maze/BacktrackPassageCommand.h"
+#include "CommandStack/Commands/Maze/CreateNewPathCommand.h"
 
 namespace Command
 {
@@ -16,100 +17,58 @@ namespace Command
 
 namespace MazeGenerator
 {
-	Maze::Maze(int Width, int Height) : Width(Width),
-		Height(Height),
-		bGoalHasBeenReached(false),
-		CurrentCell(nullptr),
-		StartCell(nullptr),
-		GoalCell(nullptr)
+	Maze::Maze(int Width, int Height) : StateData(Width, Height)
 	{
-		Grid.resize(Width);
+		StateData.MazeGrid.resize(Width);
 
 		for (int GridX = 0; GridX < Width; GridX++)
 		{
-			Grid[GridX].resize(Height);
+			StateData.MazeGrid[GridX].resize(Height);
 
 			for (int GridY = 0; GridY < Height; GridY++)
 			{
-				Grid[GridX][GridY] = MazeCell(SDL_Point{ GridX, GridY });
+				StateData.MazeGrid[GridX][GridY] = MazeCell(SDL_Point{ GridX, GridY });
 			}
 		}
 
-		InitializePath();
+		InitializeMaze();
 	}
 
-	void Maze::CarveCellPassage()
+	MazeActionType Maze::Step()
 	{
- 		if (VisitedStack.empty())
-		{
-			if (bGoalHasBeenReached)
-			{
-				bGoalHasBeenReached = false;
-				StartCell->SetVisited(true);
-				VisitedStack.push(StartCell);
-				CalculateStepsLeft();
-
-				GoalCell->SetVisited(false);
-
-				for (DirectionType Direction : GetRandomDirections())
-				{
-					const int NeighborX = GoalCell->GetPosition().x + DirectionToGridStepX.at(Direction);
-					const int NeighborY = GoalCell->GetPosition().y + DirectionToGridStepY.at(Direction);
-
-					if (!IsOutOfBound(NeighborX, NeighborY))
-					{
-						Grid[NeighborX][NeighborY].SetVisited(false);
-					}
-				}
-			}
-
-			return;
-		}
-
-		const bool bNewPathCreated = TryMakePathToNeighbor();
-
-		// Backtrack if there's no new path that has been created
-		if (!bNewPathCreated)
+		if (StateData.CurrentAction == MazeActionType::BacktrackPassage)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::BacktrackPassageCommand>(
-					CurrentCell,
-					VisitedStack,
-					Pathway,
-					bGoalHasBeenReached,
-					[&](MazeCell* NewCurrentCell)
-					{
-						CurrentCell = NewCurrentCell;
-						CalculateStepsLeft();
-					}
+					StateData
 				)
 			);
-		} // If a new path has been created, check if goal has been reached
-		else if (CurrentCell == GoalCell)
+		}
+
+		if (StateData.CurrentAction == MazeActionType::CreateNewPath)
 		{
-			SetGoalReached();
+			CreateNewPath();
+		}
+
+		if (StateData.CurrentAction == MazeActionType::CarvePassage)
+		{
+			TryCarvePassage();
 		}
 	
-		if (!bGoalHasBeenReached)
-		{
-			CalculateStepsLeft();
-		}
-	}
+		CalculateStepsLeft();
 
-	void Maze::SetCurrentCell(MazeCell* NewCurrentCell)
-	{
-		CurrentCell = NewCurrentCell;
+		return StateData.CurrentAction;
 	}
 
 	void Maze::DrawDebugText()
 	{
-		ImGui::SetNextWindowSize({ 208, 156 });
-		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 156 - 16) });
+		ImGui::SetNextWindowSize({ 208, 172 });
+		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 172 - 16) });
 
 		ImGui::Begin("Debug");
 
 		ImGui::Text("Seed: %d", Utils::RandomGenerator::GetInstance().GetSeed());
-		ImGui::Text("Goal Reached: %s", bGoalHasBeenReached ? "True" : "False");
+		ImGui::Text("Done: %s", StateData.CurrentAction == MazeActionType::Done ? "True" : "False");
 		ImGui::Text("Number Of Steps Taken: %d", PathwayCalculationData.NumberOfStepsTaken);
 		ImGui::Text("Steps To Goal X: %d", PathwayCalculationData.StepsToGoalX);
 		ImGui::Text("Steps To Goal Y: %d", PathwayCalculationData.StepsToGoalY);
@@ -121,90 +80,75 @@ namespace MazeGenerator
 
 	std::vector<std::vector<MazeCell>> Maze::GetGrid()
 	{
-		return Grid;
+		return StateData.MazeGrid;
 	}
 
 	MazeCell& Maze::GetCurrentCell() const
 	{
-		return *CurrentCell;
+		return *StateData.CurrentCell;
 	}
 
 	MazeCell& Maze::GetStartCell() const
 	{
-		return *StartCell;
+		return *StateData.StartCell;
 	}
 
 	MazeCell& Maze::GetGoalCell() const
 	{
-		return *GoalCell;
+		return *StateData.GoalCell;
 	}
 
 	MazeCell* Maze::GetCell(int PositionX, int PositionY)
 	{
-		return &Grid[PositionX][PositionY];
+		return &StateData.MazeGrid[PositionX][PositionY];
 	}
 
 	std::vector<MazeCell*> Maze::GetPathway()
 	{
-		return Pathway;
+		return StateData.GetCurrentPathway();
 	}
 
-	void Maze::SetGoalReached()
-	{
-		bGoalHasBeenReached = true;
-		Pathway.reserve(VisitedStack.size());
-		CalculateStepsLeft();
-	}
-
-	MazeCell* Maze::GetNeighborCell(MazeCell* From, DirectionType Direction)
+	const MazeCell* Maze::GetNeighborCell(MazeCell* From, DirectionType Direction) const
 	{
 		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
 		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);
-		return &Grid[NeighborX][NeighborY];
+
+		if (IsOutOfBound(StateData, NeighborX, NeighborY))
+		{
+			return nullptr;
+		}
+
+		return &StateData.MazeGrid[NeighborX][NeighborY];
 	}
 
 
-	bool Maze::TryMakePathToNeighbor()
+	void Maze::TryCarvePassage()
 	{
-		if (bGoalHasBeenReached)
+		const DirectionType MoveTowardsDirection = CalculateNextDirection();
+
+		if (MoveTowardsDirection == DirectionType::None)
 		{
-			return false;
+			StateData.CurrentAction = MazeActionType::CarvePassageFailed;
+			return;
 		}
 		
-		const DirectionType NextDirection = CalculateNextDirection();
-
-		if (NextDirection == DirectionType::None)
-		{
-			return false;
-		}
-
-		const std::function SetCurrentCellCallback = [&](MazeCell* NewCurrentCell)
-		{
-			CurrentCell = NewCurrentCell;
-			CalculateStepsLeft();
-		};
-
+		// Move towards direction
 		Command::CommandStack::GetInstance().ExecuteCommand(
 			std::make_unique<Command::CarvePassageCommand>(
-				Command::CarvePassageCommandData {
-					CurrentCell,
-					GetNeighborCell(CurrentCell, NextDirection),
-					NextDirection,
-					PreviousDirection,
-					VisitedStack,
-					SetCurrentCellCallback
-				}
+				StateData,
+				MoveTowardsDirection
 			)
 		);
-
-		PreviousDirection = NextDirection;
-
-		return true;
 	}
 
 	DirectionType Maze::CalculateNextDirection() const
 	{
 		std::vector<DirectionType> AvailableDirections = GetAvailableRandomDirections();
+
+ 		if (StateData.CurrentAction == MazeActionType::CarvePassageFailed)
+		{
+			AvailableDirections.erase(std::ranges::remove(AvailableDirections, StateData.PreviousDirection).begin(), AvailableDirections.end());
+		}
 
 		if (AvailableDirections.empty())
 		{
@@ -241,9 +185,9 @@ namespace MazeGenerator
 					}
 				}
 			}
-			else if (PreviousDirection != DirectionType::None && std::ranges::find(AvailableDirections, PreviousDirection) != AvailableDirections.end())
+			else if (StateData.PreviousDirection != DirectionType::None && std::ranges::find(AvailableDirections, StateData.PreviousDirection) != AvailableDirections.end())
 			{
-				return  PreviousDirection;
+				return  StateData.PreviousDirection;
 			}
 		}
 
@@ -257,9 +201,9 @@ namespace MazeGenerator
 			}
 		}
 
-		if (std::ranges::find(AvailableDirections, PreviousDirection) != AvailableDirections.end())
+		if (std::ranges::find(AvailableDirections, StateData.PreviousDirection) != AvailableDirections.end())
 		{
-			return PreviousDirection;
+			return StateData.PreviousDirection;
 		}
 
   		return AvailableDirections[0];
@@ -267,7 +211,7 @@ namespace MazeGenerator
 
 	DirectionType Maze::GetDirectionFurthestGoal() const
 	{
-		const NavigationalDirections DirectionToGoal = GetCellDirection(*CurrentCell, *GoalCell);
+		const NavigationalDirections DirectionToGoal = GetCellDirection(*StateData.CurrentCell, *StateData.GoalCell);
 
 		if (PathwayCalculationData.StepsToGoalX > PathwayCalculationData.StepsToGoalY)
 		{
@@ -278,7 +222,7 @@ namespace MazeGenerator
 			return DirectionToGoal.GetVertical();
 		}
 
-		return PreviousDirection;
+		return StateData.PreviousDirection;
 	}
 
 	NavigationalDirections Maze::GetCellDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell) const
@@ -304,34 +248,52 @@ namespace MazeGenerator
 		return { DirectionHorizontal, DirectionVertical };
 	}
 
-	void Maze::InitializePath()
+	void Maze::InitializeStateData()
+	{
+		StateData.StartCell->SetVisited(true);
+		StateData.CurrentCell = StateData.StartCell;
+		StateData.VisitedCellStack.push(StateData.CurrentCell);
+		StateData.GoalCell->SetVisited(false);
+		StateData.CurrentAction = MazeActionType::CarvePassage;
+
+		CalculateStepsLeft();
+	}
+
+	void Maze::InitializeMaze()
 	{
 		// Which side of the grid should the start position be
 		const DirectionType StartPositionDirection = GetRandomDirection();
 
-		StartCell = GetRandomEdgeCell(StartPositionDirection);
-		StartCell->SetVisited(true);
-
+		StateData.StartCell = GetRandomEdgeCell(StartPositionDirection);
 		// Set the goal cell to be at the opposite site of the start cell
-		GoalCell = GetRandomEdgeCell(OppositeDirection.at(StartPositionDirection));
-
-		CurrentCell = StartCell;
-		VisitedStack.push(CurrentCell);
-
+		StateData.GoalCell = GetRandomEdgeCell(OppositeDirection.at(StartPositionDirection));
 		PathwayCalculationData = PathwayData();
-		
-		CalculateStepsLeft();
+
+		InitializeStateData();
 
 		PathwayCalculationData.MinSteps = static_cast<int>(static_cast<float>(PathwayCalculationData.StepsToGoalX + PathwayCalculationData.StepsToGoalY) * 1.25f);
 		PathwayCalculationData.MaxSteps = static_cast<int>(static_cast<float>(PathwayCalculationData.MinSteps) * 1.75f);
 	}
 
+	void Maze::CreateNewPath()
+	{
+		InitializeStateData();
+
+		Command::CommandStack::GetInstance().ExecuteCommand(
+			std::make_unique<Command::CreateNewPathCommand>(
+				StateData,
+				GetRandomDirections()
+			)
+		);
+	}
+
+
 	void Maze::CalculateStepsLeft()
 	{
-		PathwayCalculationData.StepsToGoalX = abs(CurrentCell->GetPosition().x - GoalCell->GetPosition().x);
-		PathwayCalculationData.StepsToGoalY = abs(CurrentCell->GetPosition().y - GoalCell->GetPosition().y);
-		PathwayCalculationData.NumberOfStepsTaken = std::ranges::max(static_cast<int>(VisitedStack.size() - 1), 0);
-		PathwayCalculationData.DirectionsToGoal = GetCellDirection(*CurrentCell, *GoalCell);
+		PathwayCalculationData.StepsToGoalX = abs(StateData.CurrentCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
+		PathwayCalculationData.StepsToGoalY = abs(StateData.CurrentCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
+		PathwayCalculationData.NumberOfStepsTaken = std::ranges::max(static_cast<int>(StateData.VisitedCellStack.size() - 1), 0);
+		PathwayCalculationData.DirectionsToGoal = GetCellDirection(*StateData.CurrentCell, *StateData.GoalCell);
 	}
 
 	MazeCell* Maze::GetRandomEdgeCell(DirectionType Direction)
@@ -339,15 +301,15 @@ namespace MazeGenerator
 		switch (Direction)
 		{
 		case DirectionType::North:
-			return &Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, Width - 2)][0];
+			return &StateData.MazeGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridWidth - 2)][0];
 		case DirectionType::East:
-			return &Grid[Width - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, Height - 2)];
+			return &StateData.MazeGrid[StateData.GridWidth - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridHeight - 2)];
 			break;
 		case DirectionType::South:
-			return &Grid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, Width - 2)][Height - 1];
+			return &StateData.MazeGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridWidth - 2)][StateData.GridHeight - 1];
 		case DirectionType::West:
 		default:
-			return &Grid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, Height - 2)];
+			return &StateData.MazeGrid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridHeight - 2)];
 		}
 	}
 
@@ -380,15 +342,9 @@ namespace MazeGenerator
 
 		for (const auto& CurrentDirection : Directions)
 		{
-			const int NeighborX = CurrentCell->GetPosition().x + DirectionToGridStepX.at(CurrentDirection);
-			const int NeighborY = CurrentCell->GetPosition().y + DirectionToGridStepY.at(CurrentDirection);
+			const MazeCell* Neighbor = GetNeighborCell(StateData.CurrentCell, CurrentDirection);
 
-			if (IsOutOfBound(NeighborX, NeighborY))
-			{
-				continue;
-			}
-
-			if (Grid[NeighborX][NeighborY].IsVisited())
+			if (Neighbor == nullptr || Neighbor->IsVisited())
 			{
 				continue;
 			}
@@ -399,8 +355,8 @@ namespace MazeGenerator
 		return AvailableDirections;
 	}
 
-	bool Maze::IsOutOfBound(int PositionX, int PositionY) const
+	bool Maze::IsOutOfBound(const MazeStateData& StateData, int PositionX, int PositionY)
 	{
-		return (PositionX < 0 || PositionX > Width - 1) || (PositionY < 0 || PositionY > Height - 1);
+		return (PositionX < 0 || PositionX > StateData.GridWidth - 1) || (PositionY < 0 || PositionY > StateData.GridHeight - 1);
 	}
 }

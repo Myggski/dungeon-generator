@@ -13,34 +13,56 @@ namespace MazeGenerator
 
 namespace Command
 {
-	CarvePassageCommand::CarvePassageCommand(CarvePassageCommandData Data)
-		: Data(std::move(Data)) { }
+	CarvePassageCommand::CarvePassageCommand(MazeGenerator::MazeStateData& StateData, DirectionType MoveTowardsDirection)
+		: StateData(StateData),
+		CarvedFromCell(nullptr),
+		CarvedToCell(nullptr),
+		MoveTowardsDirection(MoveTowardsDirection),
+		PreviousAction(MazeGenerator::MazeActionType::None) { }
 
 	CarvePassageCommand::~CarvePassageCommand()
 	{
-		Data.CarveFromCell = nullptr;
-		Data.CarveToCell = nullptr;
+		CarvedFromCell = nullptr;
+		CarvedToCell = nullptr;
 	}
 	
 	void CarvePassageCommand::Execute()
 	{
-		Data.CarveFromCell->CarveEntrance(Data.MoveTowardsDirection);
+		const int NeighborX = StateData.CurrentCell->GetPosition().x + MazeGenerator::DirectionToGridStepX.at(MoveTowardsDirection);
+		const int NeighborY = StateData.CurrentCell->GetPosition().y + MazeGenerator::DirectionToGridStepY.at(MoveTowardsDirection);
 
-		Data.CarveToCell->CarveEntrance(MazeGenerator::OppositeDirection.at(Data.MoveTowardsDirection));
-		Data.CarveToCell->SetVisited(true);
-		Data.VisitedStack.push(Data.CarveToCell);
+		CarvedFromCell = StateData.CurrentCell;
+		CarvedToCell = &StateData.MazeGrid[NeighborX][NeighborY];
 
-		Data.SetCurrentCellCallback(Data.CarveToCell);
+		CarvedFromCell->CarveEntrance(MoveTowardsDirection);
+
+		CarvedToCell->SetVisited(true);
+		CarvedToCell->CarveEntrance(MazeGenerator::OppositeDirection.at(MoveTowardsDirection));
+		StateData.VisitedCellStack.push(CarvedToCell);
+
+  		StateData.CurrentCell = CarvedToCell;
+		StateData.PreviousDirection = MoveTowardsDirection;
+
+		if (StateData.CurrentCell == StateData.GoalCell)
+		{
+			StateData.CurrentAction = MazeGenerator::MazeActionType::BacktrackPassage;
+			StateData.GetCurrentPathway().reserve(StateData.VisitedCellStack.size());
+		}
 	}
 
 	void CarvePassageCommand::Undo()
 	{
-		Data.CarveFromCell->CollapseEntrance(Data.MoveTowardsDirection);
+		CarvedFromCell->CollapseEntrance(MoveTowardsDirection);
 
-		Data.CarveToCell->SetVisited(false);
-		Data.CarveToCell->CollapseEntrance(MazeGenerator::OppositeDirection.at(Data.MoveTowardsDirection));
-		Data.VisitedStack.pop();
+		CarvedToCell->SetVisited(false);
+		CarvedToCell->CollapseEntrance(MazeGenerator::OppositeDirection.at(MoveTowardsDirection));
+		StateData.VisitedCellStack.pop();
 
-		Data.SetCurrentCellCallback(Data.CarveFromCell);
+		StateData.CurrentCell = CarvedFromCell;
+
+		if (PreviousAction != MazeGenerator::MazeActionType::None)
+		{
+			StateData.CurrentAction = PreviousAction;
+		}
 	}
 }

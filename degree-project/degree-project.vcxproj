@@ -134,7 +134,6 @@
     <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdl2.cpp" />
     <ClCompile Include="..\external\Imgui\backends\imgui_impl_sdlrenderer.cpp" />
     <ClCompile Include="..\external\Imgui\imgui.cpp" />
-    <ClCompile Include="..\external\Imgui\imgui_demo.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
@@ -146,13 +145,14 @@
     <ClCompile Include="src\Application\Timer.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommand.cpp" />
-    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.cpp" />
     <ClCompile Include="src\CommandStack\Commands\CreateRoomCommand.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\CreateNewPathCommand.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\Maze.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp" />
+    <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeStateData.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp" />
     <ClCompile Include="src\LevelGeneration\Room.cpp" />
     <ClCompile Include="src\LevelGeneration\RoomFactory.cpp" />
@@ -182,8 +182,8 @@
     <ClInclude Include="src\Application\Timer.h" />
     <ClInclude Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommand.h" />
-    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommandData.h" />
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\CreateNewPathCommand.h" />
     <ClInclude Include="src\LevelGeneration\CyclicGraph.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h" />
@@ -192,6 +192,7 @@
     <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />
+    <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeStateData.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\NavigationalDirections.h" />
     <ClInclude Include="src\LevelGeneration\Room.h" />
