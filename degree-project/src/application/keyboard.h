@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <SDL_events.h>
 #include <SDL_scancode.h>
 #include <unordered_map>
@@ -21,6 +22,9 @@ namespace Application
     class Keyboard
     {
     public:
+        static void CreateInstance();
+        static Keyboard& GetInstance();
+
         void OnKeyPressed(SDL_Event Event);
         void OnKeyReleased(SDL_Event Event);
         bool IsKeyPressed(const SDL_Scancode Scancode) const;
@@ -29,6 +33,10 @@ namespace Application
         bool IsKeyHeld(const SDL_Scancode Scancode) const;
 
     private:
+        Keyboard() = default;
+
+    private:
+        static std::unique_ptr<Keyboard> Instance;
         std::unordered_map<SDL_Scancode, KeyboardKeyData> Keys;
     };
 }

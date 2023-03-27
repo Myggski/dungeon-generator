@@ -1,13 +1,16 @@
 #pragma once
 
-#include <stack>
-#include <unordered_map>
-
 #include "MazeCell.h"
 #include "DirectionType.h"
 #include "MazeStateData.h"
 #include "PathwayData.h"
 #include "NavigationalDirections.h"
+#include "LevelGeneration/Cyclic/CyclicRule.h"
+
+namespace LevelGeneration
+{
+    class Level;
+}
 
 namespace Command
 {
@@ -20,30 +23,40 @@ namespace MazeGenerator
 	class Maze
 	{
 	public:
-        Maze(int Width, int Height);
+        Maze(Cyclic::CyclicRule& MainRule, int Width, int Height);
+        inline void operator=(const Maze& Other)
+        {
+            MainRule = Other.MainRule;
+            StateData = Other.StateData;
+            PathwayCalculationData = Other.PathwayCalculationData;
+        }
 
         MazeActionType Step();
-        void DrawDebugText();
-        std::vector<MazeCell*> GetPathway();
-
-        // Probably temporary getter funcions for debugging
-        std::vector<std::vector<MazeCell>> GetGrid();
-        MazeCell& GetCurrentCell() const;
-        MazeCell& GetStartCell() const;
-        MazeCell& GetGoalCell() const;
-        MazeCell* GetCell(int PositionX, int PositionY);
 
 	private:
+        /**
+         * \brief Returns the neighbor cell by direction
+         * \param From Where to go from
+         * \param Direction The direction to go to
+         * \return Returns the neighboring cell, if it's not a valid direction it returns nullptr
+         */
         const MazeCell* GetNeighborCell(MazeCell* From, DirectionType Direction) const;
-        
-        /// <summary>
-        /// Trying to find available neighbors and create a path between current cell to neighbor cell
-        /// </summary>
-        /// <returns>True if valid neighbor is found, false if there's no available paths to go</returns>
+
+        /**
+         * \brief Checks for unvisited neighbors, if there are any, pick one of them and move towards it
+         */
         void TryCarvePassage();
 
+        /**
+         * \brief Calculating and weighting the paths by checking data relating to the pathway
+         * \return The next direction to move towards
+         */
         DirectionType CalculateNextDirection() const;
-        
+
+        /**
+         * \brief TODO: Remove this?
+         * \return Returns the direction that has the highest number of steps
+         */
         DirectionType GetDirectionFurthestGoal() const;
 
         /// <summary>
@@ -55,8 +68,9 @@ namespace MazeGenerator
         /// <returns></returns>
         NavigationalDirections GetCellDirection(const MazeCell& CurrentCell, const MazeCell& NeighborCell) const;
 
-        static bool IsOutOfBound(const MazeStateData& StateData, int PositionX, int PositionY);
-
+        /**
+         * \brief Setting up 
+         */
         void InitializeStateData();
 
         /// <summary>
@@ -66,21 +80,43 @@ namespace MazeGenerator
         /// </summary>
         void InitializeMaze();
 
+        /**
+         * \brief Changes the CurrentPathIndex and starts to save the path in another array
+         */
         void CreateNewPath();
 
+        /**
+         * \brief Recalculates the number of steps left, the direction and number of steps taken towards goal
+         */
         void CalculateStepsLeft();
 
-        // Get random maze cell from the edge of the grid
+        /**
+         * \brief Get random maze cell from the edge of the grid
+         * \param Direction Which side it should take the cell from
+         * \return A MazeCell that's at the edge of the grid
+         */
         MazeCell* GetRandomEdgeCell(DirectionType Direction);
 
-        std::array<DirectionType, 4> GetRandomDirections() const;
-
-        DirectionType GetRandomDirection() const;
-
+        /**
+         * \brief Checks the surroundings of current cell and see if there are any unvisited cells
+         * \return A random direction that is not yet visited
+         */
         std::vector<DirectionType> GetAvailableRandomDirections() const;
+
+        /**
+         * \brief Checks if the wanted position in the grid is out of bound
+         * \param StateData State of the maze
+         * \param PositionX X-axis position in the 2D grid
+         * \param PositionY Y-axis position in the 2D grid
+         * \return Returns true if it's out of bound, else it returns false
+         */
+        static bool IsOutOfBound(const MazeStateData& StateData, int PositionX, int PositionY);
 
 	private:
         MazeStateData StateData;
         PathwayData PathwayCalculationData;
+        Cyclic::CyclicRule& MainRule;
+
+        friend class LevelGeneration::Level;
 	};
 }

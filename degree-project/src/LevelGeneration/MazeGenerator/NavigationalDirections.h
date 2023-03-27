@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <array>
 
 #include "DirectionType.h"
 #include "utils/RandomGenerator.h"
@@ -49,12 +50,24 @@ namespace MazeGenerator
             return Vertical;
         }
 
-        // Don't want to favorise a direction
-        DirectionType GetRandomDirection() const
+        static std::array<DirectionType, 4> GetRandomDirections()
         {
-            return Utils::RandomGenerator::GetInstance().GetRandom(0, 1) < 1
-                ? Horizontal
-                : Vertical;
+            std::array<DirectionType, 4> Directions =
+            {
+                DirectionType::North,
+                DirectionType::East,
+                DirectionType::South,
+                DirectionType::West
+            };
+
+            std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+            return Directions;
+        }
+
+        static DirectionType GetRandomDirection()
+        {
+            return GetRandomDirections()[0];
         }
     private:
         DirectionType Horizontal;

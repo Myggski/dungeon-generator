@@ -1,4 +1,3 @@
-
 #include "Room.h"
 
 #include "FragmentPosition.h"
@@ -8,7 +7,7 @@
 
 namespace LevelGeneration
 {
-	Room::Room(SDL_Rect Rect, LevelGeneration::RoomType RoomType)
+	Room::Room(SDL_FRect Rect, LevelGeneration::RoomType RoomType)
 		: RoomRect(Rect),
 		  FullRect({}),
 		  FloorTexture(nullptr),
@@ -23,8 +22,8 @@ namespace LevelGeneration
 			return;
 		}
 
-		const int FragmentWidth = Utils::RandomGenerator::GetInstance().GetRandom(MIN_ROOM_SIZE, RoomRect.w);
-		const int FragmentHeight = Utils::RandomGenerator::GetInstance().GetRandom(MIN_ROOM_SIZE, RoomRect.h);
+		const int FragmentWidth = Utils::RandomGenerator::GetInstance().GetRandom(MIN_ROOM_SIZE, static_cast<int>(RoomRect.w));
+		const int FragmentHeight = Utils::RandomGenerator::GetInstance().GetRandom(MIN_ROOM_SIZE, static_cast<int>(RoomRect.h));
 		const int OffsetWidth = RoomRect.w - FragmentWidth;
 		const int OffsetHeight = RoomRect.h - FragmentHeight;
 
@@ -59,10 +58,10 @@ namespace LevelGeneration
 			{
 				const SDL_Point FragmentPosition = GetFragmentPosition(static_cast<enum FragmentPosition>(FragmentIndex));
 				DrawRoom(Renderer, {
-					FragmentPosition.x,
-					FragmentPosition.y,
-					FragmentRooms[FragmentIndex].value().GetWidth(),
-				FragmentRooms[FragmentIndex].value().GetHeight()
+					static_cast<float>(FragmentPosition.x),
+					static_cast<float>(FragmentPosition.y),
+					static_cast<float>(FragmentRooms[FragmentIndex].value().GetWidth()),
+				static_cast<float>(FragmentRooms[FragmentIndex].value().GetHeight())
 				});
 			}
 		}
@@ -76,7 +75,7 @@ namespace LevelGeneration
 
 	SDL_Point Room::GetFragmentPosition(FragmentPosition FragmentPosition) const
 	{
-		SDL_Point Position = { RoomRect.x, RoomRect.y };
+		SDL_Point Position = { static_cast<int>(RoomRect.x), static_cast<int>(RoomRect.y) };
 		const std::optional<RoomFragment> Fragment = FragmentRooms[static_cast<int>(FragmentPosition)];
 
 		if (!Fragment.has_value())
@@ -122,23 +121,23 @@ namespace LevelGeneration
 
 	void Room::SetFullRect()
 	{
-		const int LeftFragmentWidth = FragmentRooms[static_cast<int>(FragmentPosition::Left)].has_value()
+		const float LeftFragmentWidth = FragmentRooms[static_cast<int>(FragmentPosition::Left)].has_value()
 			? FragmentRooms[static_cast<int>(FragmentPosition::Left)].value().GetWidth()
 			: 0;
-		const int RightFragmentWidth = FragmentRooms[static_cast<int>(FragmentPosition::Right)].has_value()
+		const float RightFragmentWidth = FragmentRooms[static_cast<int>(FragmentPosition::Right)].has_value()
 			? FragmentRooms[static_cast<int>(FragmentPosition::Right)].value().GetWidth()
 			: 0;
-		const int TopFragmentHeight = FragmentRooms[static_cast<int>(FragmentPosition::Top)].has_value()
+		const float TopFragmentHeight = FragmentRooms[static_cast<int>(FragmentPosition::Top)].has_value()
 			? FragmentRooms[static_cast<int>(FragmentPosition::Top)].value().GetHeight()
 			: 0;
-		const int BottomFragmentHeight = FragmentRooms[static_cast<int>(FragmentPosition::Bottom)].has_value()
+		const float BottomFragmentHeight = FragmentRooms[static_cast<int>(FragmentPosition::Bottom)].has_value()
 			? FragmentRooms[static_cast<int>(FragmentPosition::Bottom)].value().GetHeight()
 			: 0;
 
-		const int X = RoomRect.x - LeftFragmentWidth;
-		const int Y = RoomRect.y - TopFragmentHeight;
-		const int TotalW = RoomRect.w + LeftFragmentWidth + RightFragmentWidth;
-		const int TotalH = RoomRect.h + TopFragmentHeight + BottomFragmentHeight;
+		const float X = RoomRect.x - LeftFragmentWidth;
+		const float Y = RoomRect.y - TopFragmentHeight;
+		const float TotalW = RoomRect.w + LeftFragmentWidth + RightFragmentWidth;
+		const float TotalH = RoomRect.h + TopFragmentHeight + BottomFragmentHeight;
 
 		FullRect = {
 			X,
@@ -148,15 +147,15 @@ namespace LevelGeneration
 		};
 	}
 
-	void Room::DrawRoom(Application::Renderer& Renderer, SDL_Rect Rect)
+	void Room::DrawRoom(Application::Renderer& Renderer, SDL_FRect Rect)
 	{
 		for (int X = 0; X < Rect.w; X++)
 		{
 			for (int Y = 0; Y < Rect.h; Y++)
 			{
-				SDL_Rect TextureRect{
-					(Rect.x + X) * ROOM_TILE_SIZE,
-					(Rect.y + Y) * ROOM_TILE_SIZE,
+				SDL_FRect TextureRect{
+					(Rect.x + static_cast<float>(X)) * ROOM_TILE_SIZE,
+					(Rect.y + static_cast<float>(Y)) * ROOM_TILE_SIZE,
 					ROOM_TILE_SIZE,
 					ROOM_TILE_SIZE
 				};
@@ -164,7 +163,7 @@ namespace LevelGeneration
 				Renderer.DrawTexture(FloorTexture, TextureRect, 0);
 
 				Renderer.SetDrawColor(23, 23, 23);
-				Renderer.DrawRectangle({ Rect.x + X, Rect.y + Y, 1, 1 });
+				Renderer.DrawRectangle({ Rect.x + static_cast<float>(X), Rect.y + static_cast<float>(Y), 1, 1 });
 			}
 		}
 	}

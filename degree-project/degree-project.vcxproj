@@ -138,6 +138,7 @@
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
     <ClCompile Include="src\Application\Application.cpp" />
+    <ClCompile Include="src\Application\Camera.cpp" />
     <ClCompile Include="src\Application\Events.cpp" />
     <ClCompile Include="src\Application\Font.cpp" />
     <ClCompile Include="src\Application\Keyboard.cpp" />
@@ -150,6 +151,7 @@
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp" />
+    <ClCompile Include="src\LevelGeneration\Level.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\Maze.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp" />
     <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeStateData.cpp" />
@@ -174,6 +176,7 @@
     <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
     <ClInclude Include="src\Application\Application.h" />
+    <ClInclude Include="src\Application\Camera.h" />
     <ClInclude Include="src\Application\Events.h" />
     <ClInclude Include="src\Application\Font.h" />
     <ClInclude Include="src\Application\Keyboard.h" />
@@ -189,6 +192,7 @@
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h" />
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
+    <ClInclude Include="src\LevelGeneration\Level.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
     <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />

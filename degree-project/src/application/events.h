@@ -16,7 +16,7 @@ namespace Application
 
 		void Pull() const;
 		void AddListener(const SDL_EventType& EventType, EventCallback* Callback);
-		void remove_listener(const SDL_EventType& EventType, EventCallback* Callback);
+		void RemoveListener(const SDL_EventType& EventType, EventCallback* Callback);
 		void Clear();
 
 	private:

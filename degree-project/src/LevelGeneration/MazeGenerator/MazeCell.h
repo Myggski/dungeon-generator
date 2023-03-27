@@ -1,5 +1,7 @@
 #pragma once
+
 #include <SDL_rect.h>
+
 #include "DirectionType.h"
 
 namespace MazeGenerator

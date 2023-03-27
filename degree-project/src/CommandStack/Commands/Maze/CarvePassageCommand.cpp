@@ -1,8 +1,5 @@
 #include "CarvePassageCommand.h"
 
-#include <functional>
-#include <utility>
-
 #include "LevelGeneration/MazeGenerator/NavigationalDirections.h"
 #include "LevelGeneration/MazeGenerator/MazeCell.h"
 

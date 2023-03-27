@@ -14,7 +14,7 @@ namespace Command
 	void CommandStack::CreateInstance(int NumberOfCommandsToReserve)
 	{
 		if (StackInstance != nullptr) {
-			throw std::logic_error("Instance of CommandStack is already created!");
+			throw std::logic_error("Instance of CommandStack has already been created!");
 		}
 
 		StackInstance = std::make_unique<CommandStack>(CommandStack(NumberOfCommandsToReserve));

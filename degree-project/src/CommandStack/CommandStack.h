@@ -11,6 +11,7 @@ namespace Command
 	public:
 		static void CreateInstance(int NumberOfCommandsToReserve);
 		static CommandStack& GetInstance();
+
 		void ExecuteCommand(std::unique_ptr<Command> Command);
 		void Undo();
 		void Redo();

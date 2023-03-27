@@ -7,7 +7,7 @@ namespace LevelGeneration
 	class RoomFactory
 	{
 	public:
-		static Room CreateSimpleRoom(SDL_Rect Rect, RoomType RoomType);
+		static Room CreateSimpleRoom(SDL_FRect Rect, RoomType RoomType);
 		static Room CreateRoom(SDL_Point Position, RoomType RoomType);
 
 	private:

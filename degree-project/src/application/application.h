@@ -2,13 +2,12 @@
 
 #include <SDL_video.h>
 #include "Events.h"
-#include "Keyboard.h"
 #include "Renderer.h"
 #include "Timer.h"
 
 namespace Application
 {
-	class Application
+	class Application final
 	{
 	public:
 		explicit Application();
@@ -24,12 +23,13 @@ namespace Application
 
 		SDL_Window* Window{};
 		Events Events;
-		Keyboard Keyboard;
 		Timer Time;
 		Renderer Renderer;
 
 		EventCallback ExitApplication;
 		EventCallback OnKeyDown;
 		EventCallback OnKeyReleased;
+		EventCallback OnMouseDown;
+		EventCallback OnMouseUp;
 	};
 }

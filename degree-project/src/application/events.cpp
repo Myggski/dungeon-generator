@@ -44,7 +44,7 @@ namespace Application
 		}
 	}
 
-	void Events::remove_listener(const SDL_EventType& EventType, EventCallback* Callback) {
+	void Events::RemoveListener(const SDL_EventType& EventType, EventCallback* Callback) {
 
 		std::vector<EventCallback*>& Callbacks = RegisteredEvents[EventType];
 
@@ -74,7 +74,7 @@ namespace Application
 			auto& RegisteredEvent = *RegisteredEvents.begin();
 			for (const auto& Callback : RegisteredEvent.second)
 			{
-				remove_listener(RegisteredEvent.first, Callback);
+				RemoveListener(RegisteredEvent.first, Callback);
 			}
 		}
 

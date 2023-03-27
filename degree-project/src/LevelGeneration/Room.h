@@ -21,7 +21,7 @@ namespace LevelGeneration
 	class Room
 	{
 	public:
-		Room(SDL_Rect Rect, LevelGeneration::RoomType RoomType);
+		Room(SDL_FRect Rect, RoomType RoomType);
 
 		void GenerateFragment(FragmentPosition FragmentPosition);
 		void RemoveFragment(FragmentPosition FragmentPosition);
@@ -33,13 +33,13 @@ namespace LevelGeneration
 	private:
 		SDL_Point GetFragmentPosition(FragmentPosition FragmentPosition) const;
 		void SetFullRect();
-		void DrawRoom(Application::Renderer& Renderer, SDL_Rect Rect);
+		void DrawRoom(Application::Renderer& Renderer, SDL_FRect Rect);
 
 	private:
-		SDL_Rect RoomRect; // for the Room
-		SDL_Rect FullRect; // for the Room and fragments
+		SDL_FRect RoomRect; // for the Room
+		SDL_FRect FullRect; // for the Room and fragments
 		SDL_Texture* FloorTexture;
-		LevelGeneration::RoomType RoomType;
+		RoomType RoomType;
 		std::array<std::optional<RoomFragment>, 4> FragmentRooms;
 
 		size_t RoomId;

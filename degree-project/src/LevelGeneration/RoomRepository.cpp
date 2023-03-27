@@ -4,12 +4,12 @@
 
 namespace LevelGeneration
 {
-	void RoomRepository::Add(const Room&& RoomToAdd)
+	void RoomRepository::Add(const Room&& RoomToAdd) const
 	{
 		Rooms.emplace_back(RoomToAdd);
 	}
 
-	void RoomRepository::Remove(Room RoomToRemove)
+	void RoomRepository::Remove(Room RoomToRemove) const
 	{
 		Rooms.erase(std::ranges::remove_if(Rooms, [RoomToRemove](LevelGeneration::Room const& Room)
 		{

@@ -5,8 +5,12 @@
 #include <imgui_impl_sdlrenderer.h>
 #include <SDL_image.h>
 
+#include "Camera.h"
+
 namespace Application
 {
+	static constexpr float TILE_SIZE = 32.f;
+
 	void Renderer::Init(SDL_Window* Window)
 	{
 		SDLRenderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -34,16 +38,20 @@ namespace Application
 		}
 	}
 
-	void Renderer::DrawTexture(SDL_Texture* Texture, const SDL_Rect& ImageRect, double Angle) const
+	void Renderer::DrawTexture(SDL_Texture* Texture, const SDL_FRect& ImageRect, double Angle) const
 	{
-		const SDL_FPoint Center { ImageRect.w / 2.f, ImageRect.h / 2.f };
-		const SDL_FRect Rect {
-			static_cast<float>(ImageRect.x),
-			static_cast<float>(ImageRect.y),
-			static_cast<float>(ImageRect.w),
-			static_cast<float>(ImageRect.h),
+		const SDL_FPoint Center {
+			ImageRect.w / 2.f,
+			ImageRect.h / 2.f
 		};
-		SDL_RenderCopyExF(SDLRenderer, Texture, nullptr, &Rect, Angle, &Center, SDL_FLIP_NONE);
+		const SDL_FRect DrawRect{
+			ImageRect.x * TILE_SIZE - Camera::GetInstance().PositionX,
+			ImageRect.y * TILE_SIZE - Camera::GetInstance().PositionY,
+			ImageRect.w * TILE_SIZE,
+			ImageRect.h * TILE_SIZE,
+		};
+
+		SDL_RenderCopyExF(SDLRenderer, Texture, nullptr, &DrawRect, Angle, &Center, SDL_FLIP_NONE);
 		SDL_SetTextureBlendMode(Texture, SDL_BLENDMODE_BLEND);
 	}
 
@@ -68,18 +76,17 @@ namespace Application
 		SDL_SetRenderDrawColor(SDLRenderer, R, G, B, 255);
 	}
 
-	void Renderer::DrawRectangle(const SDL_Rect& Rect) const
+	void Renderer::DrawRectangle(const SDL_FRect& Rect) const
 	{
-		SDL_Rect DrawRect{
-			Rect.x * 32,
-			Rect.y * 32,
-			Rect.w * 32,
-			Rect.h * 32,
+		SDL_FRect DrawRect{
+			Rect.x * TILE_SIZE - Camera::GetInstance().PositionX,
+			Rect.y * TILE_SIZE - Camera::GetInstance().PositionY,
+			Rect.w * TILE_SIZE,
+			Rect.h * TILE_SIZE,
 		};
 
-		SDL_RenderDrawRect(SDLRenderer, &DrawRect);
+		SDL_RenderDrawRectF(SDLRenderer, &DrawRect);
 	}
-
 
 	SDL_Texture* Renderer::GetImage(const std::string& FilePath)
 	{

@@ -14,15 +14,15 @@ namespace LevelGeneration
 		}
 	}
 
-	Room RoomFactory::CreateSimpleRoom(SDL_Rect Rect, RoomType RoomType)
+	Room RoomFactory::CreateSimpleRoom(SDL_FRect Rect, RoomType RoomType)
 	{
 		return Room { Rect, RoomType };
 	}
 
 	Room RoomFactory::CreateRoom(SDL_Point Position, RoomType RoomType)
 	{
-		const int Size = GetRoomSize(RoomType);
-		const SDL_Rect RoomRectangle = { Position.x, Position.y, Size, Size };
+		const float Size = static_cast<float>(GetRoomSize(RoomType));
+		const SDL_FRect RoomRectangle = { static_cast<float>(Position.x), static_cast<float>(Position.y), Size, Size };
 		Room Room = CreateSimpleRoom(RoomRectangle, RoomType);
 		GenerateFragments(Room, static_cast<int>(RoomType));
 

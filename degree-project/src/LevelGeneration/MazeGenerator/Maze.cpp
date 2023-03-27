@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include "imgui.h"
-#include "Application/Configuration.h"
 #include "Application/Font.h"
 #include "CommandStack/CommandStack.h"
 #include "CommandStack/Commands/Maze/CarvePassageCommand.h"
@@ -17,7 +15,9 @@ namespace Command
 
 namespace MazeGenerator
 {
-	Maze::Maze(int Width, int Height) : StateData(Width, Height)
+	Maze::Maze(Cyclic::CyclicRule& MainRule, int Width, int Height)
+	: StateData(Width, Height),
+	MainRule(MainRule)
 	{
 		StateData.MazeGrid.resize(Width);
 
@@ -58,54 +58,6 @@ namespace MazeGenerator
 		CalculateStepsLeft();
 
 		return StateData.CurrentAction;
-	}
-
-	void Maze::DrawDebugText()
-	{
-		ImGui::SetNextWindowSize({ 208, 172 });
-		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 172 - 16) });
-
-		ImGui::Begin("Debug");
-
-		ImGui::Text("Seed: %d", Utils::RandomGenerator::GetInstance().GetSeed());
-		ImGui::Text("Done: %s", StateData.CurrentAction == MazeActionType::Done ? "True" : "False");
-		ImGui::Text("Number Of Steps Taken: %d", PathwayCalculationData.NumberOfStepsTaken);
-		ImGui::Text("Steps To Goal X: %d", PathwayCalculationData.StepsToGoalX);
-		ImGui::Text("Steps To Goal Y: %d", PathwayCalculationData.StepsToGoalY);
-		ImGui::Text("Min Steps: %d", PathwayCalculationData.MinSteps);
-		ImGui::Text("Max Steps: %d", PathwayCalculationData.MaxSteps);
-
-		ImGui::End();
-	}
-
-	std::vector<std::vector<MazeCell>> Maze::GetGrid()
-	{
-		return StateData.MazeGrid;
-	}
-
-	MazeCell& Maze::GetCurrentCell() const
-	{
-		return *StateData.CurrentCell;
-	}
-
-	MazeCell& Maze::GetStartCell() const
-	{
-		return *StateData.StartCell;
-	}
-
-	MazeCell& Maze::GetGoalCell() const
-	{
-		return *StateData.GoalCell;
-	}
-
-	MazeCell* Maze::GetCell(int PositionX, int PositionY)
-	{
-		return &StateData.MazeGrid[PositionX][PositionY];
-	}
-
-	std::vector<MazeCell*> Maze::GetPathway()
-	{
-		return StateData.GetCurrentPathway();
 	}
 
 	const MazeCell* Maze::GetNeighborCell(MazeCell* From, DirectionType Direction) const
@@ -262,7 +214,7 @@ namespace MazeGenerator
 	void Maze::InitializeMaze()
 	{
 		// Which side of the grid should the start position be
-		const DirectionType StartPositionDirection = GetRandomDirection();
+		DirectionType StartPositionDirection = NavigationalDirections::GetRandomDirection();
 
 		StateData.StartCell = GetRandomEdgeCell(StartPositionDirection);
 		// Set the goal cell to be at the opposite site of the start cell
@@ -282,7 +234,7 @@ namespace MazeGenerator
 		Command::CommandStack::GetInstance().ExecuteCommand(
 			std::make_unique<Command::CreateNewPathCommand>(
 				StateData,
-				GetRandomDirections()
+				NavigationalDirections::GetRandomDirections()
 			)
 		);
 	}
@@ -313,32 +265,12 @@ namespace MazeGenerator
 		}
 	}
 
-	std::array<DirectionType, 4> Maze::GetRandomDirections() const
-	{
-		std::array<DirectionType, 4> Directions =
-		{
-			DirectionType::North,
-			DirectionType::East,
-			DirectionType::South,
-			DirectionType::West
-		};
-
-		std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
-
-		return Directions;
-	}
-
-	DirectionType Maze::GetRandomDirection() const
-	{
-		return GetRandomDirections()[0];
-	}
-
 	std::vector<DirectionType> Maze::GetAvailableRandomDirections() const
 	{
 		std::vector<DirectionType> AvailableDirections;
 		AvailableDirections.reserve(4);
 
-		const std::array<DirectionType, 4> Directions = GetRandomDirections();
+		const std::array<DirectionType, 4> Directions = NavigationalDirections::GetRandomDirections();
 
 		for (const auto& CurrentDirection : Directions)
 		{

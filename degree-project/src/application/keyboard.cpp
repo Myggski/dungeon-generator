@@ -1,8 +1,31 @@
 #include "Keyboard.h"
 
+#include <stdexcept>
+
 namespace Application
 {
+    std::unique_ptr<Keyboard> Keyboard::Instance = nullptr;
+
     KeyboardKeyData::KeyboardKeyData(SDL_Scancode Scancode) : Scancode(Scancode) { }
+
+    void Keyboard::CreateInstance()
+    {
+        if (Instance != nullptr) {
+            throw std::logic_error("Instance of Keyboard has already been created!");
+        }
+
+        Instance = std::make_unique<Keyboard>(Keyboard());
+    }
+
+    Keyboard& Keyboard::GetInstance()
+    {
+        if (Instance == nullptr)
+        {
+            throw std::logic_error("Instance of Keyboard has not been created yet, or has been destroyed!");
+        }
+
+        return *Instance;
+    }
 
     void Keyboard::OnKeyPressed(SDL_Event Event)
     {

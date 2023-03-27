@@ -7,6 +7,11 @@
 #include "DirectionType.h"
 #include "MazeCell.h"
 
+namespace LevelGeneration
+{
+    class Level;
+}
+
 namespace Command
 {
     class BacktrackPassageCommand;
@@ -52,6 +57,7 @@ namespace MazeGenerator
         MazeActionType CurrentAction;
 
 		friend class Maze;
+        friend class LevelGeneration::Level;
         friend class Command::BacktrackPassageCommand;
         friend class Command::CarvePassageCommand;
         friend class Command::CreateNewPathCommand;
