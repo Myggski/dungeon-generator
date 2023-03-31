@@ -16,17 +16,17 @@ namespace LevelGenerator
 namespace Command
 {
 
-	class BacktrackPassageCommand final : public Command
+	class DeadEndCommand final : public Command
 	{
 	public:
-		BacktrackPassageCommand(LevelGenerator::LevelStateData& StateData);
+		DeadEndCommand(LevelGenerator::LevelStateData& StateData);
 
 		void Execute() override;
 		void Undo() override;
 
 	private:
-		bool PathReversed;
 		LevelGenerator::LevelStateData& StateData;
-		LevelGenerator::LevelCell* PreviousCell;
+		LevelGenerator::LevelCell* DeadEndCell;
+		DirectionType CarvedDirection;
 	};
 }

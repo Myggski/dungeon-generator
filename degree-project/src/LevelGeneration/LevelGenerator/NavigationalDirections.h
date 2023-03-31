@@ -6,7 +6,7 @@
 #include "DirectionType.h"
 #include "utils/RandomGenerator.h"
 
-namespace MazeGenerator
+namespace LevelGenerator
 {
     const std::unordered_map<DirectionType, DirectionType> OppositeDirection
     {
@@ -50,9 +50,9 @@ namespace MazeGenerator
             return Vertical;
         }
 
-        static std::array<DirectionType, 4> GetRandomDirections()
+        static std::array<DirectionType, 4> GetDirections()
         {
-            std::array<DirectionType, 4> Directions =
+            const std::array<DirectionType, 4> Directions =
             {
                 DirectionType::North,
                 DirectionType::East,
@@ -60,6 +60,12 @@ namespace MazeGenerator
                 DirectionType::West
             };
 
+            return Directions;
+        }
+
+        static std::array<DirectionType, 4> GetRandomDirections()
+        {
+            std::array<DirectionType, 4> Directions = GetDirections();
             std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
 
             return Directions;
@@ -68,6 +74,32 @@ namespace MazeGenerator
         static DirectionType GetRandomDirection()
         {
             return GetRandomDirections()[0];
+        }
+
+        static DirectionType GetRandomHorizontal()
+        {
+            std::array<DirectionType, 2> Directions =
+            {
+                DirectionType::East,
+                DirectionType::West
+            };
+
+            std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+            return Directions[0];
+        }
+
+        static DirectionType GetRandomVertical()
+        {
+            std::array<DirectionType, 2> Directions =
+            {
+                DirectionType::North,
+                DirectionType::South
+            };
+
+            std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+            return Directions[0];
         }
     private:
         DirectionType Horizontal;

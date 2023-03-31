@@ -2,42 +2,64 @@
 
 #include <vector>
 
-#include "LevelGeneration/MazeGenerator/MazeStateData.h"
+#include "LevelGeneration/LevelGenerator/LevelStateData.h"
 
 namespace Command
 {
-	BacktrackPassageCommand::BacktrackPassageCommand(MazeGenerator::MazeStateData& StateData)
-		: StateData(StateData),
-		PreviousCell(nullptr) { }
+	BacktrackPassageCommand::BacktrackPassageCommand(LevelGenerator::LevelStateData& StateData)
+		: PathReversed(false),
+		  StateData(StateData),
+		  PreviousCell(nullptr)
+	{ }
 
 	void BacktrackPassageCommand::Execute()
 	{
 		PreviousCell = StateData.CurrentCell;
-		StateData.AddCellToPathway(StateData.VisitedCellStack.top());
-		StateData.VisitedCellStack.pop();
+
+		if (!StateData.VisitedCellStack.empty())
+		{
+			StateData.AddCellToPathway(StateData.VisitedCellStack.top());
+			StateData.VisitedCellStack.pop();
+		} else
+		{
+			StateData.CurrentCell = StateData.StartCell;
+		}
 
 		if (!StateData.VisitedCellStack.empty())
 		{
 			StateData.CurrentCell = StateData.VisitedCellStack.top();
 		} else if (StateData.CurrentCell == StateData.StartCell)
 		{
-			StateData.CurrentAction = StateData.CurrentPathwayIndex > 0
-				? MazeGenerator::MazeActionType::Done
-				: MazeGenerator::MazeActionType::CreateNewPath;
+			if (StateData.CurrentInsertionIndex > 0)
+			{
+				StateData.CurrentAction = LevelGenerator::GeneratorActionType::Done;
+			}
+			else
+			{
+				StateData.CurrentAction = LevelGenerator::GeneratorActionType::CreatingPath;
+			}
+
+			StateData.ReversePathway(StateData.CurrentInsertionIndex);
+			PathReversed = true;
 		}
 	}
 
 	void BacktrackPassageCommand::Undo()
 	{
+		if (PathReversed)
+		{
+			StateData.ReversePathway(StateData.CurrentInsertionIndex);
+		}
+
 		if (!StateData.IsPathwayEmpty())
 		{
-			const std::vector<MazeGenerator::MazeCell*>& CurrentPathway = StateData.GetCurrentPathway();
-			MazeGenerator::MazeCell* LastCellInPath = CurrentPathway[CurrentPathway.size() - 1];
+			const std::vector<LevelGenerator::LevelCell*>& CurrentPathway = StateData.GetCurrentPathway();
+			LevelGenerator::LevelCell* LastCellInPath = CurrentPathway[CurrentPathway.size() - 1];
 
 			StateData.VisitedCellStack.push(LastCellInPath);
 			StateData.RemoveLastCellFromPathway();
 		}
-		
+
 		StateData.CurrentCell = PreviousCell;
 	}
 }

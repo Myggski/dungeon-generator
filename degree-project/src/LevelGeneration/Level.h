@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include "Application/Renderer.h"
-#include "MazeGenerator/Maze.h"
+#include "LevelGenerator/LevelGenerator.h"
 
 namespace LevelGeneration
 {
 	class Level
 	{
 	public:
-		Level(Cyclic::CyclicRule MainRule, int GridSizeX, int GridSizeY);
+		Level(Cyclic::CyclicRuleRepository& RuleRepository, int GridSizeX, int GridSizeY);
 
 		/**
 		 * \brief Checking for inputs and generates a level
@@ -38,7 +38,7 @@ namespace LevelGeneration
 		 * \brief Draws the grid of the maze/level
 		 * \param Renderer Wrapper for SDL_Renderer
 		 */
-		void DrawMaze(Application::Renderer& Renderer);
+		void DrawMaze(Application::Renderer& Renderer) const;
 
 		/**
 		 * \brief Draws shortcut/input information in a ImGUI-window
@@ -48,12 +48,14 @@ namespace LevelGeneration
 		/**
 		 * \brief Draws debug data for the maze/level
 		 */
-		void DrawDebugTextWindow() const;
+		void DrawDebugTextWindow();
+
+		void DrawRulesInformationWindow() const;
 
 		/**
 		 * \brief Replaces the maze object with a new and resets generation states and data
 		 */
-		void ResetMaze();
+		void ResetMaze(Cyclic::CyclicRule& MainRule);
 		
 	private:
 		bool bLevelDone{};
@@ -64,7 +66,7 @@ namespace LevelGeneration
 		float WaitStepTimeSeconds{};
 		float SinceLastStepSeconds{};
 
-		Cyclic::CyclicRule MainRule;
-		MazeGenerator::Maze Maze;
+		Cyclic::CyclicRuleRepository& RuleRepository;
+		LevelGenerator::LevelGenerator Maze;
 	};
 }

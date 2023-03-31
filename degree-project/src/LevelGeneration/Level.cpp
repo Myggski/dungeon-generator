@@ -8,15 +8,20 @@
 #include "Application/Configuration.h"
 #include "Application/Keyboard.h"
 #include "CommandStack/CommandStack.h"
+#include "Cyclic/CyclicRuleRepository.h"
 
 namespace LevelGeneration
 {
-	Level::Level(Cyclic::CyclicRule MainRule, int GridSizeX, int GridSizeY)
+	Level::Level(Cyclic::CyclicRuleRepository& RuleRepository, int GridSizeX, int GridSizeY)
 		: GridSizeX(GridSizeX),
 		GridSizeY(GridSizeY),
 		NumberOfFailedAttempts(0),
-		MainRule(std::move(MainRule)),
-		Maze(this->MainRule, GridSizeX, GridSizeY) { }
+		RuleRepository(RuleRepository),
+		Maze(RuleRepository.GetRandomRule(), GridSizeX, GridSizeY)
+	{
+		Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
+		Maze.InitializeMaze();
+	}
 
 	void Level::Update(float DeltaTime)
 	{
@@ -33,6 +38,7 @@ namespace LevelGeneration
 
 		DrawShortcutsWindow();
 		DrawDebugTextWindow();
+		DrawRulesInformationWindow();
 	}
 
 	void Level::GenerateLevel(float DeltaTime)
@@ -44,16 +50,17 @@ namespace LevelGeneration
 
 		if (SinceLastStepSeconds > WaitStepTimeSeconds)
 		{
-			const MazeGenerator::MazeActionType CurrentStep = Maze.Step();
+			const LevelGenerator::GeneratorActionType CurrentStep = Maze.Step();
 
-			if (CurrentStep == MazeGenerator::MazeActionType::CarvePassageFailed)
+			if (CurrentStep == LevelGenerator::GeneratorActionType::Failed)
 			{
 				NumberOfFailedAttempts++;
+
 				Command::CommandStack::GetInstance().Clear();
-				Maze = { MainRule, GridSizeX, GridSizeY };
+				Maze = { Maze.MainRule, GridSizeX, GridSizeY };
 			}
 
-			if (CurrentStep == MazeGenerator::MazeActionType::Done)
+			if (CurrentStep == LevelGenerator::GeneratorActionType::Done)
 			{
 				bLevelDone = true;
 			}
@@ -84,12 +91,12 @@ namespace LevelGeneration
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_R))
 		{
 			Utils::RandomGenerator::GetInstance().RandomizeSeed();
-			ResetMaze();
+			ResetMaze(RuleRepository.GetRandomRule());
 		}
 
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_P))
 		{
-			ResetMaze();
+			ResetMaze(Maze.MainRule);
 		}
 
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_KP_PLUS))
@@ -99,7 +106,7 @@ namespace LevelGeneration
 				GridSizeX += 1;
 				GridSizeY += 1;
 
-				ResetMaze();
+				ResetMaze(Maze.MainRule);
 			}
 		}
 
@@ -110,14 +117,14 @@ namespace LevelGeneration
 				GridSizeX -= 1;
 				GridSizeY -= 1;
 
-				ResetMaze();
+				ResetMaze(Maze.MainRule);
 			}
 		}
 	}
 
-	void Level::DrawMaze(Application::Renderer& Renderer)
+	void Level::DrawMaze(Application::Renderer& Renderer) const
 	{
-		const std::vector<std::vector<MazeGenerator::MazeCell>>& grid = Maze.StateData.MazeGrid;
+		const std::vector<std::vector<LevelGenerator::LevelCell>>& grid = Maze.StateData.MazeGrid;
 
 		for (int x = 0; x < GridSizeX; x++)
 		{
@@ -158,15 +165,16 @@ namespace LevelGeneration
 			}
 		}
 
-		for (const auto& Pathway : Maze.StateData.Pathways)
+		for (const auto& Pathway : Maze.StateData.InsertionPathways)
 		{
-
 			if (Pathway.empty())
 			{
 				continue;
 			}
 
-			for (const MazeGenerator::MazeCell* maze : Pathway)
+			int Index = 0;
+
+			for (const LevelGenerator::LevelCell* maze : Pathway)
 			{
 				SDL_FRect TextureRect{
 					static_cast<float>(maze->GetPosition().x),
@@ -183,6 +191,14 @@ namespace LevelGeneration
 					SDL_Texture* image = Renderer.GetImage("resources/goal.png");
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
+
+				if (Index == (Pathway.size() - 1) / 2)
+				{
+					SDL_Texture* image = Renderer.GetImage("resources/key.png");
+					Renderer.DrawTexture(image, TextureRect, 0);
+				}
+
+				Index++;
 			}
 		}
 	}
@@ -217,19 +233,19 @@ namespace LevelGeneration
 		ImGui::End();
 	}
 
-	void Level::DrawDebugTextWindow() const
+	void Level::DrawDebugTextWindow()
 	{
 		ImGui::SetNextWindowSize({ 208, 192 });
-		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 192 - 16) });
+		ImGui::SetNextWindowPos({ 232 + 32, static_cast<float>(Configuration::WindowHeight - 192 - 16) });
 
 		ImGui::Begin("Debug");
 
-		ImGui::Text("Seed: %d", Utils::RandomGenerator::GetInstance().GetSeed());
+		ImGui::Text("Seed: %u", Utils::RandomGenerator::GetInstance().GetSeed());
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		ImGui::Text("Done: %s", Maze.StateData.CurrentAction == MazeGenerator::MazeActionType::Done ? "True" : "False");
+		ImGui::Text("Done: %s", bLevelDone ? "True" : "False");
 		ImGui::Text("Number Of Failures: %d", NumberOfFailedAttempts);
 
 		ImGui::Spacing();
@@ -242,13 +258,44 @@ namespace LevelGeneration
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		ImGui::Text("Min Steps: %d", Maze.PathwayCalculationData.MinSteps);
-		ImGui::Text("Max Steps: %d", Maze.PathwayCalculationData.MaxSteps);
+		ImGui::Text("Insertion One Steps: %llu", Maze.StateData.GetPathway(0).size());
+		ImGui::Text("Insertion Two Steps: %llu", Maze.StateData.GetPathway(1).size());
 
 		ImGui::End();
 	}
 
-	void Level::ResetMaze()
+	void Level::DrawRulesInformationWindow() const
+	{
+		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 234 - 16) });
+		ImGui::SetNextWindowSize({ 232, 234 }, 0);
+		ImGui::Begin("Main Rule");
+
+		ImGui::Text("Name:");
+		ImGui::Text("%s", Maze.MainRule.GetName().c_str());
+		ImGui::Text("Goal: %s", Maze.MainRule.GetGoalTypeToString().c_str());
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		const std::pair<int, int> MinMaxStepsOne = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(0));
+		ImGui::Text("Insertion One");
+		ImGui::Text("Element: %s", Maze.MainRule.GetElementName(0).c_str());
+		ImGui::Text("Path Length: %s", Maze.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
+		ImGui::Text("Steps: %d - %d", MinMaxStepsOne.first, MinMaxStepsOne.second);
+
+		ImGui::Spacing();
+		ImGui::Spacing();
+
+		const std::pair<int, int> MinMaxStepsTwo = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(1));
+		ImGui::Text("Insertion Two");
+		ImGui::Text("Element: %s", Maze.MainRule.GetElementName(1).c_str());
+		ImGui::Text("Path Length: %s", Maze.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
+		ImGui::Text("Steps: %d - %d", MinMaxStepsTwo.first, MinMaxStepsTwo.second);
+
+		ImGui::End();
+	}
+
+	void Level::ResetMaze(Cyclic::CyclicRule& MainRule)
 	{
 		Command::CommandStack::GetInstance().Clear();
 		Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
@@ -257,5 +304,4 @@ namespace LevelGeneration
 		NumberOfFailedAttempts = 0;
 		bLevelDone = false;
 	}
-
 }

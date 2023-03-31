@@ -25,7 +25,7 @@ namespace Cyclic
 		}
 	}
 
-	const CyclicRule& CyclicRuleRepository::GetRandomRule()
+	CyclicRule& CyclicRuleRepository::GetRandomRule()
 	{
 		const int RandomIndex = Utils::RandomGenerator::GetInstance().GetRandom(0, static_cast<int>(ListOfRules.size() - 1));
 

@@ -1,14 +1,14 @@
 ﻿#pragma once
 
 #include "CommandStack/Commands/Command.h"
-#include "LevelGeneration/MazeGenerator/MazeStateData.h"
+#include "LevelGeneration/LevelGenerator/LevelStateData.h"
 
 enum class DirectionType : uint8_t;
 
-namespace MazeGenerator
+namespace LevelGenerator
 {
-	class Maze;
-	class MazeCell;
+	class LevelGenerator;
+	class LevelCell;
 }
 
 namespace Command
@@ -17,21 +17,24 @@ namespace Command
 	class CreateNewPathCommand final : public Command
 	{
 	public:
-		CreateNewPathCommand(MazeGenerator::MazeStateData& StateData, std::array<DirectionType, 4> RandomDirections);
+		CreateNewPathCommand(LevelGenerator::LevelStateData& StateData);
 		~CreateNewPathCommand() override;
 
 		void Execute() override;
 		void Undo() override;
 
 	private:
-		static bool IsOutOfBound(const MazeGenerator::MazeStateData& StateData, int PositionX, int PositionY)
+		static bool IsOutOfBound(const LevelGenerator::LevelStateData& StateData, int PositionX, int PositionY)
 		{
 			return (PositionX < 0 || PositionX > StateData.GridWidth - 1) || (PositionY < 0 || PositionY > StateData.GridHeight - 1);
 		}
 
 	private:
-		MazeGenerator::MazeStateData& StateData;
-		std::vector<MazeGenerator::MazeCell*> ChangedCells;
-		std::array<DirectionType, 4> RandomDirections;
+		LevelGenerator::LevelStateData& StateData;
+		std::vector<LevelGenerator::LevelCell*> ChangedCells;
+		std::queue<DirectionType> PreviousDirections;
+		LevelGenerator::LevelCell* PreviousCurrentCell;
+		LevelGenerator::GeneratorActionType PreviousActionType;
+
 	};
 }

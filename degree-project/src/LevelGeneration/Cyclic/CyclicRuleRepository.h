@@ -12,7 +12,7 @@ namespace Cyclic
 
 		void Add(CyclicRule&& Rule);
 		void Remove(const CyclicRule& RuleName);
-		const CyclicRule& GetRandomRule();
+		CyclicRule& GetRandomRule();
 
 	private:
 		std::vector<CyclicRule> ListOfRules;

@@ -122,12 +122,16 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\$(ProjectName)\src;$(SolutionDir)\external\SDL2_ttf\include;$(SolutionDir)\external\SDL2_image\include;$(SolutionDir)\external\SDL2\include;$(SolutionDir)\external\imgui\backends;$(SolutionDir)\external\imgui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)\external\SDL2_image\lib\x64;$(SolutionDir)\external\SDL2_ttf\lib\x64;$(SolutionDir)\external\SDL2\lib\x64;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>SDL2.lib;SDL2main.lib;SDL2_image.lib;SDL2_ttf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -137,6 +141,11 @@
     <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\AddElementsCommand.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\Element.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\RewardProperty.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\MiniBossProperty.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Maze\DeadEndCommand.cpp" />
     <ClCompile Include="src\Application\Application.cpp" />
     <ClCompile Include="src\Application\Camera.cpp" />
     <ClCompile Include="src\Application\Events.cpp" />
@@ -151,11 +160,12 @@
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRule.cpp" />
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\LockKeyProperty.cpp" />
     <ClCompile Include="src\LevelGeneration\Level.cpp" />
-    <ClCompile Include="src\LevelGeneration\MazeGenerator\Maze.cpp" />
-    <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeCell.cpp" />
-    <ClCompile Include="src\LevelGeneration\MazeGenerator\MazeStateData.cpp" />
-    <ClCompile Include="src\LevelGeneration\MazeGenerator\PathwayData.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelGenerator.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelCell.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelStateData.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\PathwayData.cpp" />
     <ClCompile Include="src\LevelGeneration\Room.cpp" />
     <ClCompile Include="src\LevelGeneration\RoomFactory.cpp" />
     <ClCompile Include="src\LevelGeneration\RoomFragment.cpp" />
@@ -175,6 +185,12 @@
     <ClInclude Include="..\external\Imgui\imstb_rectpack.h" />
     <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
+    <ClInclude Include="AddElementsCommand.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\AddElementsCommand.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\Element.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\RewardProperty.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\MiniBossProperty.h" />
+    <ClInclude Include="src\CommandStack\Commands\Maze\DeadEndCommand.h" />
     <ClInclude Include="src\Application\Application.h" />
     <ClInclude Include="src\Application\Camera.h" />
     <ClInclude Include="src\Application\Events.h" />
@@ -187,18 +203,19 @@
     <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Maze\CreateNewPathCommand.h" />
-    <ClInclude Include="src\LevelGeneration\CyclicGraph.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicInsertionPoint.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRule.h" />
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\ElementProperty.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\LockKeyProperty.h" />
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
     <ClInclude Include="src\LevelGeneration\Level.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\DirectionType.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\Maze.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeCell.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\MazeStateData.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\PathwayData.h" />
-    <ClInclude Include="src\LevelGeneration\MazeGenerator\NavigationalDirections.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\DirectionType.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelGenerator.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelCell.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelStateData.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\PathwayData.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\NavigationalDirections.h" />
     <ClInclude Include="src\LevelGeneration\Room.h" />
     <ClInclude Include="src\LevelGeneration\RoomFactory.h" />
     <ClInclude Include="src\LevelGeneration\RoomFragment.h" />

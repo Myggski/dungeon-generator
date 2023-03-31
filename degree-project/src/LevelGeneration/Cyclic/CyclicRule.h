@@ -37,16 +37,23 @@ namespace Cyclic
 		CyclicRule(const CyclicRule& other);
 		CyclicRule(CyclicRule&& other) noexcept;
 		~CyclicRule();
-		CyclicRule& operator=(const CyclicRule& other);
+		CyclicRule& operator=(const CyclicRule& Other);
 		CyclicRule& operator=(CyclicRule&& other) noexcept;
 
 		bool HasGoalType(GoalType GoalTypeToCheck) const;
+		bool HasArcType(ArcType ArcTypeToCheck);
+		GoalType GetGoalType() const;
+		std::string GetGoalTypeToString() const;
+		ArcType GetArcType(int InsertionIndex);
+		std::string GetName() const;
+		std::string GetElementName(int InsertionIndex) const;
+		LevelElement::Element GetElement(int InsertionIndex) const;
 
 	private:
 		std::string RuleName;
 		GoalType GoalType;
 		std::optional<std::array<std::unique_ptr<CyclicInsertionPoint>, 2>> InsertionPoints;
 
-		friend CyclicRuleRepository;
+		friend class CyclicRuleRepository;
 	};
 }

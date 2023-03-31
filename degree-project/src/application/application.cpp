@@ -16,6 +16,9 @@
 #include "Application/Configuration.h"
 #include "Application/Keyboard.h"
 #include "LevelGeneration/Cyclic/CyclicRuleRepository.h"
+#include "LevelGeneration/LevelElement/LockKeyProperty.h"
+#include "LevelGeneration/LevelElement/MiniBossProperty.h"
+#include "LevelGeneration/LevelElement/RewardProperty.h"
 
 namespace Application
 {
@@ -86,14 +89,31 @@ namespace Application
 		bIsRunning = true;
 		Time.Init();
 
-		Utils::RandomGenerator::GetInstance().RandomizeSeed();
+		Cyclic::CyclicInsertionPoint LongLockKey
+		{
+			{ std::make_unique<LevelElement::LockKeyProperty>(LevelElement::LockKeyType::LockKey) },
+			Cyclic::ArcType::Long
+		};
 
-		Cyclic::CyclicInsertionPoint LongLockKey{ Cyclic::ArcType::Long, Cyclic::InsertionType::LockKey };
-		Cyclic::CyclicInsertionPoint ShortLockKey{ Cyclic::ArcType::Short, Cyclic::InsertionType::LockKey };
-		Cyclic::CyclicInsertionPoint ShortMiniBoss{ Cyclic::ArcType::Short, Cyclic::InsertionType::MiniBoss };
-		Cyclic::CyclicInsertionPoint ShortTraps{ Cyclic::ArcType::Short, Cyclic::InsertionType::Traps };
+		Cyclic::CyclicInsertionPoint ShortLockKey
+		{
+			{ std::make_unique<LevelElement::LockKeyProperty>(LevelElement::LockKeyType::LockKey) },
+			Cyclic::ArcType::Short
+		};
 
-		Cyclic::CyclicRuleRepository RuleRepository{ 4 };
+		Cyclic::CyclicInsertionPoint ShortMiniBoss
+		{
+			{ std::make_unique<LevelElement::MiniBossProperty>(LevelElement::DifficultyType::Easy) },
+			Cyclic::ArcType::Short
+		};
+
+		Cyclic::CyclicInsertionPoint ShortTraps
+		{
+			{ std::make_unique<LevelElement::RewardProperty>(LevelElement::RewardType::Tech, LevelElement::RarityType::Epic)},
+			Cyclic::ArcType::Short
+		};
+
+		Cyclic::CyclicRuleRepository RuleRepository = { 4 };
 
 		RuleRepository.Add({
 			"Two Locks and Keys - Short",
@@ -119,9 +139,11 @@ namespace Application
 			Cyclic::GoalType::Treasure | Cyclic::GoalType::SecretDocuments,
 			});
 
-		auto SelectedRule = RuleRepository.GetRandomRule();
-
-		LevelGeneration::Level Level{ SelectedRule, static_cast<int>(static_cast<float>(Configuration::GridSize) * Configuration::GridAspectRatio), Configuration::GridSize };
+		LevelGeneration::Level Level{
+			RuleRepository,
+			static_cast<int>(static_cast<float>(Configuration::GridSize) * Configuration::GridAspectRatio),
+			Configuration::GridSize
+		};
 
 		while (bIsRunning)
 		{

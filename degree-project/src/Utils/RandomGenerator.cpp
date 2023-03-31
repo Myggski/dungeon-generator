@@ -44,7 +44,6 @@ namespace Utils
     {
         Seed = NewSeed;
         RandomEngine = std::mt19937(Seed);
-        RandomEngine.seed(Seed);
     }
 
     void RandomGenerator::RandomizeSeed()

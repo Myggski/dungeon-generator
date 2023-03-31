@@ -1,6 +1,6 @@
 #include "PathwayData.h"
 
-namespace MazeGenerator
+namespace LevelGenerator
 {
 	PathwayData::PathwayData()
 		: NumberOfStepsTaken(0),

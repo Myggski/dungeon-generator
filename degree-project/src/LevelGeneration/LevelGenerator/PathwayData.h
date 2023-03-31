@@ -2,7 +2,7 @@
 
 #include "NavigationalDirections.h"
 
-namespace MazeGenerator
+namespace LevelGenerator
 {
     struct PathwayData
     {

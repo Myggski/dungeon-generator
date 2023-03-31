@@ -1,19 +1,20 @@
 ﻿#include "CreateNewPathCommand.h"
 
-#include "LevelGeneration/MazeGenerator/NavigationalDirections.h"
+#include "LevelGeneration/LevelGenerator/NavigationalDirections.h"
 
-namespace MazeGenerator
+namespace LevelGenerator
 {
-	class Maze;
+	class LevelGenerator;
 }
 
 namespace Command
 {
-	CreateNewPathCommand::CreateNewPathCommand(MazeGenerator::MazeStateData& StateData, std::array<DirectionType, 4> RandomDirections)
+	CreateNewPathCommand::CreateNewPathCommand(LevelGenerator::LevelStateData& StateData)
 		: StateData(StateData),
-		RandomDirections(RandomDirections)
+		PreviousCurrentCell(nullptr),
+		PreviousActionType(LevelGenerator::GeneratorActionType::None)
 	{
-		ChangedCells.reserve(4);
+		ChangedCells.reserve(6);
 	}
 
 	CreateNewPathCommand::~CreateNewPathCommand()
@@ -23,15 +24,34 @@ namespace Command
 
 	void CreateNewPathCommand::Execute()
 	{
-		// Set neighbors of the goal to unvisited
-		for (DirectionType Direction : RandomDirections)
+		if (!StateData.StartCell->IsVisited())
 		{
-			const int NeighborX = StateData.GoalCell->GetPosition().x + MazeGenerator::DirectionToGridStepX.at(Direction);
-			const int NeighborY = StateData.GoalCell->GetPosition().y + MazeGenerator::DirectionToGridStepY.at(Direction);
+			ChangedCells.emplace_back(StateData.StartCell);
+		}
+
+		if (StateData.GoalCell->IsVisited())
+		{
+			ChangedCells.emplace_back(StateData.StartCell);
+		}
+
+		PreviousActionType = StateData.CurrentAction;
+		PreviousCurrentCell = StateData.CurrentCell;
+
+		StateData.StartCell->SetVisited(true);
+		StateData.CurrentCell = StateData.StartCell;
+		StateData.VisitedCellStack.push(StateData.CurrentCell);
+		StateData.GoalCell->SetVisited(false);
+		StateData.CurrentAction = LevelGenerator::GeneratorActionType::CarvingPath;
+
+		// Set neighbors of the goal to unvisited
+		for (DirectionType Direction : LevelGenerator::NavigationalDirections::GetDirections())
+		{
+			const int NeighborX = StateData.GoalCell->GetPosition().x + LevelGenerator::DirectionToGridStepX.at(Direction);
+			const int NeighborY = StateData.GoalCell->GetPosition().y + LevelGenerator::DirectionToGridStepY.at(Direction);
 
 			if (!IsOutOfBound(StateData, NeighborX, NeighborY))
 			{
-				MazeGenerator::MazeCell* NeighborCell = &StateData.MazeGrid[NeighborX][NeighborY];
+				LevelGenerator::LevelCell* NeighborCell = &StateData.MazeGrid[NeighborX][NeighborY];
 
 				if (NeighborCell->IsVisited())
 				{
@@ -41,16 +61,33 @@ namespace Command
 			}
 		}
 
-		StateData.CurrentPathwayIndex++;
+		while (!StateData.PreviousDirections.empty())
+		{
+			StateData.PreviousDirections.pop();
+		}
+
+		StateData.CurrentInsertionIndex++;
 	}
 
 	void CreateNewPathCommand::Undo()
 	{
-		for (MazeGenerator::MazeCell* ChangedCell : ChangedCells)
+		for (LevelGenerator::LevelCell* ChangedCell : ChangedCells)
 		{
-			ChangedCell->SetVisited(true);
+			ChangedCell->SetVisited(!ChangedCell->IsVisited());
 		}
 
-		StateData.CurrentPathwayIndex--;
+		if (!StateData.VisitedCellStack.empty())
+		{
+			StateData.VisitedCellStack.pop();
+		}
+
+		if (PreviousCurrentCell)
+		{
+			StateData.CurrentCell = PreviousCurrentCell;
+		}
+		
+		StateData.PreviousDirections = PreviousDirections;
+		StateData.CurrentAction = PreviousActionType;
+		StateData.CurrentInsertionIndex--;
 	}
 }

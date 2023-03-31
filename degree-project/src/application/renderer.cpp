@@ -9,7 +9,7 @@
 
 namespace Application
 {
-	static constexpr float TILE_SIZE = 32.f;
+	static constexpr float TILE_SIZE = 64.f;
 
 	void Renderer::Init(SDL_Window* Window)
 	{
@@ -19,7 +19,7 @@ namespace Application
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
 		ImGuiIO& io = ImGui::GetIO(); (void)io;
-		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+		io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;
 
 		ImGui::StyleColorsDark();
 		ImGui_ImplSDL2_InitForSDLRenderer(Window, SDLRenderer);

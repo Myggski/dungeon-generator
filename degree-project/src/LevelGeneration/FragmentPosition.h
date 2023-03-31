@@ -1,15 +1,13 @@
 #pragma once
 
-#include <SDL_stdinc.h>
-
 namespace LevelGeneration
 {
-	enum class FragmentPosition : Uint8
+	enum class FragmentPosition : uint8_t
 	{
-		None = 255,
-		Top = 0,
-		Right = 1,
-		Bottom = 2,
-		Left = 3
+		None = 0,
+		Top = 1 << 1,
+		Right = 1 << 2,
+		Bottom = 1 << 3,
+		Left = 1 << 4
 	};
 }
