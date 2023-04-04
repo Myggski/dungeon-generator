@@ -8,7 +8,7 @@ namespace LevelGeneration
 {
 	class Room;
 	class RoomRepository;
-	enum class RoomType;
+	enum class RoomSize;
 }
 
 namespace Command
@@ -17,14 +17,14 @@ namespace Command
 	{
 	public:
 		~CreateRoomCommand() override = default;
-		CreateRoomCommand(LevelGeneration::RoomRepository& RoomRepository, SDL_Point Position, LevelGeneration::RoomType RoomType);
+		CreateRoomCommand(LevelGeneration::RoomRepository& RoomRepository, SDL_Point Position, LevelGeneration::RoomSize RoomType);
 
 		void Execute() override;
 		void Undo() override;
 
 	private:
 		SDL_Point Position;
-		LevelGeneration::RoomType RoomType;
+		LevelGeneration::RoomSize RoomType;
 		LevelGeneration::RoomRepository& RoomRepository;
 
 	};

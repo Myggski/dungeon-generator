@@ -124,7 +124,7 @@ namespace LevelGeneration
 
 	void Level::DrawMaze(Application::Renderer& Renderer) const
 	{
-		const std::vector<std::vector<LevelGenerator::LevelCell>>& grid = Maze.StateData.MazeGrid;
+		const std::vector<std::vector<LevelGenerator::LevelCell>>& grid = Maze.StateData.LevelGrid;
 
 		for (int x = 0; x < GridSizeX; x++)
 		{
@@ -162,6 +162,36 @@ namespace LevelGeneration
 					auto* image = Renderer.GetImage("resources/goal.png");
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
+
+				if (!grid[x][y].GetElements().empty())
+				{
+					for (const auto& Element : grid[x][y].GetElements())
+					{
+						if (Element->GetElementType() == LevelElement::ElementType::LockAndKey)
+						{
+							SDL_Texture* image = Renderer.GetImage("resources/key.png");
+							Renderer.DrawTexture(image, TextureRect, 0);
+						}
+
+						if (Element->GetElementType() == LevelElement::ElementType::MiniBoss)
+						{
+							SDL_Texture* image = Renderer.GetImage("resources/monster.png");
+							Renderer.DrawTexture(image, TextureRect, 0);
+						}
+
+						if (Element->GetElementType() == LevelElement::ElementType::Reward)
+						{
+							SDL_Texture* image = Renderer.GetImage("resources/reward.png");
+							Renderer.DrawTexture(image, TextureRect, 0);
+						}
+
+						if (Element->GetElementType() == LevelElement::ElementType::Trap)
+						{
+							SDL_Texture* image = Renderer.GetImage("resources/trap.png");
+							Renderer.DrawTexture(image, TextureRect, 0);
+						}
+					}
+				}
 			}
 		}
 
@@ -189,12 +219,6 @@ namespace LevelGeneration
 				if (Maze.StateData.GoalCell->GetPosition().x == maze->GetPosition().x && Maze.StateData.GoalCell->GetPosition().y == maze->GetPosition().y)
 				{
 					SDL_Texture* image = Renderer.GetImage("resources/goal.png");
-					Renderer.DrawTexture(image, TextureRect, 0);
-				}
-
-				if (Index == (Pathway.size() - 1) / 2)
-				{
-					SDL_Texture* image = Renderer.GetImage("resources/key.png");
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
 
@@ -264,7 +288,7 @@ namespace LevelGeneration
 		ImGui::End();
 	}
 
-	void Level::DrawRulesInformationWindow() const
+	void Level::DrawRulesInformationWindow()
 	{
 		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 234 - 16) });
 		ImGui::SetNextWindowSize({ 232, 234 }, 0);
@@ -277,20 +301,20 @@ namespace LevelGeneration
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		const std::pair<int, int> MinMaxStepsOne = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(0));
+		const auto [MinStepsOne, MaxStepsOne] = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(0));
 		ImGui::Text("Insertion One");
-		ImGui::Text("Element: %s", Maze.MainRule.GetElementName(0).c_str());
+		ImGui::Text("Element: %s", Maze.MainRule.GetElement(0).GetElementName().c_str());
 		ImGui::Text("Path Length: %s", Maze.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
-		ImGui::Text("Steps: %d - %d", MinMaxStepsOne.first, MinMaxStepsOne.second);
+		ImGui::Text("Steps: %d - %d", MinStepsOne, MaxStepsOne);
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		const std::pair<int, int> MinMaxStepsTwo = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(1));
+		const auto [MinStepsTwo, MaxStepsTwo] = Maze.CalculateMinMaxSteps(Maze.MainRule.GetArcType(1));
 		ImGui::Text("Insertion Two");
-		ImGui::Text("Element: %s", Maze.MainRule.GetElementName(1).c_str());
+		ImGui::Text("Element: %s", Maze.MainRule.GetElement(1).GetElementName().c_str());
 		ImGui::Text("Path Length: %s", Maze.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
-		ImGui::Text("Steps: %d - %d", MinMaxStepsTwo.first, MinMaxStepsTwo.second);
+		ImGui::Text("Steps: %d - %d", MinStepsTwo, MaxStepsTwo);
 
 		ImGui::End();
 	}

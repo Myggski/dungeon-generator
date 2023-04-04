@@ -18,5 +18,10 @@ namespace Command
 	private:
 		const Cyclic::CyclicRule& MainRule;
 		LevelGenerator::LevelStateData& StateData;
+
+		int FirstPathCellIndex;
+		int SecondPathCellIndex;
+		int FirstPathElementIndex;
+		int SecondPathElementIndex;
 	};
 }

@@ -6,15 +6,13 @@
 
 namespace Cyclic
 {
-	CyclicInsertionPoint::CyclicInsertionPoint(const LevelElement::Element& LevelElement, Cyclic::ArcType ArcType)
+	CyclicInsertionPoint::CyclicInsertionPoint(const LevelElement::Element&& LevelElement, Cyclic::ArcType ArcType)
 		: ArcType(ArcType),
-		ElementType(GetElementType(LevelElement.GetProperty())),
 		LevelElement(LevelElement),
 		MinorRule(nullptr) { }
 
 	CyclicInsertionPoint::CyclicInsertionPoint(const CyclicInsertionPoint& Other)
 		: ArcType(Other.ArcType),
-		ElementType(GetElementType(Other.LevelElement.GetProperty())),
 		LevelElement(Other.LevelElement),
 		MinorRule(Other.MinorRule.get()) { }
 
@@ -28,28 +26,8 @@ namespace Cyclic
 		return MinorRule != nullptr;
 	}
 
-	LevelElement::Element CyclicInsertionPoint::GetElement()
+	LevelElement::Element& CyclicInsertionPoint::GetElement()
 	{
 		return LevelElement;
-	}
-
-	ElementType CyclicInsertionPoint::GetElementType(LevelElement::ElementProperty& Property) const
-	{
-		if (dynamic_cast<LevelElement::RewardProperty*>(&Property))
-		{
-			return ElementType::Reward;
-		}
-
-		if (dynamic_cast<LevelElement::MiniBossProperty*>(&Property))
-		{
-			return ElementType::MiniBoss;
-		}
-
-		if (dynamic_cast<LevelElement::LockKeyProperty*>(&Property))
-		{
-			return ElementType::LockAndKey;
-		}
-
-		return ElementType::None;
 	}
 }

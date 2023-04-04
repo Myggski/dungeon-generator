@@ -50,7 +50,7 @@ namespace LevelGeneration
 		 */
 		void DrawDebugTextWindow();
 
-		void DrawRulesInformationWindow() const;
+		void DrawRulesInformationWindow();
 
 		/**
 		 * \brief Replaces the maze object with a new and resets generation states and data

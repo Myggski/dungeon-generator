@@ -2,7 +2,7 @@
 
 namespace Command
 {
-	CreateRoomCommand::CreateRoomCommand(LevelGeneration::RoomRepository& RoomRepository, SDL_Point Position, LevelGeneration::RoomType RoomType)
+	CreateRoomCommand::CreateRoomCommand(LevelGeneration::RoomRepository& RoomRepository, SDL_Point Position, LevelGeneration::RoomSize RoomType)
 		: Position(Position),
 		  RoomType(RoomType),
 		  RoomRepository(RoomRepository) { }

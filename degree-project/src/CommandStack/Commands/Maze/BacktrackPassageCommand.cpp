@@ -32,7 +32,7 @@ namespace Command
 		{
 			if (StateData.CurrentInsertionIndex > 0)
 			{
-				StateData.CurrentAction = LevelGenerator::GeneratorActionType::Done;
+				StateData.CurrentAction = LevelGenerator::GeneratorActionType::AddMainRuleElements;
 			}
 			else
 			{

@@ -1,6 +1,7 @@
 ﻿#include "LevelStateData.h"
 
 #include "DirectionType.h"
+#include "NavigationalDirections.h"
 
 namespace LevelGenerator
 {
@@ -51,5 +52,45 @@ namespace LevelGenerator
 		}
 
 		PreviousDirections.push(Direction);
+	}
+
+	std::vector<DirectionType> LevelStateData::GetAvailableDirections(LevelCell* Cell) const
+	{
+		std::vector<DirectionType> AvailableDirections;
+		AvailableDirections.reserve(4);
+
+		const std::array<DirectionType, 4> Directions = NavigationalDirections::GetDirections();
+
+		for (const auto& CurrentDirection : Directions)
+		{
+			const LevelCell* Neighbor = GetNeighborCell(Cell, CurrentDirection);
+
+			if (Neighbor == nullptr || Neighbor->IsVisited())
+			{
+				continue;
+			}
+
+			AvailableDirections.emplace_back(CurrentDirection);
+		}
+
+		return AvailableDirections;
+	}
+
+	const LevelCell* LevelStateData::GetNeighborCell(LevelCell* From, DirectionType Direction) const
+	{
+		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
+		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);
+
+		if (IsOutOfBound(NeighborX, NeighborY))
+		{
+			return nullptr;
+		}
+
+		return &LevelGrid[NeighborX][NeighborY];
+	}
+
+	bool LevelStateData::IsOutOfBound(int PositionX, int PositionY) const
+	{
+		return (PositionX < 0 || PositionX > GridWidth - 1) || (PositionY < 0 || PositionY > GridHeight - 1);
 	}
 }

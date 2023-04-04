@@ -19,6 +19,7 @@ namespace LevelGenerator
 
     const std::unordered_map<DirectionType, int> DirectionToGridStepX
     {
+        { DirectionType::None, 0 },
         { DirectionType::North, 0 },
         { DirectionType::East, 1 },
         { DirectionType::South, 0 },
@@ -27,6 +28,7 @@ namespace LevelGenerator
 
     const std::unordered_map<DirectionType, int> DirectionToGridStepY
     {
+        { DirectionType::None, 0 },
         { DirectionType::North, -1 },
         { DirectionType::East, 0 },
         { DirectionType::South, 1 },

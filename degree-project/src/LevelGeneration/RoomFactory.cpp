@@ -14,12 +14,12 @@ namespace LevelGeneration
 		}
 	}
 
-	Room RoomFactory::CreateSimpleRoom(SDL_FRect Rect, RoomType RoomType)
+	Room RoomFactory::CreateSimpleRoom(SDL_FRect Rect, RoomSize RoomType)
 	{
 		return Room { Rect, RoomType };
 	}
 
-	Room RoomFactory::CreateRoom(SDL_Point Position, RoomType RoomType)
+	Room RoomFactory::CreateRoom(SDL_Point Position, RoomSize RoomType)
 	{
 		const float Size = static_cast<float>(GetRoomSize(RoomType));
 		const SDL_FRect RoomRectangle = { static_cast<float>(Position.x), static_cast<float>(Position.y), Size, Size };
@@ -29,22 +29,22 @@ namespace LevelGeneration
 		return Room;
 	}
 
-	int RoomFactory::GetRoomSize(RoomType RoomType)
+	int RoomFactory::GetRoomSize(RoomSize RoomType)
 	{
 		switch (RoomType)
 		{
-		case RoomType::Small:
+		case RoomSize::Small:
 			return Utils::RandomGenerator::GetInstance().GetRandom<int>(3, 4);
 
-		case RoomType::Medium:
+		case RoomSize::Medium:
 			return Utils::RandomGenerator::GetInstance().GetRandom<int>(3, 5);
 
-		case RoomType::Large:
+		case RoomSize::Large:
 			return Utils::RandomGenerator::GetInstance().GetRandom<int>(4, 6);
 
-		case RoomType::ExtraLarge:
+		case RoomSize::ExtraLarge:
 			return Utils::RandomGenerator::GetInstance().GetRandom<int>(5, 7);
-		case RoomType::Simple:
+		case RoomSize::Simple:
 		default:
 			return Utils::RandomGenerator::GetInstance().GetRandom<int>(3, 7);
 		}

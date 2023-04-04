@@ -6,7 +6,7 @@
 
 #include "FragmentPosition.h"
 #include "RoomFragment.h"
-#include "RoomType.h"
+#include "RoomSize.h"
 
 namespace Application
 {
@@ -15,13 +15,28 @@ namespace Application
 
 namespace LevelGeneration
 {
+	enum class RoomType : uint8_t
+	{
+		Cargo,
+		CrewQuarters,
+		MedicalBay,
+		Bridge,
+		ScienceLab,
+		Communication,
+		Equipment,
+		Laundry,
+		Exercise,
+		EscapePods,
+		Workshop
+	};
+
 	constexpr int MIN_ROOM_SIZE = 3;
 	constexpr int ROOM_TILE_SIZE = 24;
 
 	class Room
 	{
 	public:
-		Room(SDL_FRect Rect, RoomType RoomType);
+		Room(SDL_FRect Rect, RoomSize RoomType);
 
 		void GenerateFragment(FragmentPosition FragmentPosition);
 		void RemoveFragment(FragmentPosition FragmentPosition);
@@ -39,7 +54,7 @@ namespace LevelGeneration
 		SDL_FRect RoomRect; // for the Room
 		SDL_FRect FullRect; // for the Room and fragments
 		SDL_Texture* FloorTexture;
-		RoomType RoomType;
+		RoomSize RoomType;
 		std::array<std::optional<RoomFragment>, 4> FragmentRooms;
 
 		size_t RoomId;

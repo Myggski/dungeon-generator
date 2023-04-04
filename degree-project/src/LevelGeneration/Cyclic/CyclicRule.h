@@ -40,14 +40,14 @@ namespace Cyclic
 		CyclicRule& operator=(const CyclicRule& Other);
 		CyclicRule& operator=(CyclicRule&& other) noexcept;
 
+		void ReverseInsertionPoints();
 		bool HasGoalType(GoalType GoalTypeToCheck) const;
 		bool HasArcType(ArcType ArcTypeToCheck);
 		GoalType GetGoalType() const;
 		std::string GetGoalTypeToString() const;
-		ArcType GetArcType(int InsertionIndex);
 		std::string GetName() const;
-		std::string GetElementName(int InsertionIndex) const;
-		LevelElement::Element GetElement(int InsertionIndex) const;
+		ArcType GetArcType(int InsertionIndex);
+		LevelElement::Element& GetElement(int InsertionIndex) const;
 
 	private:
 		std::string RuleName;

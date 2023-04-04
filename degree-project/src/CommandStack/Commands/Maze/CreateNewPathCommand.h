@@ -24,12 +24,6 @@ namespace Command
 		void Undo() override;
 
 	private:
-		static bool IsOutOfBound(const LevelGenerator::LevelStateData& StateData, int PositionX, int PositionY)
-		{
-			return (PositionX < 0 || PositionX > StateData.GridWidth - 1) || (PositionY < 0 || PositionY > StateData.GridHeight - 1);
-		}
-
-	private:
 		LevelGenerator::LevelStateData& StateData;
 		std::vector<LevelGenerator::LevelCell*> ChangedCells;
 		std::queue<DirectionType> PreviousDirections;

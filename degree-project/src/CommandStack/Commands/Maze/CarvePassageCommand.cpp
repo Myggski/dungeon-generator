@@ -29,12 +29,12 @@ namespace Command
 		const int NeighborY = StateData.CurrentCell->GetPosition().y + LevelGenerator::DirectionToGridStepY.at(MoveTowardsDirection);
 
 		CarvedFromCell = StateData.CurrentCell;
-		CarvedToCell = &StateData.MazeGrid[NeighborX][NeighborY];
+		CarvedToCell = &StateData.LevelGrid[NeighborX][NeighborY];
 
-		CarvedFromCell->CarveEntrance(MoveTowardsDirection);
+		CarvedFromCell->CarveEntrance(CarvedToCell->GetSpatialHash());
 
 		CarvedToCell->SetVisited(true);
-		CarvedToCell->CarveEntrance(LevelGenerator::OppositeDirection.at(MoveTowardsDirection));
+		CarvedToCell->CarveEntrance(CarvedFromCell->GetSpatialHash());
 		StateData.VisitedCellStack.push(CarvedToCell);
 
   		StateData.CurrentCell = CarvedToCell;
@@ -55,10 +55,10 @@ namespace Command
 
 	void CarvePassageCommand::Undo()
 	{
-		CarvedFromCell->CollapseEntrance(MoveTowardsDirection);
+		CarvedFromCell->CollapseEntrance(CarvedToCell->GetSpatialHash());
 
 		CarvedToCell->SetVisited(false);
-		CarvedToCell->CollapseEntrance(LevelGenerator::OppositeDirection.at(MoveTowardsDirection));
+		CarvedToCell->CollapseEntrance(CarvedFromCell->GetSpatialHash());
 		StateData.VisitedCellStack.pop();
 
 		if (!StateData.PreviousDirections.empty())

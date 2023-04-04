@@ -5,6 +5,8 @@
 
 #include "Application/Font.h"
 #include "CommandStack/CommandStack.h"
+#include "CommandStack/Commands/Maze/AddElementsCommand.h"
+#include "CommandStack/Commands/Maze/AddSideRoomsCommand.h"
 #include "CommandStack/Commands/Maze/CarvePassageCommand.h"
 #include "CommandStack/Commands/Maze/BacktrackPassageCommand.h"
 #include "CommandStack/Commands/Maze/CreateNewPathCommand.h"
@@ -17,12 +19,31 @@ namespace Command
 
 namespace LevelGenerator
 {
-	LevelGenerator::LevelGenerator(Cyclic::CyclicRule& MainRule, int Width, int Height)
+	LevelGenerator::LevelGenerator(Cyclic::CyclicRule MainRule, int Width, int Height)
 		: StateData(Width, Height),
-		MainRule(MainRule) { }
+		MainRule(std::move(MainRule)) { }
 
 	GeneratorActionType LevelGenerator::Step()
 	{
+		if (StateData.CurrentAction == GeneratorActionType::AddSidePaths)
+		{
+			Command::CommandStack::GetInstance().ExecuteCommand(
+				std::make_unique<Command::AddSideRoomsCommand>(
+					StateData
+				)
+			);
+		}
+
+		if (StateData.CurrentAction == GeneratorActionType::AddMainRuleElements)
+		{
+			Command::CommandStack::GetInstance().ExecuteCommand(
+				std::make_unique<Command::AddElementCommand>(
+					MainRule,
+					StateData
+				)
+			);
+		}
+
 		if (StateData.CurrentAction == GeneratorActionType::SavingPath)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
@@ -34,7 +55,11 @@ namespace LevelGenerator
 
 		if (StateData.CurrentAction == GeneratorActionType::CreatingPath)
 		{
-			CreateNewPath();
+			Command::CommandStack::GetInstance().ExecuteCommand(
+				std::make_unique<Command::CreateNewPathCommand>(
+					StateData
+				)
+			);
 		}
 
 		if (StateData.CurrentAction == GeneratorActionType::CarvingPath)
@@ -54,31 +79,12 @@ namespace LevelGenerator
 					StateData
 				)
 			);
-
-			if (!StateData.VisitedCellStack.empty())
-			{
-				StateData.CurrentAction = GeneratorActionType::CarvingPath;
-			}
 		}
 
 		CalculateStepsLeft();
 
 		return StateData.CurrentAction;
 	}
-	
-	const LevelCell* LevelGenerator::GetNeighborCell(LevelCell* From, DirectionType Direction) const
-	{
-		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
-		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);
-
-		if (IsOutOfBound(StateData, NeighborX, NeighborY))
-		{
-			return nullptr;
-		}
-
-		return &StateData.MazeGrid[NeighborX][NeighborY];
-	}
-
 
 	void LevelGenerator::TryCarvePassage()
 	{
@@ -86,14 +92,7 @@ namespace LevelGenerator
 
 		if (MoveTowardsDirection == DirectionType::None)
 		{
-			if (StateData.VisitedCellStack.empty())
-			{
-				StateData.CurrentAction = GeneratorActionType::Failed;
-			}
-			else
-			{
-				StateData.CurrentAction = GeneratorActionType::ReachedDeadEnd;
-			}
+			StateData.CurrentAction = GeneratorActionType::ReachedDeadEnd;
 
 			return;
 		}
@@ -107,28 +106,38 @@ namespace LevelGenerator
 		);
 	}
 
-	DirectionType LevelGenerator::CalculateNextDirection() const
+	std::vector<DirectionType> GetCellsWithWeight(const std::vector<std::tuple<DirectionType, float>>& WeightedNeighborCells, float Weight)
 	{
-		std::vector<DirectionType> AvailableDirections = GetAvailableDirections();
-		std::vector<std::pair<DirectionType, float>> WeightedNeighborCells;
-		WeightedNeighborCells.reserve(AvailableDirections.size());
+		std::vector<DirectionType> Directions;
+		Directions.reserve(WeightedNeighborCells.size());
 
-		if (AvailableDirections.empty())
+		for (const auto& [Direction, DirectionWeight] : WeightedNeighborCells)
 		{
-			return DirectionType::None;
+			if (DirectionWeight == Weight)
+			{
+				Directions.emplace_back(Direction);
+			}
 		}
+		
+		return Directions;
+	}
+
+	std::vector<std::tuple<DirectionType, float>> LevelGenerator::GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections) const
+	{
+		std::vector<std::tuple<DirectionType, float>> WeightedNeighborCells;
+		WeightedNeighborCells.reserve(AvailableDirections.size());
 
 		for (const DirectionType Direction : AvailableDirections)
 		{
-			if (AvailableDirections.size() > 1)
+			/*if (!bIsShortArc && AvailableDirections.size() > 1 && PathwayCalculationData.NumberOfStepsTaken > 3)
 			{
 				if (StateData.PreviousDirections.size() > 1 && StateData.PreviousDirections.back() == StateData.PreviousDirections.front() && StateData.PreviousDirections.front() == Direction)
 				{
 					continue;
 				}
-			}
+			}*/
 
-			const LevelCell* NeighborCell = GetNeighborCell(StateData.CurrentCell, Direction);
+			const LevelCell* NeighborCell = StateData.GetNeighborCell(StateData.CurrentCell, Direction);
 
 			const int StepsToGoalX = abs(NeighborCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
 			const int StepsToGoalY = abs(NeighborCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
@@ -137,27 +146,82 @@ namespace LevelGenerator
 		}
 
 		// Descending (From furthest to nearest)
-		std::ranges::sort(WeightedNeighborCells, 
-			[](const std::pair<DirectionType, float>& A,
-		            const std::pair<DirectionType, float>& B)
-					{
-						return A.second > B.second;
-					});
+		std::ranges::sort(WeightedNeighborCells,
+			[](const auto& A, const auto& B)
+			{
+				const auto& [DirectionA, WeightA] = A;
+				const auto& [DirectionB, WeightB] = B;
+				return WeightA > WeightB;
+			});
 
-		const float StepsLeft = static_cast<float>(PathwayCalculationData.MaxSteps - PathwayCalculationData.NumberOfStepsTaken);
-		const float StepsLeftPercentage = StepsLeft / static_cast<float>(PathwayCalculationData.MaxSteps);
+		return WeightedNeighborCells;
+	}
 
-		if (StepsLeftPercentage > 0.8f) {
-			return WeightedNeighborCells[0].first;
-		}
-		else if (StepsLeftPercentage <= 0.65f)
+	DirectionType LevelGenerator::CalculateNextDirection()
+	{
+		const bool bIsShortArc = MainRule.GetArcType(StateData.CurrentInsertionIndex) == Cyclic::ArcType::Short;
+		const std::vector<DirectionType> AvailableDirections = StateData.GetAvailableDirections(StateData.CurrentCell);
+
+		if (AvailableDirections.empty())
 		{
-			return WeightedNeighborCells[WeightedNeighborCells.size() - 1].first;
+			return DirectionType::None;
 		}
-		else
+
+		std::vector<std::tuple<DirectionType, float>> WeightedNeighborCells = GetWeightedDirections(AvailableDirections);
+		const float MaxWeight = std::get<1>(WeightedNeighborCells[0]);
+		const float MinWeight = std::get<1>(WeightedNeighborCells[WeightedNeighborCells.size() - 1]);
+
+		const float StepsLeft = static_cast<float>(PathwayCalculationData.MaxSteps + 2 - PathwayCalculationData.NumberOfStepsTaken);
+		const float StepsLeftPercentage = StepsLeft / static_cast<float>(PathwayCalculationData.MaxSteps + 2);
+
+		const bool bShortPathFirstStep = bIsShortArc && StepsLeftPercentage == 1.f;
+		const bool bLongPathFirstSteps = PathwayCalculationData.NumberOfStepsTaken < (StateData.GridWidth + StateData.GridHeight) / 4;
+
+		const float LongPathThreshold = bIsShortArc ? 0.9f : 0.8f;
+		const float ShortPathThreshold = bIsShortArc ? 0.8f : 0.65f;
+
+		if (bShortPathFirstStep)
+		{
+			std::vector<DirectionType> Directions = GetCellsWithWeight(WeightedNeighborCells, MinWeight);
+			std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+			return Directions[0];
+		}
+
+		if (bLongPathFirstSteps)
+		{
+			std::vector<DirectionType> Directions = GetCellsWithWeight(WeightedNeighborCells, MaxWeight);
+
+			if (!StateData.PreviousDirections.empty() && std::ranges::find(Directions, StateData.PreviousDirections.back()) != Directions.end())
+			{
+				return StateData.PreviousDirections.back();
+			}
+
+			std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+			return Directions[0];
+		}
+
+		if (StepsLeftPercentage > LongPathThreshold) // Take the long way
+		{
+			std::vector<DirectionType> Directions = GetCellsWithWeight(WeightedNeighborCells, MaxWeight);
+
+			std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+			return Directions[0];
+		}
+		else if (StepsLeftPercentage <= ShortPathThreshold) // Take short way
+		{
+			std::vector<DirectionType> Directions = GetCellsWithWeight(WeightedNeighborCells, MinWeight);
+
+			std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
+
+			return Directions[0];
+		}
+		else // Take random available direction
 		{
 			std::ranges::shuffle(WeightedNeighborCells, Utils::RandomGenerator::GetInstance().GetEngine());
-			return WeightedNeighborCells[0].first;
+			return std::get<0>(WeightedNeighborCells[0]);
 		}
 	}
 
@@ -184,22 +248,26 @@ namespace LevelGenerator
 		return { DirectionHorizontal, DirectionVertical };
 	}
 
-	void LevelGenerator::InitializeStateData()
-	{
-		CalculateStepsLeft();
-	}
-
 	void LevelGenerator::InitializeMaze()
 	{
-		StateData.MazeGrid.resize(StateData.GridWidth);
+		StateData.LevelGrid.resize(StateData.GridWidth);
 
 		for (int GridX = 0; GridX < StateData.GridWidth; GridX++)
 		{
-			StateData.MazeGrid[GridX].resize(StateData.GridHeight);
+			StateData.LevelGrid[GridX].resize(StateData.GridHeight);
 
 			for (int GridY = 0; GridY < StateData.GridHeight; GridY++)
 			{
-				StateData.MazeGrid[GridX][GridY] = LevelCell(SDL_Point{ GridX, GridY });
+				StateData.LevelGrid[GridX][GridY] = LevelCell(SDL_Point{ GridX, GridY });
+			}
+		}
+
+		// Start with the short path
+		if (MainRule.HasArcType(Cyclic::ArcType::Short))
+		{
+			if (MainRule.GetArcType(0) != Cyclic::ArcType::Short)
+			{
+				MainRule.ReverseInsertionPoints();
 			}
 		}
 
@@ -238,7 +306,7 @@ namespace LevelGenerator
 		StateData.StartCell = GetRandomEdgeCell(StartPositionDirection);
 
 		// Set the goal cell to be at the opposite site of the start cell
-		StateData.GoalCell = GetRandomEdgeCell(OppositeDirection.at(StartPositionDirection));
+		StateData.GoalCell = GetRandomGoalCell(OppositeDirection.at(StartPositionDirection));
 		PathwayCalculationData = PathwayData();
 
 		Command::CommandStack::GetInstance().ExecuteCommand(
@@ -247,30 +315,13 @@ namespace LevelGenerator
 			)
 		);
 
-		CalculateStepsLeft();
-
 		const Cyclic::ArcType CurrentArcType = MainRule.GetArcType(StateData.CurrentInsertionIndex);
-		const std::pair<int, int> MinMaxSteps = CalculateMinMaxSteps(CurrentArcType);
+		const auto [Min, Max] = CalculateMinMaxSteps(CurrentArcType);
 
-		PathwayCalculationData.MinSteps = MinMaxSteps.first;
-		PathwayCalculationData.MaxSteps = MinMaxSteps.second;
-	}
-
-	void LevelGenerator::CreateNewPath()
-	{
-		Command::CommandStack::GetInstance().ExecuteCommand(
-			std::make_unique<Command::CreateNewPathCommand>(
-				StateData
-			)
-		);
+		PathwayCalculationData.MinSteps = Min;
+		PathwayCalculationData.MaxSteps = Max;
 
 		CalculateStepsLeft();
-
-		const Cyclic::ArcType CurrentArcType = MainRule.GetArcType(StateData.CurrentInsertionIndex);
-		const std::pair<int, int> MinMaxSteps = CalculateMinMaxSteps(CurrentArcType);
-
-		PathwayCalculationData.MinSteps = MinMaxSteps.first;
-		PathwayCalculationData.MaxSteps = MinMaxSteps.second;
 	}
 
 	void LevelGenerator::CalculateStepsLeft()
@@ -286,58 +337,75 @@ namespace LevelGenerator
 		switch (Direction)
 		{
 		case DirectionType::North:
-			return &StateData.MazeGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridWidth - 1)][0];
+			return &StateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridWidth - 1)][0];
 		case DirectionType::East:
-			return &StateData.MazeGrid[StateData.GridWidth - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridHeight - 1)];
+			return &StateData.LevelGrid[StateData.GridWidth - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridHeight - 1)];
 			break;
 		case DirectionType::South:
-			return &StateData.MazeGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridWidth - 1)][StateData.GridHeight - 1];
+			return &StateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridWidth - 1)][StateData.GridHeight - 1];
 		case DirectionType::West:
 		default:
-			return &StateData.MazeGrid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(1, StateData.GridHeight - 1)];
+			return &StateData.LevelGrid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridHeight - 1)];
 		}
 	}
 
-	std::vector<DirectionType> LevelGenerator::GetAvailableDirections() const
+	int Wrap(int Value, int MaxValue)
 	{
-		std::vector<DirectionType> AvailableDirections;
-		AvailableDirections.reserve(4);
+		return (Value % (MaxValue + 1) + (MaxValue + 1)) % (MaxValue + 1);
+	}
 
-		const std::array<DirectionType, 4> Directions = NavigationalDirections::GetDirections();
+	LevelCell* LevelGenerator::GetRandomGoalCell(DirectionType Direction)
+	{
+		LevelCell* PotentialGoalCell = GetRandomEdgeCell(Direction);
 
-		for (const auto& CurrentDirection : Directions)
+		const int PositionX = PotentialGoalCell->GetPosition().x;
+		const int PositionY = PotentialGoalCell->GetPosition().y;
+		int MovePositionX = 0;
+		int MovePositionY = 0;
+		
+		if (PositionX == StateData.StartCell->GetPosition().x)
 		{
-			const LevelCell* Neighbor = GetNeighborCell(StateData.CurrentCell, CurrentDirection);
+			int MoveSteps = Utils::RandomGenerator::GetInstance().GetRandom(1, 2);
 
-			if (Neighbor == nullptr || Neighbor->IsVisited())
+			if (Utils::RandomGenerator::GetInstance().GetRandom(0, 1))
 			{
-				continue;
+				MoveSteps = -MoveSteps;
 			}
 
-			AvailableDirections.emplace_back(CurrentDirection);
+			MovePositionX += MoveSteps;
 		}
-
-		return AvailableDirections;
-	}
-
-	std::vector<DirectionType> LevelGenerator::GetAvailableRandomDirections() const
-	{
-		std::vector<DirectionType> AvailableDirections = GetAvailableDirections();
-
-		if (AvailableDirections.size() > 1)
+		else if (PositionY == StateData.StartCell->GetPosition().y)
 		{
-			std::ranges::shuffle(AvailableDirections, Utils::RandomGenerator::GetInstance().GetEngine());
+			int MoveSteps = Utils::RandomGenerator::GetInstance().GetRandom(1, 2);
+
+			if (Utils::RandomGenerator::GetInstance().GetRandom(0, 1))
+			{
+				MoveSteps = -MoveSteps;
+			}
+
+			MovePositionY += MoveSteps;
 		}
 
-		return AvailableDirections;
+		PotentialGoalCell = &StateData.LevelGrid[(PositionX + MovePositionX % StateData.GridWidth + StateData.GridWidth) % StateData.GridWidth][(PositionY + MovePositionY % StateData.GridHeight + StateData.GridHeight) % StateData.GridHeight];
+
+		if (MainRule.HasArcType(Cyclic::ArcType::Short))
+		{
+			const NavigationalDirections Directions = GetCellDirection(*PotentialGoalCell, *StateData.StartCell);
+
+			if (std::abs(StateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x) > std::abs(StateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y))
+			{
+				MovePositionX += DirectionToGridStepX.at(Directions.GetHorizontal());
+			}
+			else if (std::abs(StateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y) > std::abs(StateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x))
+			{
+				MovePositionY += DirectionToGridStepY.at(Directions.GetVertical());
+			}
+		}
+
+		return &StateData.LevelGrid[(PositionX + MovePositionX % StateData.GridWidth + StateData.GridWidth) % StateData.GridWidth][(PositionY + MovePositionY % StateData.GridHeight + StateData.GridHeight) % StateData.GridHeight];
 	}
 
-	bool LevelGenerator::IsOutOfBound(const LevelStateData& StateData, int PositionX, int PositionY)
-	{
-		return (PositionX < 0 || PositionX > StateData.GridWidth - 1) || (PositionY < 0 || PositionY > StateData.GridHeight - 1);
-	}
-
-	std::pair<int, int> LevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
+	std::tuple<int, int> LevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
 	{
 		float MinPercentage;
 		float MaxPercentage;
@@ -353,10 +421,13 @@ namespace LevelGenerator
 			MaxPercentage = 1.65f;
 		}
 
+		const int StepsToGoalX = abs(StateData.StartCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
+		const int StepsToGoalY = abs(StateData.StartCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
+		const int TotalSteps = StepsToGoalX + StepsToGoalY;
 
-		return std::make_pair(
-			static_cast<int>(static_cast<float>(PathwayCalculationData.StepsToGoalX + PathwayCalculationData.StepsToGoalY) * MinPercentage),
-			static_cast<int>(static_cast<float>(PathwayCalculationData.MinSteps) * MaxPercentage)
+		return std::make_tuple(
+			static_cast<int>(static_cast<float>(TotalSteps) * MinPercentage),
+			static_cast<int>(static_cast<float>(TotalSteps) * MaxPercentage)
 		);
 	}
 }

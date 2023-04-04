@@ -1,13 +1,13 @@
 #include "Room.h"
 
 #include "FragmentPosition.h"
-#include "RoomType.h"
+#include "RoomSize.h"
 #include "Application/Renderer.h"
 #include "Utils/RandomGenerator.h"
 
 namespace LevelGeneration
 {
-	Room::Room(SDL_FRect Rect, LevelGeneration::RoomType RoomType)
+	Room::Room(SDL_FRect Rect, LevelGeneration::RoomSize RoomType)
 		: RoomRect(Rect),
 		  FullRect({}),
 		  FloorTexture(nullptr),

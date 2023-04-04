@@ -4,7 +4,7 @@
 
 namespace LevelGeneration
 {
-	enum class RoomType : Uint8
+	enum class RoomSize : Uint8
 	{
 		Simple = 0,
 		Small = 1,

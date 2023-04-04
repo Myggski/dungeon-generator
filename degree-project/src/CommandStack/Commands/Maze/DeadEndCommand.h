@@ -27,6 +27,5 @@ namespace Command
 	private:
 		LevelGenerator::LevelStateData& StateData;
 		LevelGenerator::LevelCell* DeadEndCell;
-		DirectionType CarvedDirection;
 	};
 }

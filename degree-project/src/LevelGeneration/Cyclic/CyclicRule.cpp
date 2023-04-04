@@ -60,6 +60,17 @@ namespace Cyclic
 		return *this;
 	}
 
+	/**
+	 * \brief Is used to make sure that a short path is being created first
+	 */
+	void CyclicRule::ReverseInsertionPoints()
+	{
+		if (InsertionPoints.has_value())
+		{
+			std::ranges::reverse(InsertionPoints.value());
+		}
+	}
+
 	bool CyclicRule::HasGoalType(Cyclic::GoalType GoalTypeToCheck) const
 	{
 		return (GoalType & GoalTypeToCheck) == GoalTypeToCheck;
@@ -108,29 +119,8 @@ namespace Cyclic
 	{
 		return RuleName;
 	}
-
-	std::string CyclicRule::GetElementName(int InsertionIndex) const
-	{
-		if (!InsertionPoints.has_value() || InsertionIndex > InsertionPoints.value().size() - 1)
-		{
-			return "";
-		}
-
-		switch (InsertionPoints.value()[InsertionIndex]->ElementType)
-		{
-		case ElementType::LockAndKey:
-			return "Lock & Key";
-		case ElementType::MiniBoss: 
-			return "Mini Boss";
-		case ElementType::Reward: 
-			return "Reward";
-		case ElementType::None:
-		default: 
-			return "";
-		}
-	}
-
-	LevelElement::Element CyclicRule::GetElement(int InsertionIndex) const
+	
+	LevelElement::Element& CyclicRule::GetElement(int InsertionIndex) const
 	{
 		if (!InsertionPoints.has_value() || InsertionIndex > InsertionPoints.value().size() - 1)
 		{

@@ -49,14 +49,14 @@ namespace Command
 			const int NeighborX = StateData.GoalCell->GetPosition().x + LevelGenerator::DirectionToGridStepX.at(Direction);
 			const int NeighborY = StateData.GoalCell->GetPosition().y + LevelGenerator::DirectionToGridStepY.at(Direction);
 
-			if (!IsOutOfBound(StateData, NeighborX, NeighborY))
+			if (!StateData.IsOutOfBound(NeighborX, NeighborY))
 			{
-				LevelGenerator::LevelCell* NeighborCell = &StateData.MazeGrid[NeighborX][NeighborY];
+				LevelGenerator::LevelCell* NeighborCell = &StateData.LevelGrid[NeighborX][NeighborY];
 
 				if (NeighborCell->IsVisited())
 				{
-					ChangedCells.emplace_back(NeighborCell);
-					NeighborCell->SetVisited(false);
+					//ChangedCells.emplace_back(NeighborCell);
+					//NeighborCell->SetVisited(false);
 				}
 			}
 		}
