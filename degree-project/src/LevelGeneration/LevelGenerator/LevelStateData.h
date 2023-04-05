@@ -34,7 +34,7 @@ namespace LevelGenerator
         CreatingPath = 1 << 3,
         ReachedDeadEnd = 1 << 4,
         AddMainRuleElements = 1 << 5,
-        AddSidePaths = 1 << 6,
+        FillEmptySlots = 1 << 6,
         Failed = 1 << 7,
         Done = 1 << 8,
     };
@@ -53,6 +53,7 @@ namespace LevelGenerator
         void ReversePathway(int InsertionIndex);
         bool IsPathwayEmpty() const;
         void AddPreviousDirection(DirectionType Direction);
+        int GetNumberOfEmptySlots();
 
         // TODO: Move GetAvailableDirections, IsOutOfBound and GetNeighborCell to a different file
 
@@ -60,7 +61,7 @@ namespace LevelGenerator
          * \brief Checks the surroundings of the current cell and see if there are any unvisited cells
          * \return A list of available directions
          */
-        std::vector<DirectionType> GetAvailableDirections(LevelCell* Cell) const;
+        std::vector<DirectionType> GetAvailableDirections(LevelCell* Cell);
 
         /**
 		 * \brief Checks if the wanted position in the grid is out of bound
@@ -76,7 +77,7 @@ namespace LevelGenerator
          * \param Direction The direction to go to
          * \return Returns the neighboring cell, if it's not a valid direction it returns nullptr
          */
-        const LevelCell* GetNeighborCell(LevelCell* From, DirectionType Direction) const;
+        LevelCell* GetNeighborCell(LevelCell* From, DirectionType Direction);
 
 	private:
         int GridWidth;

@@ -23,8 +23,7 @@ namespace Command
 		SecondPathway[SecondPathCellIndex]->AddElement(MainRule.GetElement(1));
 		SecondPathElementIndex = static_cast<int>(SecondPathway[SecondPathCellIndex]->GetElements().size() - 1);
 
-		StateData.CurrentInsertionIndex = 0;
-		StateData.CurrentAction = LevelGenerator::GeneratorActionType::AddSidePaths;
+		StateData.CurrentAction = LevelGenerator::GeneratorActionType::FillEmptySlots;
 	}
 
 	void AddElementCommand::Undo()

@@ -105,7 +105,7 @@ namespace Cyclic
 		}
 	}
 
-	ArcType CyclicRule::GetArcType(int InsertionIndex)
+	ArcType CyclicRule::GetArcType(int InsertionIndex) const
 	{
 		if (!InsertionPoints.has_value() || InsertionIndex > InsertionPoints.value().size() - 1)
 		{

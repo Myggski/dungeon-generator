@@ -1,5 +1,7 @@
 ﻿#include "LevelStateData.h"
 
+#include <numeric>
+
 #include "DirectionType.h"
 #include "NavigationalDirections.h"
 
@@ -54,7 +56,25 @@ namespace LevelGenerator
 		PreviousDirections.push(Direction);
 	}
 
-	std::vector<DirectionType> LevelStateData::GetAvailableDirections(LevelCell* Cell) const
+	int LevelStateData::GetNumberOfEmptySlots()
+	{
+		int NumberOfEmptySlots = 0;
+
+		for (int X = 0; X < GridWidth; X++)
+		{
+			for (int Y = 0; Y < GridHeight; Y++)
+			{
+				if (!LevelGrid[X][Y].IsVisited())
+				{
+					NumberOfEmptySlots++;
+				}
+			}
+		}
+
+		return NumberOfEmptySlots;
+	}
+	
+	std::vector<DirectionType> LevelStateData::GetAvailableDirections(LevelCell* Cell)
 	{
 		std::vector<DirectionType> AvailableDirections;
 		AvailableDirections.reserve(4);
@@ -76,7 +96,7 @@ namespace LevelGenerator
 		return AvailableDirections;
 	}
 
-	const LevelCell* LevelStateData::GetNeighborCell(LevelCell* From, DirectionType Direction) const
+	LevelCell* LevelStateData::GetNeighborCell(LevelCell* From, DirectionType Direction)
 	{
 		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
 		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);

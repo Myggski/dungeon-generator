@@ -46,7 +46,7 @@ namespace Cyclic
 		GoalType GetGoalType() const;
 		std::string GetGoalTypeToString() const;
 		std::string GetName() const;
-		ArcType GetArcType(int InsertionIndex);
+		ArcType GetArcType(int InsertionIndex) const;
 		LevelElement::Element& GetElement(int InsertionIndex) const;
 
 	private:

@@ -141,6 +141,7 @@
     <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelLowRes\LevelLowRes.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Maze\AddSideRoomsCommand.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Maze\AddElementsCommand.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelElement\Element.cpp" />
@@ -187,6 +188,7 @@
     <ClInclude Include="..\external\Imgui\imstb_rectpack.h" />
     <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelLowRes\LevelLowRes.h" />
     <ClInclude Include="src\CommandStack\Commands\Maze\AddSideRoomsCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Maze\AddElementsCommand.h" />
     <ClInclude Include="src\LevelGeneration\LevelElement\Element.h" />

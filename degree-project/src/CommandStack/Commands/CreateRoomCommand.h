@@ -24,7 +24,7 @@ namespace Command
 
 	private:
 		SDL_Point Position;
-		LevelGeneration::RoomSize RoomType;
+		LevelGeneration::RoomSize RoomSize;
 		LevelGeneration::RoomRepository& RoomRepository;
 
 	};

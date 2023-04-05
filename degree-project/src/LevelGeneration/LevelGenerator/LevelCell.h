@@ -50,6 +50,7 @@ namespace LevelGenerator
 		const std::vector<std::shared_ptr<LevelElement::Element>>& GetElements() const;
 		std::string GetSpatialHash() const;
 		static std::tuple<int, int> SpatialHashToCoordinates(const SpatialHash& SpatialHash);
+		int GetNumberOfEntrances() const;
 
 	private:
 		DirectionType SpatialHashToDirectionType(const SpatialHash& SpatialHash) const;

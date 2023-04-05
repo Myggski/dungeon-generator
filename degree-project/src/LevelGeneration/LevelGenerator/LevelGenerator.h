@@ -7,33 +7,15 @@
 #include "NavigationalDirections.h"
 #include "LevelGeneration/Cyclic/CyclicRule.h"
 
-namespace LevelGeneration
-{
-    class Level;
-}
-
-namespace Command
-{
-	class CarvePassageCommand;
-}
-
 namespace LevelGenerator
 {
+    class LevelLowRes;
 
-	class LevelGenerator
-	{
-	public:
+    class LevelGenerator
+    {
+    public:
         LevelGenerator(Cyclic::CyclicRule MainRule, int Width, int Height);
-
-        inline LevelGenerator& operator=(LevelGenerator&& Other) noexcept
-        {
-            MainRule = Other.MainRule;
-            StateData = { Other.StateData.GridWidth, Other.StateData.GridHeight };
-
-            InitializeMaze();
-
-            return *this;
-        }
+        LevelGenerator& operator=(LevelGenerator&& Other) noexcept;
 
         /// <summary>
         /// Setting up the start and goal cells. 
@@ -43,6 +25,8 @@ namespace LevelGenerator
         void InitializeMaze();
         GeneratorActionType Step();
         std::tuple<int, int> CalculateMinMaxSteps(Cyclic::ArcType ArcType) const;
+        int GetGridWidth() const;
+        int GetGridHeight() const;
 
 	private:
 
@@ -51,8 +35,7 @@ namespace LevelGenerator
          */
         void TryCarvePassage();
 
-        std::vector<std::tuple<DirectionType, float>> GetWeightedDirections(const std::vector<DirectionType>&
-	        AvailableDirections) const;
+        std::vector<std::tuple<DirectionType, float>> GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections);
 
         /**
          * \brief Calculating and weighting the paths by checking data relating to the pathway
@@ -83,11 +66,14 @@ namespace LevelGenerator
         
         LevelCell* GetRandomGoalCell(DirectionType Direction);
 
+        std::vector<std::vector<LevelCell>>& GetLevelGrid();
+
 	private:
         LevelStateData StateData;
         PathwayData PathwayCalculationData;
         Cyclic::CyclicRule MainRule;
 
         friend class LevelGeneration::Level;
+        friend class LevelLowRes;
 	};
 }

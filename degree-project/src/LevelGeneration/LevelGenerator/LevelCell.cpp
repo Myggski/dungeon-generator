@@ -87,6 +87,12 @@ namespace LevelGenerator
 
 		return std::make_tuple(x, y);
 	}
+
+	int LevelCell::GetNumberOfEntrances() const
+	{
+		return static_cast<int>(EntranceDirections.size());
+	}
+
 	
 	DirectionType LevelCell::GetEntranceFlag() const
 	{

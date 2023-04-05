@@ -15,7 +15,9 @@ namespace Command
 		CarvedFromCell(nullptr),
 		CarvedToCell(nullptr),
 		MoveTowardsDirection(MoveTowardsDirection),
-		PreviousAction(LevelGenerator::GeneratorActionType::None) { }
+		RemovedDirection(DirectionType::None),
+		PreviousAction(LevelGenerator::GeneratorActionType::None),
+		DeadEnds({}) { }
 
 	CarvePassageCommand::~CarvePassageCommand()
 	{
@@ -48,6 +50,7 @@ namespace Command
 
 		if (StateData.CurrentCell == StateData.GoalCell)
 		{
+			ClearAllDeadEnds();
 			StateData.CurrentAction = LevelGenerator::GeneratorActionType::SavingPath;
 			StateData.GetCurrentPathway().reserve(StateData.VisitedCellStack.size());
 		}
@@ -72,6 +75,28 @@ namespace Command
 		if (PreviousAction != LevelGenerator::GeneratorActionType::None)
 		{
 			StateData.CurrentAction = PreviousAction;
+		}
+
+		for (LevelGenerator::LevelCell* DeadEnd : DeadEnds)
+		{
+			DeadEnd->SetVisited(true);
+		}
+	}
+
+	void CarvePassageCommand::ClearAllDeadEnds()
+	{
+		for (int X = 0; X < StateData.GridWidth; X++)
+		{
+			for (int Y = 0; Y < StateData.GridWidth; Y++)
+			{
+				LevelGenerator::LevelCell* Cell = &StateData.LevelGrid[X][Y];
+
+				if (Cell->IsVisited() && Cell->GetEntranceFlag() == DirectionType::None)
+				{
+					DeadEnds.push_back(Cell);
+					Cell->SetVisited(false);
+				}
+			}
 		}
 	}
 }

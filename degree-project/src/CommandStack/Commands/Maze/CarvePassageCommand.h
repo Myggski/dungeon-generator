@@ -24,11 +24,16 @@ namespace Command
 		void Undo() override;
 
 	private:
+		// Resets the "bHasBeenVisited" on the dead end cells
+		void ClearAllDeadEnds();
+
+	private:
 		LevelGenerator::LevelStateData& StateData;
 		LevelGenerator::LevelCell* CarvedFromCell;
 		LevelGenerator::LevelCell* CarvedToCell;
 		DirectionType MoveTowardsDirection;
 		DirectionType RemovedDirection;
 		LevelGenerator::GeneratorActionType PreviousAction;
+		std::vector<LevelGenerator::LevelCell*> DeadEnds;
 	};
 }

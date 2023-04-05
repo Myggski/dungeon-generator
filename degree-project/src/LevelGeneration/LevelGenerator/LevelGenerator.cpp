@@ -1,7 +1,6 @@
 #include "LevelGenerator.h"
 
 #include <array>
-#include <iostream>
 
 #include "Application/Font.h"
 #include "CommandStack/CommandStack.h"
@@ -12,24 +11,31 @@
 #include "CommandStack/Commands/Maze/CreateNewPathCommand.h"
 #include "CommandStack/Commands/Maze/DeadEndCommand.h"
 
-namespace Command
-{
-	class CarvePassageCommand;
-}
-
 namespace LevelGenerator
 {
 	LevelGenerator::LevelGenerator(Cyclic::CyclicRule MainRule, int Width, int Height)
 		: StateData(Width, Height),
 		MainRule(std::move(MainRule)) { }
 
+	LevelGenerator& LevelGenerator::operator=(LevelGenerator&& Other) noexcept
+	{
+		MainRule = Other.MainRule;
+		StateData = { Other.StateData.GridWidth, Other.StateData.GridHeight };
+
+		InitializeMaze();
+
+		return *this;
+	}
+
 	GeneratorActionType LevelGenerator::Step()
 	{
-		if (StateData.CurrentAction == GeneratorActionType::AddSidePaths)
+		if (StateData.CurrentAction == GeneratorActionType::FillEmptySlots)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::AddSideRoomsCommand>(
-					StateData
+					StateData,
+					NavigationalDirections::GetRandomDirections(),
+					!Utils::RandomGenerator::GetInstance().GetRandom(0, 3) // 25% chance to add a room
 				)
 			);
 		}
@@ -122,7 +128,7 @@ namespace LevelGenerator
 		return Directions;
 	}
 
-	std::vector<std::tuple<DirectionType, float>> LevelGenerator::GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections) const
+	std::vector<std::tuple<DirectionType, float>> LevelGenerator::GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections)
 	{
 		std::vector<std::tuple<DirectionType, float>> WeightedNeighborCells;
 		WeightedNeighborCells.reserve(AvailableDirections.size());
@@ -137,7 +143,7 @@ namespace LevelGenerator
 				}
 			}*/
 
-			const LevelCell* NeighborCell = StateData.GetNeighborCell(StateData.CurrentCell, Direction);
+			LevelCell* NeighborCell = StateData.GetNeighborCell(StateData.CurrentCell, Direction);
 
 			const int StepsToGoalX = abs(NeighborCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
 			const int StepsToGoalY = abs(NeighborCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
@@ -405,6 +411,11 @@ namespace LevelGenerator
 		return &StateData.LevelGrid[(PositionX + MovePositionX % StateData.GridWidth + StateData.GridWidth) % StateData.GridWidth][(PositionY + MovePositionY % StateData.GridHeight + StateData.GridHeight) % StateData.GridHeight];
 	}
 
+	std::vector<std::vector<LevelCell>>& LevelGenerator::GetLevelGrid()
+	{
+		return StateData.LevelGrid;
+	}
+
 	std::tuple<int, int> LevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
 	{
 		float MinPercentage;
@@ -429,5 +440,15 @@ namespace LevelGenerator
 			static_cast<int>(static_cast<float>(TotalSteps) * MinPercentage),
 			static_cast<int>(static_cast<float>(TotalSteps) * MaxPercentage)
 		);
+	}
+
+	int LevelGenerator::GetGridWidth() const
+	{
+		return StateData.GridWidth;
+	}
+
+	int LevelGenerator::GetGridHeight() const
+	{
+		return StateData.GridHeight;
 	}
 }

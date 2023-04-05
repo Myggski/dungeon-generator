@@ -15,19 +15,20 @@ namespace Application
 
 namespace LevelGeneration
 {
-	enum class RoomType : uint8_t
+	enum class RoomType : uint16_t
 	{
-		Cargo,
-		CrewQuarters,
-		MedicalBay,
-		Bridge,
-		ScienceLab,
-		Communication,
-		Equipment,
-		Laundry,
-		Exercise,
-		EscapePods,
-		Workshop
+		Cargo = 1 << 1,
+		CrewQuarters = 1 << 2,
+		MedicalBay = 1 << 3,
+		Bridge = 1 << 4,
+		ScienceLab = 1 << 5,
+		Communication = 1 << 6,
+		Equipment = 1 << 7,
+		Laundry = 1 << 8,
+		Exercise = 1 << 9,
+		EscapePods = 1 << 10,
+		Workshop = 1 << 11,
+		Hub = 1 << 12
 	};
 
 	constexpr int MIN_ROOM_SIZE = 3;
