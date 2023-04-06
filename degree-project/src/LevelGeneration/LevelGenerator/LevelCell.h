@@ -47,10 +47,11 @@ namespace LevelGenerator
 		void RemoveElement(int ElementIndex);
 		bool IsVisited() const;
 		DirectionType GetEntranceFlag() const;
+		bool HasEntrance(DirectionType Direction) const;
 		const std::vector<std::shared_ptr<LevelElement::Element>>& GetElements() const;
+		int GetNumberOfEntrances() const;
 		std::string GetSpatialHash() const;
 		static std::tuple<int, int> SpatialHashToCoordinates(const SpatialHash& SpatialHash);
-		int GetNumberOfEntrances() const;
 
 	private:
 		DirectionType SpatialHashToDirectionType(const SpatialHash& SpatialHash) const;

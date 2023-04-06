@@ -9,6 +9,7 @@
 #include "Application/Keyboard.h"
 #include "CommandStack/CommandStack.h"
 #include "Cyclic/CyclicRuleRepository.h"
+#include "LevelGenerator/LevelLowRes/LowResCell.h"
 
 namespace LevelGeneration
 {
@@ -17,7 +18,8 @@ namespace LevelGeneration
 		GridSizeY(GridSizeY),
 		NumberOfFailedAttempts(0),
 		RuleRepository(RuleRepository),
-		Maze(RuleRepository.GetRandomRule(), GridSizeX, GridSizeY)
+		Maze(RuleRepository.GetRandomRule(), GridSizeX, GridSizeY),
+		LowResLevel(std::nullopt)
 	{
 		Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
 		Maze.InitializeMaze();
@@ -31,11 +33,17 @@ namespace LevelGeneration
 
 	void Level::Draw(Application::Renderer& Renderer)
 	{
-		DrawMaze(Renderer);
+		if (!bLevelDone)
+		{
+			DrawMaze(Renderer);
 
-		Renderer.SetDrawColor(32, 32, 32);
-		Renderer.DrawRectangle({ 0.f, 0.f, static_cast<float>(GridSizeX), static_cast<float>(GridSizeY) });
-
+			Renderer.SetDrawColor(32, 32, 32);
+			Renderer.DrawRectangle({ 0.f, 0.f, static_cast<float>(GridSizeX), static_cast<float>(GridSizeY) });
+		}
+		else {
+			DrawLowResLevel(Renderer);
+		}
+		
 		DrawShortcutsWindow();
 		DrawDebugTextWindow();
 		DrawRulesInformationWindow();
@@ -63,6 +71,7 @@ namespace LevelGeneration
 			if (CurrentStep == LevelGenerator::GeneratorActionType::Done)
 			{
 				bLevelDone = true;
+				LowResLevel = std::make_optional(LevelGenerator::LowResLevel(Maze));
 			}
 
 			SinceLastStepSeconds = 0.f;
@@ -223,6 +232,48 @@ namespace LevelGeneration
 				}
 
 				Index++;
+			}
+		}
+	}
+
+	void Level::DrawLowResLevel(Application::Renderer& Renderer) const
+	{
+		if (!LowResLevel.has_value())
+		{
+			return;
+		}
+
+		const std::vector<std::vector<LevelGenerator::LowResCell>>& Grid = LowResLevel->GetGrid();
+		const int Width = LowResLevel->GetGridWidth();
+		const int Height = LowResLevel->GetGridHeight();
+
+		for (int X = 0; X < Width; X++)
+		{
+			for (int Y = 0; Y < Height; Y++)
+			{
+				const LevelGenerator::LowResCell& Cell = Grid[X][Y];
+
+				SDL_Texture* image = nullptr;
+				SDL_FRect TextureRect{
+					static_cast<float>(X),
+					static_cast<float>(Y),
+					1.f,
+					1.f
+				};
+
+				if (Cell.GetType() == LevelGenerator::LowResCellType::Room)
+				{
+					image = Renderer.GetImage("resources/lowres-room.png");
+				}
+				else if (Cell.GetType() == LevelGenerator::LowResCellType::Entrance)
+				{
+					image = Renderer.GetImage("resources/lowres-door.png");
+				}
+				else {
+					image = Renderer.GetImage("resources/lowres-empty.png");
+				}
+
+				Renderer.DrawTexture(image, TextureRect, 0);
 			}
 		}
 	}

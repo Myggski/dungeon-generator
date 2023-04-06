@@ -74,6 +74,6 @@ namespace LevelGenerator
         Cyclic::CyclicRule MainRule;
 
         friend class LevelGeneration::Level;
-        friend class LevelLowRes;
+        friend class LowResLevel;
 	};
 }

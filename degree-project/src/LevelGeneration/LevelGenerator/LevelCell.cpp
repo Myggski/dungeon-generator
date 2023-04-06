@@ -99,6 +99,11 @@ namespace LevelGenerator
 		return EntranceFlag;
 	}
 
+	bool LevelCell::HasEntrance(DirectionType Direction) const
+	{
+		return static_cast<bool>((EntranceFlag & Direction));
+	}
+
 	DirectionType LevelCell::SpatialHashToDirectionType(const SpatialHash& SpatialHash) const
 	{
 		auto [PositionX, PositionY] = SpatialHashToCoordinates(SpatialHash);

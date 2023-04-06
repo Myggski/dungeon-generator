@@ -2,6 +2,7 @@
 
 #include "Application/Renderer.h"
 #include "LevelGenerator/LevelGenerator.h"
+#include "LevelGenerator/LevelLowRes/LowResLevel.h"
 
 namespace LevelGeneration
 {
@@ -40,6 +41,8 @@ namespace LevelGeneration
 		 */
 		void DrawMaze(Application::Renderer& Renderer) const;
 
+		void DrawLowResLevel(Application::Renderer& Renderer) const;
+
 		/**
 		 * \brief Draws shortcut/input information in a ImGUI-window
 		 */
@@ -68,5 +71,6 @@ namespace LevelGeneration
 
 		Cyclic::CyclicRuleRepository& RuleRepository;
 		LevelGenerator::LevelGenerator Maze;
+		std::optional<LevelGenerator::LowResLevel> LowResLevel;
 	};
 }
