@@ -1,11 +1,20 @@
 ﻿#pragma once
 
 #include "Application/Renderer.h"
-#include "LevelGenerator/LevelGenerator.h"
-#include "LevelGenerator/LevelLowRes/LowResLevel.h"
+#include "LevelGenerator/LowResLevel/LowResLevelStateData.h"
+#include "LevelGenerator/RuleLevel/LevelGenerator.h"
+#include "LevelGenerator/RuleLevel/RuleLevelStateData.h"
 
 namespace LevelGeneration
 {
+	enum class LevelProcessState : uint8_t
+	{
+		RuleGridLevel = 0,
+		LowResLevel = 1,
+		HiResLevel = 2,
+		Done = 3,
+	};
+
 	class Level
 	{
 	public:
@@ -33,15 +42,17 @@ namespace LevelGeneration
 		 * \brief Generates the level one step each frame
 		 * \param DeltaTime Time since last frame
 		 */
-		void GenerateLevel(float DeltaTime);
+		void GenerateRuleLevel(float DeltaTime);
 
 		/**
 		 * \brief Draws the grid of the maze/level
 		 * \param Renderer Wrapper for SDL_Renderer
 		 */
-		void DrawMaze(Application::Renderer& Renderer) const;
+		void DrawRuleGrid(Application::Renderer& Renderer) const;
 
 		void DrawLowResLevel(Application::Renderer& Renderer) const;
+
+		void DrawElements(Application::Renderer& Renderer, const SDL_FRect& TextureRect, const std::vector<std::shared_ptr<LevelElement::Element>>& Elements) const;
 
 		/**
 		 * \brief Draws shortcut/input information in a ImGUI-window
@@ -61,16 +72,17 @@ namespace LevelGeneration
 		void ResetMaze(Cyclic::CyclicRule& MainRule);
 		
 	private:
-		bool bLevelDone{};
 		bool bGenerateLevel{};
 		int GridSizeX;
 		int GridSizeY;
 		int NumberOfFailedAttempts;
 		float WaitStepTimeSeconds{};
 		float SinceLastStepSeconds{};
+		LevelProcessState ProcessState;
 
 		Cyclic::CyclicRuleRepository& RuleRepository;
-		LevelGenerator::LevelGenerator Maze;
-		std::optional<LevelGenerator::LowResLevel> LowResLevel;
+		LevelGenerator::LevelGenerator LevelGenerator;
+		LevelGenerator::RuleLevelStateData RuleLevelStateData;
+		LevelGenerator::LowResLevelStateData LowResLevelStateData;
 	};
 }

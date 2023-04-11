@@ -24,12 +24,12 @@ namespace LevelGenerator
 		DirectionType Direction { DirectionType::None };
 	};
 
-	class LevelCell
+	class RuleLevelCell
 	{
 	public:
-		LevelCell();
-		LevelCell(SDL_Point Position);
-		bool operator==(const LevelCell& Other) const
+		RuleLevelCell();
+		RuleLevelCell(SDL_Point Position);
+		bool operator==(const RuleLevelCell& Other) const
 		{
 			return Position.x == Other.Position.x
 				&& Position.y == Other.Position.y;

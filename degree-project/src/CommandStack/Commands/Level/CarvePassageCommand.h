@@ -1,14 +1,14 @@
 #pragma once
 
 #include "CommandStack/Commands/Command.h"
-#include "LevelGeneration/LevelGenerator/LevelStateData.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelStateData.h"
 
 enum class DirectionType : uint8_t;
 
 namespace LevelGenerator
 {
 	class LevelGenerator;
-	class LevelCell;
+	class RuleLevelCell;
 }
 
 namespace Command
@@ -17,7 +17,7 @@ namespace Command
 	class CarvePassageCommand final : public Command
 	{
 	public:
-		CarvePassageCommand(LevelGenerator::LevelStateData& StateData, DirectionType MoveTowardsDirection);
+		CarvePassageCommand(LevelGenerator::RuleLevelStateData& RuleLevelStateData, DirectionType MoveTowardsDirection);
 		~CarvePassageCommand() override;
 
 		void Execute() override;
@@ -28,12 +28,12 @@ namespace Command
 		void ClearAllDeadEnds();
 
 	private:
-		LevelGenerator::LevelStateData& StateData;
-		LevelGenerator::LevelCell* CarvedFromCell;
-		LevelGenerator::LevelCell* CarvedToCell;
+		LevelGenerator::RuleLevelStateData& RuleLevelStateData;
+		LevelGenerator::RuleLevelCell* CarvedFromCell;
+		LevelGenerator::RuleLevelCell* CarvedToCell;
 		DirectionType MoveTowardsDirection;
 		DirectionType RemovedDirection;
 		LevelGenerator::GeneratorActionType PreviousAction;
-		std::vector<LevelGenerator::LevelCell*> DeadEnds;
+		std::vector<LevelGenerator::RuleLevelCell*> DeadEnds;
 	};
 }

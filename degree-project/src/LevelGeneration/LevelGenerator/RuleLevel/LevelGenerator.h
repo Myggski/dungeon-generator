@@ -1,20 +1,23 @@
 #pragma once
 
-#include "LevelCell.h"
 #include "DirectionType.h"
-#include "LevelStateData.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelCell.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelStateData.h"
 #include "PathwayData.h"
 #include "NavigationalDirections.h"
 #include "LevelGeneration/Cyclic/CyclicRule.h"
 
+namespace Command
+{
+    class CreateLowResLevelCommand;
+}
+
 namespace LevelGenerator
 {
-    class LevelLowRes;
-
     class LevelGenerator
     {
     public:
-        LevelGenerator(Cyclic::CyclicRule MainRule, int Width, int Height);
+        LevelGenerator(RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule);
         LevelGenerator& operator=(LevelGenerator&& Other) noexcept;
 
         /// <summary>
@@ -50,7 +53,7 @@ namespace LevelGenerator
         /// <param name="CurrentCell"></param>
         /// <param name="NeighborCell"></param>
         /// <returns></returns>
-        NavigationalDirections GetCellDirection(const LevelCell& CurrentCell, const LevelCell& NeighborCell) const;
+        NavigationalDirections GetCellDirection(const RuleLevelCell& CurrentCell, const RuleLevelCell& NeighborCell) const;
 
         /**
          * \brief Recalculates the number of steps left, the direction and number of steps taken towards goal
@@ -62,18 +65,18 @@ namespace LevelGenerator
          * \param Direction Which side it should take the cell from
          * \return A MazeCell that's at the edge of the grid
          */
-        LevelCell* GetRandomEdgeCell(DirectionType Direction);
+        RuleLevelCell* GetRandomEdgeCell(DirectionType Direction);
         
-        LevelCell* GetRandomGoalCell(DirectionType Direction);
+        RuleLevelCell* GetRandomGoalCell(DirectionType Direction);
 
-        std::vector<std::vector<LevelCell>>& GetLevelGrid();
+        std::vector<std::vector<RuleLevelCell>>& GetLevelGrid();
 
 	private:
-        LevelStateData StateData;
         PathwayData PathwayCalculationData;
         Cyclic::CyclicRule MainRule;
+        RuleLevelStateData& RuleLevelStateData;
 
         friend class LevelGeneration::Level;
-        friend class LowResLevel;
+        friend class Command::CreateLowResLevelCommand;
 	};
 }

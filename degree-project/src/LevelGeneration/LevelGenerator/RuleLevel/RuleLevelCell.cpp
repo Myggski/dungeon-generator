@@ -1,4 +1,4 @@
-#include "LevelCell.h"
+#include "RuleLevelCell.h"
 
 #include <ranges>
 #include <sstream>
@@ -7,26 +7,26 @@
 
 namespace LevelGenerator
 {
-	LevelCell::LevelCell()
+	RuleLevelCell::RuleLevelCell()
 		: Position({ -1, -1 }),
 		EntranceDirections({}),
 		EntranceFlag(DirectionType::None),
 	    bHasBeenVisited(false) { }
 
-	LevelCell::LevelCell(SDL_Point Position)
+	RuleLevelCell::RuleLevelCell(SDL_Point Position)
 		: Position(Position),
 		EntranceDirections({}),
 		EntranceFlag(DirectionType::None),
 		bHasBeenVisited(false) { }
 
-	void LevelCell::CarveEntrance(const SpatialHash& ConnectedTo)
+	void RuleLevelCell::CarveEntrance(const SpatialHash& ConnectedTo)
 	{
 		const DirectionType Direction = SpatialHashToDirectionType(ConnectedTo);
 		EntranceFlag = EntranceFlag | Direction;
 		EntranceDirections[Direction]++;
 	}
 
-	void LevelCell::CollapseEntrance(const SpatialHash& ConnectedTo)
+	void RuleLevelCell::CollapseEntrance(const SpatialHash& ConnectedTo)
 	{
 		const DirectionType Direction = SpatialHashToDirectionType(ConnectedTo);
 
@@ -44,39 +44,39 @@ namespace LevelGenerator
 		}
 	}
 
-	void LevelCell::SetVisited(bool bVisited)
+	void RuleLevelCell::SetVisited(bool bVisited)
 	{
 		bHasBeenVisited = bVisited;
 	}
 
-	void LevelCell::AddElement(LevelElement::Element& Element)
+	void RuleLevelCell::AddElement(LevelElement::Element& Element)
 	{
 		Elements.push_back(std::make_shared<LevelElement::Element>(Element));
 	}
 
-	void LevelCell::RemoveElement(int ElementIndex)
+	void RuleLevelCell::RemoveElement(int ElementIndex)
 	{
 		Elements.erase(Elements.begin() + ElementIndex);
 	}
 
-	bool LevelCell::IsVisited() const
+	bool RuleLevelCell::IsVisited() const
 	{
 		return bHasBeenVisited;
 	}
 
-	const std::vector<std::shared_ptr<LevelElement::Element>>& LevelCell::GetElements() const
+	const std::vector<std::shared_ptr<LevelElement::Element>>& RuleLevelCell::GetElements() const
 	{
 		return Elements;
 	}
 
-	std::string LevelCell::GetSpatialHash() const
+	std::string RuleLevelCell::GetSpatialHash() const
 	{
 		std::stringstream SpatialHashStream;
 		SpatialHashStream << Position.x << "." << Position.y;
 		return SpatialHashStream.str();
 	}
 
-	std::tuple<int, int> LevelCell::SpatialHashToCoordinates(const SpatialHash& SpatialHash)
+	std::tuple<int, int> RuleLevelCell::SpatialHashToCoordinates(const SpatialHash& SpatialHash)
 	{
 		int x, y;
 		std::stringstream ss(SpatialHash);
@@ -88,23 +88,23 @@ namespace LevelGenerator
 		return std::make_tuple(x, y);
 	}
 
-	int LevelCell::GetNumberOfEntrances() const
+	int RuleLevelCell::GetNumberOfEntrances() const
 	{
 		return static_cast<int>(EntranceDirections.size());
 	}
 
 	
-	DirectionType LevelCell::GetEntranceFlag() const
+	DirectionType RuleLevelCell::GetEntranceFlag() const
 	{
 		return EntranceFlag;
 	}
 
-	bool LevelCell::HasEntrance(DirectionType Direction) const
+	bool RuleLevelCell::HasEntrance(DirectionType Direction) const
 	{
 		return static_cast<bool>((EntranceFlag & Direction));
 	}
 
-	DirectionType LevelCell::SpatialHashToDirectionType(const SpatialHash& SpatialHash) const
+	DirectionType RuleLevelCell::SpatialHashToDirectionType(const SpatialHash& SpatialHash) const
 	{
 		auto [PositionX, PositionY] = SpatialHashToCoordinates(SpatialHash);
 

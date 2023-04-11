@@ -1,13 +1,13 @@
-﻿#include "LevelStateData.h"
+#include "RuleLevelStateData.h"
 
 #include <numeric>
 
-#include "DirectionType.h"
-#include "NavigationalDirections.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/DirectionType.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/NavigationalDirections.h"
 
 namespace LevelGenerator
 {
-	LevelStateData::LevelStateData(int GridWidth, int GridHeight)
+	RuleLevelStateData::RuleLevelStateData(int GridWidth, int GridHeight)
 		: GridWidth(GridWidth),
 		GridHeight(GridHeight),
 		CurrentInsertionIndex(-1),
@@ -16,37 +16,47 @@ namespace LevelGenerator
 		GoalCell(nullptr),
 		CurrentAction(GeneratorActionType::None) { }
 
-	std::vector<LevelCell*>& LevelStateData::GetCurrentPathway()
+	std::vector<RuleLevelCell*>& RuleLevelStateData::GetCurrentPathway()
 	{
 		return InsertionPathways[CurrentInsertionIndex];
 	}
 
-	std::vector<LevelCell*>& LevelStateData::GetPathway(int InsertionIndex)
+	std::vector<RuleLevelCell*>& RuleLevelStateData::GetPathway(int InsertionIndex)
 	{
 		return InsertionPathways[InsertionIndex];
 	}
 
-	void LevelStateData::AddCellToPathway(LevelCell* Cell)
+	void RuleLevelStateData::AddCellToPathway(RuleLevelCell* Cell)
 	{
 		InsertionPathways[CurrentInsertionIndex].emplace_back(Cell);
 	}
 
-	void LevelStateData::RemoveLastCellFromPathway()
+	void RuleLevelStateData::RemoveLastCellFromPathway()
 	{
 		InsertionPathways[CurrentInsertionIndex].erase(InsertionPathways[CurrentInsertionIndex].end() - 1);
 	}
 
-	bool LevelStateData::IsPathwayEmpty() const
+	bool RuleLevelStateData::IsPathwayEmpty() const
 	{
 		return InsertionPathways[CurrentInsertionIndex].empty();
 	}
 
-	void LevelStateData::ReversePathway(int InsertionIndex)
+	bool RuleLevelStateData::IsStartCell(RuleLevelCell* Cell) const
+	{
+		return Cell == StartCell;
+	}
+
+	bool RuleLevelStateData::IsGoalCell(RuleLevelCell* Cell) const
+	{
+		return Cell == GoalCell;
+	}
+
+	void RuleLevelStateData::ReversePathway(int InsertionIndex)
 	{
 		std::ranges::reverse(InsertionPathways[InsertionIndex]);
 	}
 
-	void LevelStateData::AddPreviousDirection(DirectionType Direction)
+	void RuleLevelStateData::AddPreviousDirection(DirectionType Direction)
 	{
 		if (PreviousDirections.size() > 1)
 		{
@@ -56,7 +66,7 @@ namespace LevelGenerator
 		PreviousDirections.push(Direction);
 	}
 
-	int LevelStateData::GetNumberOfEmptySlots()
+	int RuleLevelStateData::GetNumberOfEmptySlots()
 	{
 		int NumberOfEmptySlots = 0;
 
@@ -73,8 +83,8 @@ namespace LevelGenerator
 
 		return NumberOfEmptySlots;
 	}
-	
-	std::vector<DirectionType> LevelStateData::GetAvailableDirections(LevelCell* Cell)
+
+	std::vector<DirectionType> RuleLevelStateData::GetAvailableDirections(RuleLevelCell* Cell)
 	{
 		std::vector<DirectionType> AvailableDirections;
 		AvailableDirections.reserve(4);
@@ -83,7 +93,7 @@ namespace LevelGenerator
 
 		for (const auto& CurrentDirection : Directions)
 		{
-			const LevelCell* Neighbor = GetNeighborCell(Cell, CurrentDirection);
+			const RuleLevelCell* Neighbor = GetNeighborCell(Cell, CurrentDirection);
 
 			if (Neighbor == nullptr || Neighbor->IsVisited())
 			{
@@ -96,7 +106,7 @@ namespace LevelGenerator
 		return AvailableDirections;
 	}
 
-	LevelCell* LevelStateData::GetNeighborCell(LevelCell* From, DirectionType Direction)
+	RuleLevelCell* RuleLevelStateData::GetNeighborCell(RuleLevelCell* From, DirectionType Direction)
 	{
 		const int NeighborX = From->GetPosition().x + DirectionToGridStepX.at(Direction);
 		const int NeighborY = From->GetPosition().y + DirectionToGridStepY.at(Direction);
@@ -109,7 +119,7 @@ namespace LevelGenerator
 		return &LevelGrid[NeighborX][NeighborY];
 	}
 
-	bool LevelStateData::IsOutOfBound(int PositionX, int PositionY) const
+	bool RuleLevelStateData::IsOutOfBound(int PositionX, int PositionY) const
 	{
 		return (PositionX < 0 || PositionX > GridWidth - 1) || (PositionY < 0 || PositionY > GridHeight - 1);
 	}

@@ -3,14 +3,14 @@
 #include <cstdint>
 
 #include "CommandStack/Commands/Command.h"
-#include "LevelGeneration/LevelGenerator/LevelStateData.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelStateData.h"
 
 enum class DirectionType : uint8_t;
 
 namespace LevelGenerator
 {
 	class LevelGenerator;
-	class LevelCell;
+	class RuleLevelCell;
 }
 
 namespace Command
@@ -19,13 +19,13 @@ namespace Command
 	class DeadEndCommand final : public Command
 	{
 	public:
-		DeadEndCommand(LevelGenerator::LevelStateData& StateData);
+		DeadEndCommand(LevelGenerator::RuleLevelStateData& RuleLevelStateData);
 
 		void Execute() override;
 		void Undo() override;
 
 	private:
-		LevelGenerator::LevelStateData& StateData;
-		LevelGenerator::LevelCell* DeadEndCell;
+		LevelGenerator::RuleLevelStateData& RuleLevelStateData;
+		LevelGenerator::RuleLevelCell* DeadEndCell;
 	};
 }

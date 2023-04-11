@@ -4,23 +4,24 @@
 
 #include "Application/Font.h"
 #include "CommandStack/CommandStack.h"
-#include "CommandStack/Commands/Maze/AddElementsCommand.h"
-#include "CommandStack/Commands/Maze/AddSideRoomsCommand.h"
-#include "CommandStack/Commands/Maze/CarvePassageCommand.h"
-#include "CommandStack/Commands/Maze/BacktrackPassageCommand.h"
-#include "CommandStack/Commands/Maze/CreateNewPathCommand.h"
-#include "CommandStack/Commands/Maze/DeadEndCommand.h"
+#include "CommandStack/Commands/Level/AddElementsCommand.h"
+#include "CommandStack/Commands/Level/AddSideRoomsCommand.h"
+#include "CommandStack/Commands/Level/CarvePassageCommand.h"
+#include "CommandStack/Commands/Level/BacktrackPassageCommand.h"
+#include "CommandStack/Commands/Level/CreateNewPathCommand.h"
+#include "CommandStack/Commands/Level/DeadEndCommand.h"
 
 namespace LevelGenerator
 {
-	LevelGenerator::LevelGenerator(Cyclic::CyclicRule MainRule, int Width, int Height)
-		: StateData(Width, Height),
+	LevelGenerator::LevelGenerator(::LevelGenerator::RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule)
+		: RuleLevelStateData(RuleLevelStateData),
 		MainRule(std::move(MainRule)) { }
 
 	LevelGenerator& LevelGenerator::operator=(LevelGenerator&& Other) noexcept
 	{
+		RuleLevelStateData = Other.RuleLevelStateData;
 		MainRule = Other.MainRule;
-		StateData = { Other.StateData.GridWidth, Other.StateData.GridHeight };
+		RuleLevelStateData = { Other.RuleLevelStateData.GridWidth, Other.RuleLevelStateData.GridHeight };
 
 		InitializeMaze();
 
@@ -29,67 +30,67 @@ namespace LevelGenerator
 
 	GeneratorActionType LevelGenerator::Step()
 	{
-		if (StateData.CurrentAction == GeneratorActionType::FillEmptySlots)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::FillEmptySlots)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::AddSideRoomsCommand>(
-					StateData,
+					RuleLevelStateData,
 					NavigationalDirections::GetRandomDirections(),
-					!Utils::RandomGenerator::GetInstance().GetRandom(0, 3) // 25% chance to add a room
+					!Utils::RandomGenerator::GetInstance().GetRandom(0, 3) // 25% chance to add additional sideroom
 				)
 			);
 		}
 
-		if (StateData.CurrentAction == GeneratorActionType::AddMainRuleElements)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::AddMainRuleElements)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::AddElementCommand>(
 					MainRule,
-					StateData
+					RuleLevelStateData
 				)
 			);
 		}
 
-		if (StateData.CurrentAction == GeneratorActionType::SavingPath)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::SavingPath)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::BacktrackPassageCommand>(
-					StateData
+					RuleLevelStateData
 				)
 			);
 		}
 
-		if (StateData.CurrentAction == GeneratorActionType::CreatingPath)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::CreatingPath)
 		{
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::CreateNewPathCommand>(
-					StateData
+					RuleLevelStateData
 				)
 			);
 		}
 
-		if (StateData.CurrentAction == GeneratorActionType::CarvingPath)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::CarvingPath)
 		{
 			TryCarvePassage();
 		}
 
-		if (StateData.CurrentAction == GeneratorActionType::ReachedDeadEnd)
+		if (RuleLevelStateData.CurrentAction == GeneratorActionType::ReachedDeadEnd)
 		{
-			if (StateData.VisitedCellStack.empty())
+			if (RuleLevelStateData.VisitedCellStack.empty())
 			{
 				return GeneratorActionType::Failed;
 			}
 
 			Command::CommandStack::GetInstance().ExecuteCommand(
 				std::make_unique<Command::DeadEndCommand>(
-					StateData
+					RuleLevelStateData
 				)
 			);
 		}
 
 		CalculateStepsLeft();
 
-		return StateData.CurrentAction;
+		return RuleLevelStateData.CurrentAction;
 	}
 
 	void LevelGenerator::TryCarvePassage()
@@ -98,7 +99,7 @@ namespace LevelGenerator
 
 		if (MoveTowardsDirection == DirectionType::None)
 		{
-			StateData.CurrentAction = GeneratorActionType::ReachedDeadEnd;
+			RuleLevelStateData.CurrentAction = GeneratorActionType::ReachedDeadEnd;
 
 			return;
 		}
@@ -106,7 +107,7 @@ namespace LevelGenerator
 		// Move towards direction
 		Command::CommandStack::GetInstance().ExecuteCommand(
 			std::make_unique<Command::CarvePassageCommand>(
-				StateData,
+				RuleLevelStateData,
 				MoveTowardsDirection
 			)
 		);
@@ -135,18 +136,10 @@ namespace LevelGenerator
 
 		for (const DirectionType Direction : AvailableDirections)
 		{
-			/*if (!bIsShortArc && AvailableDirections.size() > 1 && PathwayCalculationData.NumberOfStepsTaken > 3)
-			{
-				if (StateData.PreviousDirections.size() > 1 && StateData.PreviousDirections.back() == StateData.PreviousDirections.front() && StateData.PreviousDirections.front() == Direction)
-				{
-					continue;
-				}
-			}*/
+			RuleLevelCell* NeighborCell = RuleLevelStateData.GetNeighborCell(RuleLevelStateData.CurrentCell, Direction);
 
-			LevelCell* NeighborCell = StateData.GetNeighborCell(StateData.CurrentCell, Direction);
-
-			const int StepsToGoalX = abs(NeighborCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
-			const int StepsToGoalY = abs(NeighborCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
+			const int StepsToGoalX = abs(NeighborCell->GetPosition().x - RuleLevelStateData.GoalCell->GetPosition().x);
+			const int StepsToGoalY = abs(NeighborCell->GetPosition().y - RuleLevelStateData.GoalCell->GetPosition().y);
 
 			WeightedNeighborCells.emplace_back(Direction, StepsToGoalX + StepsToGoalY);
 		}
@@ -165,8 +158,8 @@ namespace LevelGenerator
 
 	DirectionType LevelGenerator::CalculateNextDirection()
 	{
-		const bool bIsShortArc = MainRule.GetArcType(StateData.CurrentInsertionIndex) == Cyclic::ArcType::Short;
-		const std::vector<DirectionType> AvailableDirections = StateData.GetAvailableDirections(StateData.CurrentCell);
+		const bool bIsShortArc = MainRule.GetArcType(RuleLevelStateData.CurrentInsertionIndex) == Cyclic::ArcType::Short;
+		const std::vector<DirectionType> AvailableDirections = RuleLevelStateData.GetAvailableDirections(RuleLevelStateData.CurrentCell);
 
 		if (AvailableDirections.empty())
 		{
@@ -181,7 +174,7 @@ namespace LevelGenerator
 		const float StepsLeftPercentage = StepsLeft / static_cast<float>(PathwayCalculationData.MaxSteps + 2);
 
 		const bool bShortPathFirstStep = bIsShortArc && StepsLeftPercentage == 1.f;
-		const bool bLongPathFirstSteps = PathwayCalculationData.NumberOfStepsTaken < (StateData.GridWidth + StateData.GridHeight) / 4;
+		const bool bLongPathFirstSteps = PathwayCalculationData.NumberOfStepsTaken < (RuleLevelStateData.GridWidth + RuleLevelStateData.GridHeight) / 4;
 
 		const float LongPathThreshold = bIsShortArc ? 0.9f : 0.8f;
 		const float ShortPathThreshold = bIsShortArc ? 0.8f : 0.65f;
@@ -198,9 +191,9 @@ namespace LevelGenerator
 		{
 			std::vector<DirectionType> Directions = GetCellsWithWeight(WeightedNeighborCells, MaxWeight);
 
-			if (!StateData.PreviousDirections.empty() && std::ranges::find(Directions, StateData.PreviousDirections.back()) != Directions.end())
+			if (!RuleLevelStateData.PreviousDirections.empty() && std::ranges::find(Directions, RuleLevelStateData.PreviousDirections.back()) != Directions.end())
 			{
-				return StateData.PreviousDirections.back();
+				return RuleLevelStateData.PreviousDirections.back();
 			}
 
 			std::ranges::shuffle(Directions, Utils::RandomGenerator::GetInstance().GetEngine());
@@ -231,7 +224,7 @@ namespace LevelGenerator
 		}
 	}
 
-	NavigationalDirections LevelGenerator::GetCellDirection(const LevelCell& CurrentCell, const LevelCell& NeighborCell) const
+	NavigationalDirections LevelGenerator::GetCellDirection(const RuleLevelCell& CurrentCell, const RuleLevelCell& NeighborCell) const
 	{
 		const int DirectionX = NeighborCell.GetPosition().x - CurrentCell.GetPosition().x;
 		const int DirectionY = NeighborCell.GetPosition().y - CurrentCell.GetPosition().y;
@@ -256,15 +249,15 @@ namespace LevelGenerator
 
 	void LevelGenerator::InitializeMaze()
 	{
-		StateData.LevelGrid.resize(StateData.GridWidth);
+		RuleLevelStateData.LevelGrid.resize(RuleLevelStateData.GridWidth);
 
-		for (int GridX = 0; GridX < StateData.GridWidth; GridX++)
+		for (int GridX = 0; GridX < RuleLevelStateData.GridWidth; GridX++)
 		{
-			StateData.LevelGrid[GridX].resize(StateData.GridHeight);
+			RuleLevelStateData.LevelGrid[GridX].resize(RuleLevelStateData.GridHeight);
 
-			for (int GridY = 0; GridY < StateData.GridHeight; GridY++)
+			for (int GridY = 0; GridY < RuleLevelStateData.GridHeight; GridY++)
 			{
-				StateData.LevelGrid[GridX][GridY] = LevelCell(SDL_Point{ GridX, GridY });
+				RuleLevelStateData.LevelGrid[GridX][GridY] = RuleLevelCell(SDL_Point{ GridX, GridY });
 			}
 		}
 
@@ -282,22 +275,22 @@ namespace LevelGenerator
 
 		if (MainRule.HasArcType(Cyclic::ArcType::Short))
 		{
-			if (StateData.GridHeight < StateData.GridWidth)
+			if (RuleLevelStateData.GridHeight < RuleLevelStateData.GridWidth)
 			{
 				StartPositionDirection = NavigationalDirections::GetRandomVertical();
 			}
-			else if (StateData.GridWidth < StateData.GridHeight)
+			else if (RuleLevelStateData.GridWidth < RuleLevelStateData.GridHeight)
 			{
 				StartPositionDirection = NavigationalDirections::GetRandomHorizontal();
 			}
 		}
 		else
 		{
-			if (StateData.GridHeight > StateData.GridWidth)
+			if (RuleLevelStateData.GridHeight > RuleLevelStateData.GridWidth)
 			{
 				StartPositionDirection = NavigationalDirections::GetRandomVertical();
 			}
-			else if (StateData.GridWidth > StateData.GridHeight)
+			else if (RuleLevelStateData.GridWidth > RuleLevelStateData.GridHeight)
 			{
 				StartPositionDirection = NavigationalDirections::GetRandomHorizontal();
 			}
@@ -309,19 +302,19 @@ namespace LevelGenerator
 			StartPositionDirection = NavigationalDirections::GetRandomDirection();
 		}
 
-		StateData.StartCell = GetRandomEdgeCell(StartPositionDirection);
+		RuleLevelStateData.StartCell = GetRandomEdgeCell(StartPositionDirection);
 
 		// Set the goal cell to be at the opposite site of the start cell
-		StateData.GoalCell = GetRandomGoalCell(OppositeDirection.at(StartPositionDirection));
+		RuleLevelStateData.GoalCell = GetRandomGoalCell(OppositeDirection.at(StartPositionDirection));
 		PathwayCalculationData = PathwayData();
 
 		Command::CommandStack::GetInstance().ExecuteCommand(
 			std::make_unique<Command::CreateNewPathCommand>(
-				StateData
+				RuleLevelStateData
 			)
 		);
 
-		const Cyclic::ArcType CurrentArcType = MainRule.GetArcType(StateData.CurrentInsertionIndex);
+		const Cyclic::ArcType CurrentArcType = MainRule.GetArcType(RuleLevelStateData.CurrentInsertionIndex);
 		const auto [Min, Max] = CalculateMinMaxSteps(CurrentArcType);
 
 		PathwayCalculationData.MinSteps = Min;
@@ -332,26 +325,26 @@ namespace LevelGenerator
 
 	void LevelGenerator::CalculateStepsLeft()
 	{
-		PathwayCalculationData.StepsToGoalX = abs(StateData.CurrentCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
-		PathwayCalculationData.StepsToGoalY = abs(StateData.CurrentCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
-		PathwayCalculationData.NumberOfStepsTaken = std::ranges::max(static_cast<int>(StateData.VisitedCellStack.size() - 1), 0);
-		PathwayCalculationData.DirectionsToGoal = GetCellDirection(*StateData.CurrentCell, *StateData.GoalCell);
+		PathwayCalculationData.StepsToGoalX = abs(RuleLevelStateData.CurrentCell->GetPosition().x - RuleLevelStateData.GoalCell->GetPosition().x);
+		PathwayCalculationData.StepsToGoalY = abs(RuleLevelStateData.CurrentCell->GetPosition().y - RuleLevelStateData.GoalCell->GetPosition().y);
+		PathwayCalculationData.NumberOfStepsTaken = std::ranges::max(static_cast<int>(RuleLevelStateData.VisitedCellStack.size() - 1), 0);
+		PathwayCalculationData.DirectionsToGoal = GetCellDirection(*RuleLevelStateData.CurrentCell, *RuleLevelStateData.GoalCell);
 	}
 
-	LevelCell* LevelGenerator::GetRandomEdgeCell(DirectionType Direction)
+	RuleLevelCell* LevelGenerator::GetRandomEdgeCell(DirectionType Direction)
 	{
 		switch (Direction)
 		{
 		case DirectionType::North:
-			return &StateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridWidth - 1)][0];
+			return &RuleLevelStateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, RuleLevelStateData.GridWidth - 1)][0];
 		case DirectionType::East:
-			return &StateData.LevelGrid[StateData.GridWidth - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridHeight - 1)];
+			return &RuleLevelStateData.LevelGrid[RuleLevelStateData.GridWidth - 1][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, RuleLevelStateData.GridHeight - 1)];
 			break;
 		case DirectionType::South:
-			return &StateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridWidth - 1)][StateData.GridHeight - 1];
+			return &RuleLevelStateData.LevelGrid[Utils::RandomGenerator::GetInstance().GetRandom<int>(0, RuleLevelStateData.GridWidth - 1)][RuleLevelStateData.GridHeight - 1];
 		case DirectionType::West:
 		default:
-			return &StateData.LevelGrid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, StateData.GridHeight - 1)];
+			return &RuleLevelStateData.LevelGrid[0][Utils::RandomGenerator::GetInstance().GetRandom<int>(0, RuleLevelStateData.GridHeight - 1)];
 		}
 	}
 
@@ -360,16 +353,16 @@ namespace LevelGenerator
 		return (Value % (MaxValue + 1) + (MaxValue + 1)) % (MaxValue + 1);
 	}
 
-	LevelCell* LevelGenerator::GetRandomGoalCell(DirectionType Direction)
+	RuleLevelCell* LevelGenerator::GetRandomGoalCell(DirectionType Direction)
 	{
-		LevelCell* PotentialGoalCell = GetRandomEdgeCell(Direction);
+		RuleLevelCell* PotentialGoalCell = GetRandomEdgeCell(Direction);
 
 		const int PositionX = PotentialGoalCell->GetPosition().x;
 		const int PositionY = PotentialGoalCell->GetPosition().y;
 		int MovePositionX = 0;
 		int MovePositionY = 0;
 		
-		if (PositionX == StateData.StartCell->GetPosition().x)
+		if (PositionX == RuleLevelStateData.StartCell->GetPosition().x)
 		{
 			int MoveSteps = Utils::RandomGenerator::GetInstance().GetRandom(1, 2);
 
@@ -380,7 +373,7 @@ namespace LevelGenerator
 
 			MovePositionX += MoveSteps;
 		}
-		else if (PositionY == StateData.StartCell->GetPosition().y)
+		else if (PositionY == RuleLevelStateData.StartCell->GetPosition().y)
 		{
 			int MoveSteps = Utils::RandomGenerator::GetInstance().GetRandom(1, 2);
 
@@ -392,28 +385,28 @@ namespace LevelGenerator
 			MovePositionY += MoveSteps;
 		}
 
-		PotentialGoalCell = &StateData.LevelGrid[(PositionX + MovePositionX % StateData.GridWidth + StateData.GridWidth) % StateData.GridWidth][(PositionY + MovePositionY % StateData.GridHeight + StateData.GridHeight) % StateData.GridHeight];
+		PotentialGoalCell = &RuleLevelStateData.LevelGrid[(PositionX + MovePositionX % RuleLevelStateData.GridWidth + RuleLevelStateData.GridWidth) % RuleLevelStateData.GridWidth][(PositionY + MovePositionY % RuleLevelStateData.GridHeight + RuleLevelStateData.GridHeight) % RuleLevelStateData.GridHeight];
 
 		if (MainRule.HasArcType(Cyclic::ArcType::Short))
 		{
-			const NavigationalDirections Directions = GetCellDirection(*PotentialGoalCell, *StateData.StartCell);
+			const NavigationalDirections Directions = GetCellDirection(*PotentialGoalCell, *RuleLevelStateData.StartCell);
 
-			if (std::abs(StateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x) > std::abs(StateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y))
+			if (std::abs(RuleLevelStateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x) > std::abs(RuleLevelStateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y))
 			{
 				MovePositionX += DirectionToGridStepX.at(Directions.GetHorizontal());
 			}
-			else if (std::abs(StateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y) > std::abs(StateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x))
+			else if (std::abs(RuleLevelStateData.StartCell->GetPosition().y - PotentialGoalCell->GetPosition().y) > std::abs(RuleLevelStateData.StartCell->GetPosition().x - PotentialGoalCell->GetPosition().x))
 			{
 				MovePositionY += DirectionToGridStepY.at(Directions.GetVertical());
 			}
 		}
 
-		return &StateData.LevelGrid[(PositionX + MovePositionX % StateData.GridWidth + StateData.GridWidth) % StateData.GridWidth][(PositionY + MovePositionY % StateData.GridHeight + StateData.GridHeight) % StateData.GridHeight];
+		return &RuleLevelStateData.LevelGrid[(PositionX + MovePositionX % RuleLevelStateData.GridWidth + RuleLevelStateData.GridWidth) % RuleLevelStateData.GridWidth][(PositionY + MovePositionY % RuleLevelStateData.GridHeight + RuleLevelStateData.GridHeight) % RuleLevelStateData.GridHeight];
 	}
 
-	std::vector<std::vector<LevelCell>>& LevelGenerator::GetLevelGrid()
+	std::vector<std::vector<RuleLevelCell>>& LevelGenerator::GetLevelGrid()
 	{
-		return StateData.LevelGrid;
+		return RuleLevelStateData.LevelGrid;
 	}
 
 	std::tuple<int, int> LevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
@@ -432,8 +425,8 @@ namespace LevelGenerator
 			MaxPercentage = 1.65f;
 		}
 
-		const int StepsToGoalX = abs(StateData.StartCell->GetPosition().x - StateData.GoalCell->GetPosition().x);
-		const int StepsToGoalY = abs(StateData.StartCell->GetPosition().y - StateData.GoalCell->GetPosition().y);
+		const int StepsToGoalX = abs(RuleLevelStateData.StartCell->GetPosition().x - RuleLevelStateData.GoalCell->GetPosition().x);
+		const int StepsToGoalY = abs(RuleLevelStateData.StartCell->GetPosition().y - RuleLevelStateData.GoalCell->GetPosition().y);
 		const int TotalSteps = StepsToGoalX + StepsToGoalY;
 
 		return std::make_tuple(
@@ -444,11 +437,11 @@ namespace LevelGenerator
 
 	int LevelGenerator::GetGridWidth() const
 	{
-		return StateData.GridWidth;
+		return RuleLevelStateData.GridWidth;
 	}
 
 	int LevelGenerator::GetGridHeight() const
 	{
-		return StateData.GridHeight;
+		return RuleLevelStateData.GridHeight;
 	}
 }

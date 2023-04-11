@@ -75,22 +75,16 @@
     <ClCompile Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelCell.cpp">
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\PathwayData.cpp">
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelGenerator.cpp">
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application\Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\Maze\CarvePassageCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp">
@@ -111,19 +105,10 @@
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp">
       <Filter>Source Files\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\LevelStateData.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\Maze\CreateNewPathCommand.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\LevelGeneration\Level.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application\Camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\Maze\DeadEndCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\LevelGeneration\LevelElement\LockKeyProperty.cpp">
@@ -138,10 +123,40 @@
     <ClCompile Include="src\LevelGeneration\LevelElement\Element.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AddElementsCommand.cpp">
+    <ClCompile Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\CommandStack\Commands\Maze\AddElementsCommand.cpp">
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResCell.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\AddSideRoomsCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\AddElementsCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\DeadEndCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\BacktrackPassageCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\CarvePassageCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\CreateNewPathCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelElement\TrapProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResLevelStateData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResLevelStateData.h">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -182,9 +197,6 @@
     <ClInclude Include="src\CommandStack\Commands\CreateRoomCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\RoomType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -200,28 +212,22 @@
     <ClInclude Include="src\LevelGeneration\Cyclic\CyclicRuleRepository.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelCell.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelGenerator.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\DirectionType.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\DirectionType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\PathwayData.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Application\Font.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\NavigationalDirections.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\Maze\CarvePassageCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\Maze\BacktrackPassageCommand.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\NavigationalDirections.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Application\Configuration.h">
@@ -251,19 +257,10 @@
     <ClInclude Include="..\external\Imgui\imstb_truetype.h">
       <Filter>Header Files\imgui</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\LevelStateData.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\Maze\CreateNewPathCommand.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\LevelGeneration\Level.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Application\Camera.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\Maze\DeadEndCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\LevelGeneration\LevelElement\ElementProperty.h">
@@ -281,10 +278,37 @@
     <ClInclude Include="src\LevelGeneration\LevelElement\Element.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AddElementsCommand.h">
+    <ClInclude Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\CommandStack\Commands\Maze\AddElementsCommand.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResCell.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\AddSideRoomsCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\AddElementsCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\DeadEndCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\BacktrackPassageCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\CarvePassageCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\CreateNewPathCommand.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelElement\TrapProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\RoomSize.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -346,7 +370,25 @@
     <Image Include="resources\visited.png">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="resources\controls.png">
+    <Image Include="resources\door.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\key.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\lowres-door.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\lowres-room.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\monster.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\reward.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\trap.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
