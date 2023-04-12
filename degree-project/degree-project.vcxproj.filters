@@ -81,7 +81,7 @@
     <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.cpp">
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelGenerator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\Application\Font.cpp">
@@ -159,6 +159,12 @@
     <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -215,7 +221,7 @@
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.h">
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelGenerator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\DirectionType.h">
@@ -309,6 +315,15 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\ProcessState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

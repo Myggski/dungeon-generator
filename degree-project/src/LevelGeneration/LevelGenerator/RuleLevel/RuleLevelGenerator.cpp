@@ -1,4 +1,4 @@
-#include "LevelGenerator.h"
+#include "RuleLevelGenerator.h"
 
 #include <array>
 
@@ -13,22 +13,22 @@
 
 namespace LevelGenerator
 {
-	LevelGenerator::LevelGenerator(::LevelGenerator::RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule)
+	RuleLevelGenerator::RuleLevelGenerator(::LevelGenerator::RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule)
 		: RuleLevelStateData(RuleLevelStateData),
 		MainRule(std::move(MainRule)) { }
 
-	LevelGenerator& LevelGenerator::operator=(LevelGenerator&& Other) noexcept
+	RuleLevelGenerator& RuleLevelGenerator::operator=(RuleLevelGenerator&& Other) noexcept
 	{
-		RuleLevelStateData = Other.RuleLevelStateData;
 		MainRule = Other.MainRule;
 		RuleLevelStateData = { Other.RuleLevelStateData.GridWidth, Other.RuleLevelStateData.GridHeight };
+		RuleLevelStateData = Other.RuleLevelStateData;
 
 		InitializeMaze();
 
 		return *this;
 	}
 
-	GeneratorActionType LevelGenerator::Step()
+	GeneratorActionType RuleLevelGenerator::Step()
 	{
 		if (RuleLevelStateData.CurrentAction == GeneratorActionType::FillEmptySlots)
 		{
@@ -93,7 +93,7 @@ namespace LevelGenerator
 		return RuleLevelStateData.CurrentAction;
 	}
 
-	void LevelGenerator::TryCarvePassage()
+	void RuleLevelGenerator::TryCarvePassage()
 	{
 		const DirectionType MoveTowardsDirection = CalculateNextDirection();
 
@@ -129,7 +129,7 @@ namespace LevelGenerator
 		return Directions;
 	}
 
-	std::vector<std::tuple<DirectionType, float>> LevelGenerator::GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections)
+	std::vector<std::tuple<DirectionType, float>> RuleLevelGenerator::GetWeightedDirections(const std::vector<DirectionType>& AvailableDirections)
 	{
 		std::vector<std::tuple<DirectionType, float>> WeightedNeighborCells;
 		WeightedNeighborCells.reserve(AvailableDirections.size());
@@ -156,7 +156,7 @@ namespace LevelGenerator
 		return WeightedNeighborCells;
 	}
 
-	DirectionType LevelGenerator::CalculateNextDirection()
+	DirectionType RuleLevelGenerator::CalculateNextDirection()
 	{
 		const bool bIsShortArc = MainRule.GetArcType(RuleLevelStateData.CurrentInsertionIndex) == Cyclic::ArcType::Short;
 		const std::vector<DirectionType> AvailableDirections = RuleLevelStateData.GetAvailableDirections(RuleLevelStateData.CurrentCell);
@@ -224,7 +224,7 @@ namespace LevelGenerator
 		}
 	}
 
-	NavigationalDirections LevelGenerator::GetCellDirection(const RuleLevelCell& CurrentCell, const RuleLevelCell& NeighborCell) const
+	NavigationalDirections RuleLevelGenerator::GetCellDirection(const RuleLevelCell& CurrentCell, const RuleLevelCell& NeighborCell) const
 	{
 		const int DirectionX = NeighborCell.GetPosition().x - CurrentCell.GetPosition().x;
 		const int DirectionY = NeighborCell.GetPosition().y - CurrentCell.GetPosition().y;
@@ -247,7 +247,7 @@ namespace LevelGenerator
 		return { DirectionHorizontal, DirectionVertical };
 	}
 
-	void LevelGenerator::InitializeMaze()
+	void RuleLevelGenerator::InitializeMaze()
 	{
 		RuleLevelStateData.LevelGrid.resize(RuleLevelStateData.GridWidth);
 
@@ -323,7 +323,7 @@ namespace LevelGenerator
 		CalculateStepsLeft();
 	}
 
-	void LevelGenerator::CalculateStepsLeft()
+	void RuleLevelGenerator::CalculateStepsLeft()
 	{
 		PathwayCalculationData.StepsToGoalX = abs(RuleLevelStateData.CurrentCell->GetPosition().x - RuleLevelStateData.GoalCell->GetPosition().x);
 		PathwayCalculationData.StepsToGoalY = abs(RuleLevelStateData.CurrentCell->GetPosition().y - RuleLevelStateData.GoalCell->GetPosition().y);
@@ -331,7 +331,7 @@ namespace LevelGenerator
 		PathwayCalculationData.DirectionsToGoal = GetCellDirection(*RuleLevelStateData.CurrentCell, *RuleLevelStateData.GoalCell);
 	}
 
-	RuleLevelCell* LevelGenerator::GetRandomEdgeCell(DirectionType Direction)
+	RuleLevelCell* RuleLevelGenerator::GetRandomEdgeCell(DirectionType Direction)
 	{
 		switch (Direction)
 		{
@@ -353,7 +353,7 @@ namespace LevelGenerator
 		return (Value % (MaxValue + 1) + (MaxValue + 1)) % (MaxValue + 1);
 	}
 
-	RuleLevelCell* LevelGenerator::GetRandomGoalCell(DirectionType Direction)
+	RuleLevelCell* RuleLevelGenerator::GetRandomGoalCell(DirectionType Direction)
 	{
 		RuleLevelCell* PotentialGoalCell = GetRandomEdgeCell(Direction);
 
@@ -404,12 +404,12 @@ namespace LevelGenerator
 		return &RuleLevelStateData.LevelGrid[(PositionX + MovePositionX % RuleLevelStateData.GridWidth + RuleLevelStateData.GridWidth) % RuleLevelStateData.GridWidth][(PositionY + MovePositionY % RuleLevelStateData.GridHeight + RuleLevelStateData.GridHeight) % RuleLevelStateData.GridHeight];
 	}
 
-	std::vector<std::vector<RuleLevelCell>>& LevelGenerator::GetLevelGrid()
+	std::vector<std::vector<RuleLevelCell>>& RuleLevelGenerator::GetLevelGrid()
 	{
 		return RuleLevelStateData.LevelGrid;
 	}
 
-	std::tuple<int, int> LevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
+	std::tuple<int, int> RuleLevelGenerator::CalculateMinMaxSteps(Cyclic::ArcType ArcType) const
 	{
 		float MinPercentage;
 		float MaxPercentage;
@@ -435,12 +435,12 @@ namespace LevelGenerator
 		);
 	}
 
-	int LevelGenerator::GetGridWidth() const
+	int RuleLevelGenerator::GetGridWidth() const
 	{
 		return RuleLevelStateData.GridWidth;
 	}
 
-	int LevelGenerator::GetGridHeight() const
+	int RuleLevelGenerator::GetGridHeight() const
 	{
 		return RuleLevelStateData.GridHeight;
 	}

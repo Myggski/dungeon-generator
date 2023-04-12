@@ -9,7 +9,7 @@ enum class DirectionType : uint8_t;
 
 namespace LevelGenerator
 {
-	class LevelGenerator;
+	class RuleLevelGenerator;
 	class RuleLevelCell;
 }
 

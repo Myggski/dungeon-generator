@@ -95,7 +95,7 @@ namespace LevelGenerator
         std::queue<DirectionType> PreviousDirections;
         GeneratorActionType CurrentAction;
 
-        friend class LevelGenerator;
+        friend class RuleLevelGenerator;
         friend class LevelGeneration::Level;
         friend class Command::BacktrackPassageCommand;
         friend class Command::CarvePassageCommand;

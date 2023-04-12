@@ -11,6 +11,7 @@ namespace LevelGeneration
 namespace Command
 {
 	class CreateLowResLevelCommand;
+	class CreateHiResLevelCommand;
 }
 
 namespace LevelGenerator
@@ -23,13 +24,14 @@ namespace LevelGenerator
 		bool HasGeneratedLevel() const;
 
 	private:
-		int GridSizeWidth;
-		int GridSizeHeight;
+		int GridWidth;
+		int GridHeight;
 		bool bHasGeneratedLevel;
 		std::vector<std::vector<LowResCell>> LowResGrid;
 
 		friend class LevelGeneration::Level;
 		friend class Command::CreateLowResLevelCommand;
+		friend class Command::CreateHiResLevelCommand;
 
 	};
 }

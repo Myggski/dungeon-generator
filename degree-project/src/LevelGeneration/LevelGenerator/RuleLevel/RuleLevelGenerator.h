@@ -14,11 +14,11 @@ namespace Command
 
 namespace LevelGenerator
 {
-    class LevelGenerator
+    class RuleLevelGenerator
     {
     public:
-        LevelGenerator(RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule);
-        LevelGenerator& operator=(LevelGenerator&& Other) noexcept;
+        RuleLevelGenerator(RuleLevelStateData& RuleLevelStateData, Cyclic::CyclicRule MainRule);
+        RuleLevelGenerator& operator=(RuleLevelGenerator&& Other) noexcept;
 
         /// <summary>
         /// Setting up the start and goal cells. 

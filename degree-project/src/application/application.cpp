@@ -10,11 +10,10 @@
 #include "Camera.h"
 #include "CommandStack/CommandStack.h"
 #include "utils/RandomGenerator.h"
-#include "LevelGeneration/Level.h"
-
 #include "Application/Font.h"
 #include "Application/Configuration.h"
 #include "Application/Keyboard.h"
+#include "LevelGeneration/Level.h"
 #include "LevelGeneration/Cyclic/CyclicRuleRepository.h"
 #include "LevelGeneration/LevelElement/LockKeyProperty.h"
 #include "LevelGeneration/LevelElement/MiniBossProperty.h"

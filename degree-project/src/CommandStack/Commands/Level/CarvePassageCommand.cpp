@@ -5,7 +5,7 @@
 
 namespace LevelGenerator
 {
-	class LevelGenerator;
+	class RuleLevelGenerator;
 }
 
 namespace Command

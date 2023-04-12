@@ -1,20 +1,15 @@
 ﻿#pragma once
 
+#include <set>
+
 #include "Application/Renderer.h"
 #include "LevelGenerator/LowResLevel/LowResLevelStateData.h"
-#include "LevelGenerator/RuleLevel/LevelGenerator.h"
+#include "LevelGenerator/RuleLevel/RuleLevelGenerator.h"
 #include "LevelGenerator/RuleLevel/RuleLevelStateData.h"
+#include "LevelGenerator/ProcessState.h"
 
 namespace LevelGeneration
 {
-	enum class LevelProcessState : uint8_t
-	{
-		RuleGridLevel = 0,
-		LowResLevel = 1,
-		HiResLevel = 2,
-		Done = 3,
-	};
-
 	class Level
 	{
 	public:
@@ -42,7 +37,7 @@ namespace LevelGeneration
 		 * \brief Generates the level one step each frame
 		 * \param DeltaTime Time since last frame
 		 */
-		void GenerateRuleLevel(float DeltaTime);
+		void GenerateLevel(float DeltaTime);
 
 		/**
 		 * \brief Draws the grid of the maze/level
@@ -69,19 +64,21 @@ namespace LevelGeneration
 		/**
 		 * \brief Replaces the maze object with a new and resets generation states and data
 		 */
-		void ResetMaze(Cyclic::CyclicRule& MainRule);
+		void ResetLevelGeneration(Cyclic::CyclicRule& MainRule);
 		
 	private:
-		bool bGenerateLevel{};
+		bool bGenerateLevel;
+		bool bCheckpointReached;
+		bool bIsLevelGenerated;
 		int GridSizeX;
 		int GridSizeY;
 		int NumberOfFailedAttempts;
 		float WaitStepTimeSeconds{};
 		float SinceLastStepSeconds{};
-		LevelProcessState ProcessState;
+		LevelProcessState CurrentProcessState;
 
 		Cyclic::CyclicRuleRepository& RuleRepository;
-		LevelGenerator::LevelGenerator LevelGenerator;
+		LevelGenerator::RuleLevelGenerator RuleLevelGenerator;
 		LevelGenerator::RuleLevelStateData RuleLevelStateData;
 		LevelGenerator::LowResLevelStateData LowResLevelStateData;
 	};

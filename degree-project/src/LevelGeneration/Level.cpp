@@ -19,79 +19,106 @@ namespace LevelGeneration
 	Level::Level(Cyclic::CyclicRuleRepository& RuleRepository, int GridSizeX, int GridSizeY)
 		: GridSizeX(GridSizeX),
 		GridSizeY(GridSizeY),
+		bGenerateLevel(false),
+		bCheckpointReached(false),
+		bIsLevelGenerated(false),
 		RuleLevelStateData(GridSizeX, GridSizeY),
 		NumberOfFailedAttempts(0),
 		RuleRepository(RuleRepository),
-		LevelGenerator(RuleLevelStateData, RuleRepository.GetRandomRule()),
-		ProcessState(LevelProcessState::RuleGridLevel)
+		RuleLevelGenerator(RuleLevelStateData, RuleRepository.GetRandomRule()),
+		CurrentProcessState(LevelProcessState::RuleGridLevel)
 	{
 		Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
-		LevelGenerator.InitializeMaze();
+		RuleLevelGenerator.InitializeMaze();
 	}
 
 	void Level::Update(float DeltaTime)
 	{
 		CheckInput();
-
-		if (ProcessState == LevelProcessState::RuleGridLevel)
-		{
-			GenerateRuleLevel(DeltaTime);
-		} 
-		else if (ProcessState == LevelProcessState::LowResLevel)
-		{
-			Command::CommandStack::GetInstance().ExecuteCommand(
-				std::make_unique<Command::CreateLowResLevelCommand>(
-					LowResLevelStateData,
-					RuleLevelStateData
-				)
-			);
-		}
+		GenerateLevel(DeltaTime);
 	}
 
 	void Level::Draw(Application::Renderer& Renderer)
 	{
-		if (ProcessState == LevelProcessState::RuleGridLevel)
+		float LevelBorderWidth = 0;
+		float LevelBorderHeight = 0;
+
+		if (CurrentProcessState == LevelProcessState::RuleGridLevel)
 		{
 			DrawRuleGrid(Renderer);
 
-			Renderer.SetDrawColor(32, 32, 32);
-			Renderer.DrawRectangle({ 0.f, 0.f, static_cast<float>(GridSizeX), static_cast<float>(GridSizeY) });
+			LevelBorderWidth = static_cast<float>(RuleLevelStateData.GridWidth); 
+			LevelBorderHeight = static_cast<float>(RuleLevelStateData.GridHeight);
 		}
-		else if (ProcessState == LevelProcessState::LowResLevel){
+		else 
+		{
 			DrawLowResLevel(Renderer);
+
+			LevelBorderWidth = static_cast<float>(LowResLevelStateData.GridWidth);
+			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridWidth);
 		}
+
+		Renderer.SetDrawColor(155, 171, 178);
+		Renderer.DrawRectangle({ 0.f, 0.f, LevelBorderWidth, LevelBorderHeight });
 		
 		DrawShortcutsWindow();
 		DrawDebugTextWindow();
 		DrawRulesInformationWindow();
 	}
 
-	void Level::GenerateRuleLevel(float DeltaTime)
+	void Level::GenerateLevel(float DeltaTime)
 	{
-		if (!bGenerateLevel)
+		if (!bGenerateLevel || bIsLevelGenerated)
 		{
 			return;
 		}
 
 		if (SinceLastStepSeconds > WaitStepTimeSeconds)
 		{
-			const LevelGenerator::GeneratorActionType CurrentStep = LevelGenerator.Step();
-
-			if (CurrentStep == LevelGenerator::GeneratorActionType::Failed)
+			if (bCheckpointReached)
 			{
-				NumberOfFailedAttempts++;
-
-				Command::CommandStack::GetInstance().Clear();
-				LevelGenerator = { RuleLevelStateData, LevelGenerator.MainRule };
+				if (CurrentProcessState == LevelProcessState::RuleGridLevel)
+				{
+					CurrentProcessState = LevelProcessState::LowResLevel;
+					bCheckpointReached = false;
+				}
 			}
 
-			if (CurrentStep == LevelGenerator::GeneratorActionType::Done)
+			if (CurrentProcessState == LevelProcessState::LowResLevel)
 			{
-				ProcessState = LevelProcessState::LowResLevel;
+				Command::CommandStack::GetInstance().ExecuteCommand(
+					std::make_unique<Command::CreateLowResLevelCommand>(
+						CurrentProcessState,
+						LowResLevelStateData,
+						RuleLevelStateData
+					)
+				);
+
+				SinceLastStepSeconds = 0.f;
+				bIsLevelGenerated = true;
 			}
 
-			SinceLastStepSeconds = 0.f;
-			return;
+			if (CurrentProcessState == LevelProcessState::RuleGridLevel)
+			{
+				const LevelGenerator::GeneratorActionType CurrentStep = RuleLevelGenerator.Step();
+
+				if (CurrentStep == LevelGenerator::GeneratorActionType::Failed)
+				{
+					NumberOfFailedAttempts++;
+
+					Command::CommandStack::GetInstance().Clear();
+					RuleLevelStateData = { GridSizeX, GridSizeY };
+					RuleLevelGenerator = { RuleLevelStateData, RuleLevelGenerator.MainRule };
+				}
+
+				if (CurrentStep == LevelGenerator::GeneratorActionType::Done)
+				{
+					bCheckpointReached = true;
+				}
+
+				SinceLastStepSeconds = 0.f;
+				return;
+			}
 		}
 
 		SinceLastStepSeconds += DeltaTime;
@@ -117,12 +144,12 @@ namespace LevelGeneration
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_R))
 		{
 			Utils::RandomGenerator::GetInstance().RandomizeSeed();
-			ResetMaze(RuleRepository.GetRandomRule());
+			ResetLevelGeneration(RuleRepository.GetRandomRule());
 		}
 
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_P))
 		{
-			ResetMaze(LevelGenerator.MainRule);
+			ResetLevelGeneration(RuleLevelGenerator.MainRule);
 		}
 
 		if (Application::Keyboard::GetInstance().IsKeyPressedOnce(SDL_SCANCODE_KP_PLUS))
@@ -132,7 +159,7 @@ namespace LevelGeneration
 				GridSizeX += 1;
 				GridSizeY += 1;
 
-				ResetMaze(LevelGenerator.MainRule);
+				ResetLevelGeneration(RuleLevelGenerator.MainRule);
 			}
 		}
 
@@ -143,14 +170,14 @@ namespace LevelGeneration
 				GridSizeX -= 1;
 				GridSizeY -= 1;
 
-				ResetMaze(LevelGenerator.MainRule);
+				ResetLevelGeneration(RuleLevelGenerator.MainRule);
 			}
 		}
 	}
 
 	void Level::DrawRuleGrid(Application::Renderer& Renderer) const
 	{
-		const std::vector<std::vector<LevelGenerator::RuleLevelCell>>& grid = LevelGenerator.RuleLevelStateData.LevelGrid;
+		const std::vector<std::vector<LevelGenerator::RuleLevelCell>>& grid = RuleLevelGenerator.RuleLevelStateData.LevelGrid;
 
 		for (int x = 0; x < GridSizeX; x++)
 		{
@@ -171,19 +198,19 @@ namespace LevelGeneration
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
 
-				if (LevelGenerator.RuleLevelStateData.CurrentCell->GetPosition().x == x && LevelGenerator.RuleLevelStateData.CurrentCell->GetPosition().y == y)
+				if (RuleLevelGenerator.RuleLevelStateData.CurrentCell->GetPosition().x == x && RuleLevelGenerator.RuleLevelStateData.CurrentCell->GetPosition().y == y)
 				{
 					auto* image = Renderer.GetImage("resources/" + std::to_string(0) + ".png");
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
 
-				if (LevelGenerator.RuleLevelStateData.StartCell->GetPosition().x == x && LevelGenerator.RuleLevelStateData.StartCell->GetPosition().y == y)
+				if (RuleLevelGenerator.RuleLevelStateData.StartCell->GetPosition().x == x && RuleLevelGenerator.RuleLevelStateData.StartCell->GetPosition().y == y)
 				{
 					auto* image = Renderer.GetImage("resources/start.png");
 					Renderer.DrawTexture(image, TextureRect, 0);
 				}
 
-				if (LevelGenerator.RuleLevelStateData.GoalCell->GetPosition().x == x && LevelGenerator.RuleLevelStateData.GoalCell->GetPosition().y == y)
+				if (RuleLevelGenerator.RuleLevelStateData.GoalCell->GetPosition().x == x && RuleLevelGenerator.RuleLevelStateData.GoalCell->GetPosition().y == y)
 				{
 					auto* image = Renderer.GetImage("resources/goal.png");
 					Renderer.DrawTexture(image, TextureRect, 0);
@@ -191,7 +218,7 @@ namespace LevelGeneration
 			}
 		}
 
-		for (const auto& Pathway : LevelGenerator.RuleLevelStateData.InsertionPathways)
+		for (const auto& Pathway : RuleLevelGenerator.RuleLevelStateData.InsertionPathways)
 		{
 			if (Pathway.empty())
 			{
@@ -211,8 +238,7 @@ namespace LevelGeneration
 					1.f
 				};
 
-				auto* image = Renderer.GetImage("resources/visited.png");
-				Renderer.DrawTexture(image, TextureRect, 0);
+				Renderer.DrawTexture(Renderer.GetImage("resources/visited.png"), TextureRect, 0);
 
 				DrawElements(Renderer, TextureRect, grid[X][Y].GetElements());
 
@@ -229,8 +255,8 @@ namespace LevelGeneration
 		}
 
 		const std::vector<std::vector<LevelGenerator::LowResCell>>& Grid = LowResLevelStateData.LowResGrid;
-		const int Width = LowResLevelStateData.GridSizeWidth;
-		const int Height = LowResLevelStateData.GridSizeWidth;
+		const int Width = LowResLevelStateData.GridWidth;
+		const int Height = LowResLevelStateData.GridWidth;
 
 		for (int X = 0; X < Width; X++)
 		{
@@ -258,15 +284,16 @@ namespace LevelGeneration
 				{
 					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-goal.png"), TextureRect, 0);
 				}
-				
-				if (Cell.GetType() == LevelGenerator::LowResCellType::Entrance)
-				{
-					image = Renderer.GetImage("resources/door.png");
+				else {
+					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-empty.png"), TextureRect, 0);
 				}
 
 				DrawElements(Renderer, TextureRect, Cell.GetElements());
 
-				Renderer.DrawTexture(image, TextureRect, 0);
+				if (Cell.GetType() == LevelGenerator::LowResCellType::Entrance)
+				{
+					Renderer.DrawTexture(Renderer.GetImage("resources/door.png"), TextureRect, 0);
+				}
 			}
 		}
 	}
@@ -339,21 +366,21 @@ namespace LevelGeneration
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		ImGui::Text("Done: %s", ProcessState == LevelProcessState::Done ? "True" : "False");
+		ImGui::Text("Done: %s", CurrentProcessState == LevelProcessState::Done ? "True" : "False");
 		ImGui::Text("Number Of Failures: %d", NumberOfFailedAttempts);
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		ImGui::Text("Number Of Steps Taken: %d", LevelGenerator.PathwayCalculationData.NumberOfStepsTaken);
-		ImGui::Text("Steps To Goal X: %d", LevelGenerator.PathwayCalculationData.StepsToGoalX);
-		ImGui::Text("Steps To Goal Y: %d", LevelGenerator.PathwayCalculationData.StepsToGoalY);
+		ImGui::Text("Number Of Steps Taken: %d", RuleLevelGenerator.PathwayCalculationData.NumberOfStepsTaken);
+		ImGui::Text("Steps To Goal X: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalX);
+		ImGui::Text("Steps To Goal Y: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalY);
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		ImGui::Text("Insertion One Steps: %llu", LevelGenerator.RuleLevelStateData.GetPathway(0).size());
-		ImGui::Text("Insertion Two Steps: %llu", LevelGenerator.RuleLevelStateData.GetPathway(1).size());
+		ImGui::Text("Insertion One Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(0).size());
+		ImGui::Text("Insertion Two Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(1).size());
 
 		ImGui::End();
 	}
@@ -365,38 +392,41 @@ namespace LevelGeneration
 		ImGui::Begin("Main Rule");
 
 		ImGui::Text("Name:");
-		ImGui::Text("%s", LevelGenerator.MainRule.GetName().c_str());
-		ImGui::Text("Goal: %s", LevelGenerator.MainRule.GetGoalTypeToString().c_str());
+		ImGui::Text("%s", RuleLevelGenerator.MainRule.GetName().c_str());
+		ImGui::Text("Goal: %s", RuleLevelGenerator.MainRule.GetGoalTypeToString().c_str());
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		const auto [MinStepsOne, MaxStepsOne] = LevelGenerator.CalculateMinMaxSteps(LevelGenerator.MainRule.GetArcType(0));
+		const auto [MinStepsOne, MaxStepsOne] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(0));
 		ImGui::Text("Insertion One");
-		ImGui::Text("Element: %s", LevelGenerator.MainRule.GetElement(0).GetElementName().c_str());
-		ImGui::Text("Path Length: %s", LevelGenerator.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
+		ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(0).GetElementName().c_str());
+		ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
 		ImGui::Text("Steps: %d - %d", MinStepsOne, MaxStepsOne);
 
 		ImGui::Spacing();
 		ImGui::Spacing();
 
-		const auto [MinStepsTwo, MaxStepsTwo] = LevelGenerator.CalculateMinMaxSteps(LevelGenerator.MainRule.GetArcType(1));
+		const auto [MinStepsTwo, MaxStepsTwo] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(1));
 		ImGui::Text("Insertion Two");
-		ImGui::Text("Element: %s", LevelGenerator.MainRule.GetElement(1).GetElementName().c_str());
-		ImGui::Text("Path Length: %s", LevelGenerator.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
+		ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(1).GetElementName().c_str());
+		ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
 		ImGui::Text("Steps: %d - %d", MinStepsTwo, MaxStepsTwo);
 
 		ImGui::End();
 	}
 
-	void Level::ResetMaze(Cyclic::CyclicRule& MainRule)
+	void Level::ResetLevelGeneration(Cyclic::CyclicRule& MainRule)
 	{
 		Command::CommandStack::GetInstance().Clear();
 		Utils::RandomGenerator::GetInstance().SetSeed(Utils::RandomGenerator::GetInstance().GetSeed());
 
-		ProcessState = LevelProcessState::RuleGridLevel;
-		LevelGenerator = { RuleLevelStateData, MainRule };
+		CurrentProcessState = LevelProcessState::RuleGridLevel;
+		RuleLevelStateData = { GridSizeX, GridSizeY };
+		RuleLevelGenerator = { RuleLevelStateData, MainRule };
 		LowResLevelStateData = {};
 		NumberOfFailedAttempts = 0;
+		bCheckpointReached = false;
+		bIsLevelGenerated = false;
 	}
 }

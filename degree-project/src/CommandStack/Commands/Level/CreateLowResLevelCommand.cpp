@@ -4,23 +4,24 @@
 
 namespace Command
 {
-	CreateLowResLevelCommand::CreateLowResLevelCommand(LevelGenerator::LowResLevelStateData& LevelData, LevelGenerator::RuleLevelStateData& RuleLevelStateData)
+	CreateLowResLevelCommand::CreateLowResLevelCommand(LevelProcessState& CurrentProcessState, LevelGenerator::LowResLevelStateData& LevelData, LevelGenerator::RuleLevelStateData& RuleLevelStateData)
 		: LevelData(LevelData),
-		RuleLevelStateData(RuleLevelStateData) { }
+		RuleLevelStateData(RuleLevelStateData),
+		CurrentProcessState(CurrentProcessState) { }
 
 	void CreateLowResLevelCommand::Execute()
 	{
-		LevelData.GridSizeWidth = (RuleLevelStateData.GridWidth * 2) - 1;
-		LevelData.GridSizeHeight = (RuleLevelStateData.GridHeight * 2) - 1;
-		LevelData.LowResGrid.resize(LevelData.GridSizeWidth);
+		LevelData.GridWidth = (RuleLevelStateData.GridWidth * 2) - 1;
+		LevelData.GridHeight = (RuleLevelStateData.GridHeight * 2) - 1;
+		LevelData.LowResGrid.resize(LevelData.GridWidth);
 
-		for (int X = 0; X < LevelData.GridSizeWidth; X++)
+		for (int X = 0; X < LevelData.GridWidth; X++)
 		{
-			LevelData.LowResGrid[X].resize(LevelData.GridSizeHeight);
+			LevelData.LowResGrid[X].resize(LevelData.GridHeight);
 		}
 
 		for (int X = 0; X < RuleLevelStateData.GridWidth; X++) {
-			for (int Y = 0; Y < RuleLevelStateData.GridWidth; Y++) {
+			for (int Y = 0; Y < RuleLevelStateData.GridHeight; Y++) {
 				const int PositionX = X * 2;
 				const int PositionY = Y * 2;
 				LevelGenerator::RuleLevelCell* Cell = &RuleLevelStateData.LevelGrid[X][Y];
@@ -49,14 +50,17 @@ namespace Command
 			}
 		}
 
+		CurrentProcessState = LevelProcessState::Done;
 		LevelData.bHasGeneratedLevel = true;
 	}
 
 	void CreateLowResLevelCommand::Undo()
 	{
 		LevelData.LowResGrid.clear();
-		LevelData.GridSizeWidth = std::numeric_limits<int>::min();
-		LevelData.GridSizeHeight = std::numeric_limits<int>::min();
+		LevelData.GridWidth = std::numeric_limits<int>::min();
+		LevelData.GridHeight = std::numeric_limits<int>::min();
 		LevelData.bHasGeneratedLevel = false;
+
+		CurrentProcessState = LevelProcessState::RuleGridLevel;
 	}
 }

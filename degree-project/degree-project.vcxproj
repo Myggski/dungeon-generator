@@ -141,7 +141,9 @@
     <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResCell.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Level\AddSideRoomsCommand.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Level\AddElementsCommand.cpp" />
@@ -166,7 +168,7 @@
     <ClCompile Include="src\LevelGeneration\LevelElement\LockKeyProperty.cpp" />
     <ClCompile Include="src\LevelGeneration\Level.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelElement\TrapProperty.cpp" />
-    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelGenerator.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResLevelStateData.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResLevelStateData.h" />
@@ -191,7 +193,9 @@
     <ClInclude Include="..\external\Imgui\imstb_rectpack.h" />
     <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
+    <ClInclude Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResCell.h" />
     <ClInclude Include="src\CommandStack\Commands\Level\AddSideRoomsCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Level\AddElementsCommand.h" />
@@ -219,8 +223,9 @@
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
     <ClInclude Include="src\LevelGeneration\Level.h" />
     <ClInclude Include="src\LevelGeneration\LevelElement\TrapProperty.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\ProcessState.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\DirectionType.h" />
-    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\LevelGenerator.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelGenerator.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\NavigationalDirections.h" />

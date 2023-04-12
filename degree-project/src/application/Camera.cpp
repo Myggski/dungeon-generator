@@ -57,8 +57,8 @@ namespace Application
 
         if (MouseStartPositionX != std::numeric_limits<float>::min() && MouseStartPositionY != std::numeric_limits<float>::min())
         {
-            PositionX = std::max(-944, std::min(static_cast<int>(MouseStartPositionX - static_cast<float>(MousePositionX)), 304));
-            PositionY = std::max(-448, std::min(static_cast<int>(MouseStartPositionY - static_cast<float>(MousePositionY)), 240));
+            PositionX = static_cast<int>(MouseStartPositionX - static_cast<float>(MousePositionX));
+            PositionY = static_cast<int>(MouseStartPositionY - static_cast<float>(MousePositionY));
         }
     }
 

@@ -1,12 +1,13 @@
-#include "LowResLevelStateData.h"
+#include "HiResLevelStateData.h"
 
-namespace LevelGenerator {
-	LowResLevelStateData::LowResLevelStateData()
+namespace LevelGenerator
+{
+	HiResLevelStateData::HiResLevelStateData()
 		: GridWidth(std::numeric_limits<int>::min()),
 		GridHeight(std::numeric_limits<int>::min()),
 		bHasGeneratedLevel(false) {}
 
-	bool LowResLevelStateData::HasGeneratedLevel() const
+	bool HiResLevelStateData::HasGeneratedLevel() const
 	{
 		return bHasGeneratedLevel;
 	}
