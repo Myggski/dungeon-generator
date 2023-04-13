@@ -1,6 +1,6 @@
 #include "CreateHiResLevelCommand.h"
 
-#include "LevelGeneration/Room.h"
+#include "LevelGeneration/LevelGenerator/HiResLevel/Room.h"
 
 namespace Command
 {
@@ -25,14 +25,34 @@ namespace Command
 		{
 			for (int Y = 0; Y < LowResLevelStateData.GridHeight; Y++)
 			{
-				if (LowResLevelStateData.LowResGrid[X][Y].GetType() == LevelGenerator::LowResCellType::Room)
+				const float HiResX = X / 2.0;
+				const float HiResY = Y / 2.0;
+				LevelGenerator::LowResCellType CellType = LowResLevelStateData.LowResGrid[X][Y].GetType();
+
+				if (CellType == LevelGenerator::LowResCellType::Room)
 				{
-					const float HiResX = X / 2.0;
-					const float HiResY = Y / 2.0;
 					LevelData.HiResGrid[static_cast<int>(HiResX)][static_cast<int>(HiResY)] = LevelGeneration::Room(
-						SDL_FRect{ HiResX * RoomSize, HiResY * RoomSize, RoomSize, RoomSize }, 
-						LevelGeneration::RoomSize::Simple
+						SDL_FRect{ HiResX * RoomSize, HiResY * RoomSize, RoomSize, RoomSize }
 					);
+
+					if (X < LowResLevelStateData.GridWidth - 1)
+					{
+						const LevelGenerator::LowResCell& EastNeighbor = LowResLevelStateData.LowResGrid[X + 1][Y];
+						// Add Entrance
+						if (EastNeighbor.GetType() == LevelGenerator::LowResCellType::Entrance)
+						{
+
+						}
+					}
+
+					if (Y < LowResLevelStateData.GridHeight - 1)
+					{
+						const LevelGenerator::LowResCell& SouthNeighbor = LowResLevelStateData.LowResGrid[X][Y + 1];
+						if (SouthNeighbor.GetType() == LevelGenerator::LowResCellType::Entrance)
+						{
+
+						}
+					}
 				}
 			}
 		}

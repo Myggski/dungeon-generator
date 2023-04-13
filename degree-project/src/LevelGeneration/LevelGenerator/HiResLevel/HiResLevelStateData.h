@@ -1,7 +1,7 @@
 #pragma once
 
 #include <vector>
-#include "LevelGeneration/Room.h"
+#include "LevelGeneration/LevelGenerator/HiResLevel/Room.h"
 
 namespace Command
 {

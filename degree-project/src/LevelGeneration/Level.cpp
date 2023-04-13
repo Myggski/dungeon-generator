@@ -14,7 +14,8 @@
 #include "CommandStack/Commands/Level/CreateLowResLevelCommand.h"
 #include "CommandStack/Commands/Level/CreateHiResLevelCommand.h"
 #include <Utils/RandomGenerator.h>
-#include "LevelGeneration/Room.h"
+#include "LevelGeneration/LevelGenerator/HiResLevel/Room.h"
+#include "Application/Renderer.h"
 
 namespace LevelGeneration
 {
@@ -44,6 +45,7 @@ namespace LevelGeneration
 	{
 		float LevelBorderWidth = 0;
 		float LevelBorderHeight = 0;
+		float TileSize = Renderer.GetTileSize();
 
 		if (CurrentProcessState == LevelProcessState::RuleGridLevel)
 		{
@@ -57,17 +59,18 @@ namespace LevelGeneration
 			DrawLowResLevel(Renderer);
 
 			LevelBorderWidth = static_cast<float>(LowResLevelStateData.GridWidth);
-			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridWidth);
+			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridHeight);
 		}
 		else {
 			DrawHiResLevel(Renderer);
 
-			LevelBorderWidth = static_cast<float>(LowResLevelStateData.GridWidth * 7);
-			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridWidth * 7);
+			LevelBorderWidth = static_cast<float>(HiResLevelStateData.GridWidth * 7);
+			LevelBorderHeight = static_cast<float>(HiResLevelStateData.GridHeight * 7);
+			TileSize /= 2.f;
 		}
 
 		Renderer.SetDrawColor(155, 171, 178);
-		Renderer.DrawRectangle({ 0.f, 0.f, LevelBorderWidth, LevelBorderHeight });
+		Renderer.DrawRectangle({ 0.f, 0.f, LevelBorderWidth, LevelBorderHeight }, std::make_tuple(TileSize, TileSize));
 		
 		DrawShortcutsWindow();
 		DrawDebugTextWindow();
@@ -302,15 +305,17 @@ namespace LevelGeneration
 
 				if (Cell.GetType() == LevelGenerator::LowResCellType::Room || Cell.GetType() == LevelGenerator::LowResCellType::Entrance)
 				{
-					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-room.png"), TextureRect, 0);
-				}
-				else if (Cell.GetType() == LevelGenerator::LowResCellType::Start)
-				{
-					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-start.png"), TextureRect, 0);
-				}
-				else if (Cell.GetType() == LevelGenerator::LowResCellType::Goal)
-				{
-					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-goal.png"), TextureRect, 0);
+					if (Cell.IsStartCell())
+					{
+						Renderer.DrawTexture(Renderer.GetImage("resources/lowres-start.png"), TextureRect, 0);
+					}
+					else if (Cell.IsGoalCell())
+					{
+						Renderer.DrawTexture(Renderer.GetImage("resources/lowres-goal.png"), TextureRect, 0);
+					}
+					else {
+						Renderer.DrawTexture(Renderer.GetImage("resources/lowres-room.png"), TextureRect, 0);
+					}
 				}
 				else {
 					Renderer.DrawTexture(Renderer.GetImage("resources/lowres-empty.png"), TextureRect, 0);
@@ -335,7 +340,7 @@ namespace LevelGeneration
 		{
 			for (int Y = 0; Y < Height; Y++)
 			{
-				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer);
+				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer, std::make_tuple(32.f, 32.f));
 			}
 		}
 	}

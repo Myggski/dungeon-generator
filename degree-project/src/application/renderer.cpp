@@ -9,8 +9,6 @@
 
 namespace Application
 {
-	static constexpr float TILE_SIZE = 64.f;
-
 	void Renderer::Init(SDL_Window* Window)
 	{
 		SDLRenderer = SDL_CreateRenderer(Window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
@@ -76,16 +74,32 @@ namespace Application
 		SDL_SetRenderDrawColor(SDLRenderer, R, G, B, 255);
 	}
 
-	void Renderer::DrawRectangle(const SDL_FRect& Rect) const
+	void Renderer::DrawRectangle(const SDL_FRect& Rect, std::tuple<float, float> TileSize) const
 	{
+		auto [Width, Height] = TileSize;
+
 		SDL_FRect DrawRect{
-			Rect.x * TILE_SIZE - Camera::GetInstance().PositionX,
-			Rect.y * TILE_SIZE - Camera::GetInstance().PositionY,
-			Rect.w * TILE_SIZE,
-			Rect.h * TILE_SIZE,
+			Rect.x * Width - Camera::GetInstance().PositionX,
+			Rect.y * Height - Camera::GetInstance().PositionY,
+			Rect.w * Width,
+			Rect.h * Height,
 		};
 
 		SDL_RenderDrawRectF(SDLRenderer, &DrawRect);
+	}
+
+	void Renderer::DrawFilledRectangle(const SDL_FRect& Rect, std::tuple<float, float> TileSize) const
+	{
+		auto [Width, Height] = TileSize;
+
+		SDL_FRect DrawRect{
+			Rect.x * Width - Camera::GetInstance().PositionX,
+			Rect.y * Height - Camera::GetInstance().PositionY,
+			Rect.w * Width,
+			Rect.h * Height,
+		};
+
+		SDL_RenderFillRectF(SDLRenderer, &DrawRect);
 	}
 
 	SDL_Texture* Renderer::GetImage(const std::string& FilePath)

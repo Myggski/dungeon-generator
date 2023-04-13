@@ -27,16 +27,16 @@ namespace Command
 				LevelGenerator::RuleLevelCell* Cell = &RuleLevelStateData.LevelGrid[X][Y];
 				LevelGenerator::LowResCellType CellType = LevelGenerator::LowResCellType::Room;
 
+				LevelData.LowResGrid[PositionX][PositionY] = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY), CellType, Cell->GetElements());
+
 				if (RuleLevelStateData.IsStartCell(Cell))
 				{
-					CellType = LevelGenerator::LowResCellType::Start;
+					LevelData.LowResGrid[PositionX][PositionY].SetStartCell();
 				}
 				else if (RuleLevelStateData.IsGoalCell(Cell))
 				{
-					CellType = LevelGenerator::LowResCellType::Goal;
+					LevelData.LowResGrid[PositionX][PositionY].SetGoalCell();
 				}
-
-				LevelData.LowResGrid[PositionX][PositionY] = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY), CellType, Cell->GetElements());
 
 				if (Cell->HasEntrance(DirectionType::East))
 				{

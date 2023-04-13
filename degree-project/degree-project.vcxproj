@@ -174,13 +174,8 @@
     <ClCompile Include="src\LevelGeneration\LevelGenerator\LowResLevel\LowResLevelStateData.h" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.cpp" />
-    <ClCompile Include="src\LevelGeneration\Room.cpp" />
-    <ClCompile Include="src\LevelGeneration\RoomFactory.cpp" />
-    <ClCompile Include="src\LevelGeneration\RoomFragment.cpp" />
-    <ClCompile Include="src\LevelGeneration\RoomRepository.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelGenerator\HiResLevel\Room.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.cpp" />
-    <ClCompile Include="src\CommandStack\Commands\AddRoomFragmentCommand.h" />
     <ClCompile Include="src\CommandStack\CommandStack.cpp" />
     <ClCompile Include="src\Utils\RandomGenerator.cpp" />
   </ItemGroup>
@@ -230,12 +225,9 @@
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\PathwayData.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\NavigationalDirections.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelStateData.h" />
-    <ClInclude Include="src\LevelGeneration\Room.h" />
-    <ClInclude Include="src\LevelGeneration\RoomFactory.h" />
-    <ClInclude Include="src\LevelGeneration\RoomFragment.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\HiResLevel\Room.h" />
     <ClInclude Include="src\CommandStack\Commands\Command.h" />
     <ClInclude Include="src\CommandStack\CommandStack.h" />
-    <ClInclude Include="src\LevelGeneration\RoomRepository.h" />
     <ClInclude Include="src\LevelGeneration\RoomSize.h" />
     <ClInclude Include="src\Utils\RandomGenerator.h" />
   </ItemGroup>

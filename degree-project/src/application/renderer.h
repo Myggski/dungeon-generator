@@ -18,10 +18,16 @@ namespace Application
 		void DrawCanvas() const;
 		void ClearCanvas() const;
 		void SetDrawColor(Uint8 R, Uint8 G, Uint8 B) const;
-		void DrawRectangle(const SDL_FRect& Rect) const;
+		void DrawRectangle(const SDL_FRect& Rect, std::tuple<float, float> TileSize = std::make_tuple(TILE_SIZE, TILE_SIZE)) const;
+		void DrawFilledRectangle(const SDL_FRect& Rect, std::tuple<float, float> TileSize = std::make_tuple(TILE_SIZE, TILE_SIZE)) const;
 		SDL_Texture* GetImage(const std::string& FilePath);
+		inline float GetTileSize() const
+		{
+			return TILE_SIZE;
+		}
 
 	private:
+		static constexpr float TILE_SIZE { 64.f };
 		SDL_Renderer* SDLRenderer = nullptr;
 		std::unordered_map<std::string, SDL_Texture*> Textures;
 
