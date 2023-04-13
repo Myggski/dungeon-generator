@@ -7,6 +7,13 @@
 
 namespace LevelGeneration
 {
+	Room::Room()
+		: RoomRect({}),
+		FullRect({}),
+		FloorTexture(nullptr),
+		RoomType(RoomSize::Simple),
+		RoomId(std::numeric_limits<size_t>::min()) {}
+
 	Room::Room(SDL_FRect Rect, LevelGeneration::RoomSize RoomType)
 		: RoomRect(Rect),
 		  FullRect({}),
@@ -47,7 +54,7 @@ namespace LevelGeneration
 	{
 		if (FloorTexture == nullptr)
 		{
-			FloorTexture = Renderer.GetImage("resources/floor.png");
+			FloorTexture = Renderer.GetImage("resources/lowres-room.png");
 		}
 
 		DrawRoom(Renderer, RoomRect);
@@ -105,7 +112,6 @@ namespace LevelGeneration
 
 		return Position;
 	}
-
 
 	bool Room::IsPositionOccupied(FragmentPosition FragmentPosition) const
 	{

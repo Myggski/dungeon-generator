@@ -37,6 +37,7 @@ namespace LevelGeneration
 	class Room
 	{
 	public:
+		Room();
 		Room(SDL_FRect Rect, RoomSize RoomType);
 
 		void GenerateFragment(FragmentPosition FragmentPosition);

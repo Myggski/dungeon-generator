@@ -50,7 +50,6 @@ namespace Command
 			}
 		}
 
-		CurrentProcessState = LevelProcessState::Done;
 		LevelData.bHasGeneratedLevel = true;
 	}
 

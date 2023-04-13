@@ -10,7 +10,7 @@ namespace Command
 	class CreateHiResLevelCommand final : public Command
 	{
 	public:
-		CreateHiResLevelCommand(LevelProcessState& CurrentProcessState, LevelGenerator::HiResLevelStateData& LevelData, LevelGenerator::LowResLevelStateData& RuleLevelStateData);
+		CreateHiResLevelCommand(LevelProcessState& CurrentProcessState, LevelGenerator::HiResLevelStateData& LevelData, LevelGenerator::LowResLevelStateData& LowResLevelStateData);
 
 		void Execute() override;
 		void Undo() override;
@@ -18,6 +18,6 @@ namespace Command
 	private:
 		LevelProcessState& CurrentProcessState;
 		LevelGenerator::HiResLevelStateData& LevelData;
-		LevelGenerator::LowResLevelStateData& RuleLevelStateData;
+		LevelGenerator::LowResLevelStateData& LowResLevelStateData;
 	};
 }

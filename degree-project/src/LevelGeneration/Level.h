@@ -4,6 +4,7 @@
 
 #include "Application/Renderer.h"
 #include "LevelGenerator/LowResLevel/LowResLevelStateData.h"
+#include "LevelGenerator/HiResLevel/HiResLevelStateData.h"
 #include "LevelGenerator/RuleLevel/RuleLevelGenerator.h"
 #include "LevelGenerator/RuleLevel/RuleLevelStateData.h"
 #include "LevelGenerator/ProcessState.h"
@@ -47,6 +48,8 @@ namespace LevelGeneration
 
 		void DrawLowResLevel(Application::Renderer& Renderer) const;
 
+		void DrawHiResLevel(Application::Renderer& Renderer);
+
 		void DrawElements(Application::Renderer& Renderer, const SDL_FRect& TextureRect, const std::vector<std::shared_ptr<LevelElement::Element>>& Elements) const;
 
 		/**
@@ -81,5 +84,6 @@ namespace LevelGeneration
 		LevelGenerator::RuleLevelGenerator RuleLevelGenerator;
 		LevelGenerator::RuleLevelStateData RuleLevelStateData;
 		LevelGenerator::LowResLevelStateData LowResLevelStateData;
+		LevelGenerator::HiResLevelStateData HiResLevelStateData;
 	};
 }

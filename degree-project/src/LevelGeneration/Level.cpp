@@ -12,7 +12,9 @@
 #include "Cyclic/CyclicRuleRepository.h"
 #include "LevelGenerator/LowResLevel/LowResCell.h"
 #include "CommandStack/Commands/Level/CreateLowResLevelCommand.h"
+#include "CommandStack/Commands/Level/CreateHiResLevelCommand.h"
 #include <Utils/RandomGenerator.h>
+#include "LevelGeneration/Room.h"
 
 namespace LevelGeneration
 {
@@ -50,12 +52,18 @@ namespace LevelGeneration
 			LevelBorderWidth = static_cast<float>(RuleLevelStateData.GridWidth); 
 			LevelBorderHeight = static_cast<float>(RuleLevelStateData.GridHeight);
 		}
-		else 
+		else if (CurrentProcessState == LevelProcessState::LowResLevel)
 		{
 			DrawLowResLevel(Renderer);
 
 			LevelBorderWidth = static_cast<float>(LowResLevelStateData.GridWidth);
 			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridWidth);
+		}
+		else {
+			DrawHiResLevel(Renderer);
+
+			LevelBorderWidth = static_cast<float>(LowResLevelStateData.GridWidth * 7);
+			LevelBorderHeight = static_cast<float>(LowResLevelStateData.GridWidth * 7);
 		}
 
 		Renderer.SetDrawColor(155, 171, 178);
@@ -77,11 +85,31 @@ namespace LevelGeneration
 		{
 			if (bCheckpointReached)
 			{
+				if (CurrentProcessState == LevelProcessState::LowResLevel)
+				{
+					CurrentProcessState = LevelProcessState::HiResLevel;
+					bCheckpointReached = false;
+				}
+
 				if (CurrentProcessState == LevelProcessState::RuleGridLevel)
 				{
 					CurrentProcessState = LevelProcessState::LowResLevel;
 					bCheckpointReached = false;
 				}
+			}
+
+			if (CurrentProcessState == LevelProcessState::HiResLevel)
+			{
+				Command::CommandStack::GetInstance().ExecuteCommand(
+					std::make_unique<Command::CreateHiResLevelCommand>(
+						CurrentProcessState,
+						HiResLevelStateData,
+						LowResLevelStateData
+					)
+				);
+
+				SinceLastStepSeconds = 0.f;
+				bIsLevelGenerated = true;
 			}
 
 			if (CurrentProcessState == LevelProcessState::LowResLevel)
@@ -95,7 +123,7 @@ namespace LevelGeneration
 				);
 
 				SinceLastStepSeconds = 0.f;
-				bIsLevelGenerated = true;
+				bCheckpointReached = true;
 			}
 
 			if (CurrentProcessState == LevelProcessState::RuleGridLevel)
@@ -294,6 +322,20 @@ namespace LevelGeneration
 				{
 					Renderer.DrawTexture(Renderer.GetImage("resources/door.png"), TextureRect, 0);
 				}
+			}
+		}
+	}
+
+	void Level::DrawHiResLevel(Application::Renderer& Renderer)
+	{
+		const int Width = HiResLevelStateData.GridWidth;
+		const int Height = HiResLevelStateData.GridWidth;
+
+		for (int X = 0; X < Width; X++)
+		{
+			for (int Y = 0; Y < Height; Y++)
+			{
+				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer);
 			}
 		}
 	}
