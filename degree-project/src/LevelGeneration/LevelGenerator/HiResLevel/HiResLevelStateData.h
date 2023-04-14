@@ -18,7 +18,7 @@ namespace LevelGenerator
 	struct HiResLevelStateData
 	{
 	public:
-		HiResLevelStateData();
+		HiResLevelStateData(std::tuple<float, float> RoomCellSize);
 
 		bool HasGeneratedLevel() const;
 
@@ -26,7 +26,10 @@ namespace LevelGenerator
 		int GridWidth;
 		int GridHeight;
 		bool bHasGeneratedLevel;
+		std::tuple<float, float> RoomCellSize;
 		std::vector<std::vector<LevelGeneration::Room>> HiResGrid;
+		LevelGeneration::Room* StartRoom;
+		LevelGeneration::Room* GoalRoom;
 
 		friend class LevelGeneration::Level;
 		friend class Command::CreateHiResLevelCommand;

@@ -2,8 +2,9 @@
 
 namespace LevelGenerator
 {
-	HiResLevelStateData::HiResLevelStateData()
-		: GridWidth(std::numeric_limits<int>::min()),
+	HiResLevelStateData::HiResLevelStateData(std::tuple<float, float> RoomCellSize)
+		: RoomCellSize(RoomCellSize),
+		GridWidth(std::numeric_limits<int>::min()),
 		GridHeight(std::numeric_limits<int>::min()),
 		bHasGeneratedLevel(false) {}
 

@@ -52,17 +52,7 @@ namespace LevelGeneration
 
 		void DrawElements(Application::Renderer& Renderer, const SDL_FRect& TextureRect, const std::vector<std::shared_ptr<LevelElement::Element>>& Elements) const;
 
-		/**
-		 * \brief Draws shortcut/input information in a ImGUI-window
-		 */
-		void DrawShortcutsWindow();
-
-		/**
-		 * \brief Draws debug data for the maze/level
-		 */
-		void DrawDebugTextWindow();
-
-		void DrawRulesInformationWindow();
+		void DrawToolsWindow();
 
 		/**
 		 * \brief Replaces the maze object with a new and resets generation states and data

@@ -28,6 +28,7 @@ namespace LevelGeneration
 		RuleLevelStateData(GridSizeX, GridSizeY),
 		NumberOfFailedAttempts(0),
 		RuleRepository(RuleRepository),
+		HiResLevelStateData(std::make_tuple(32.f, 32.f)),
 		RuleLevelGenerator(RuleLevelStateData, RuleRepository.GetRandomRule()),
 		CurrentProcessState(LevelProcessState::RuleGridLevel)
 	{
@@ -71,10 +72,8 @@ namespace LevelGeneration
 
 		Renderer.SetDrawColor(155, 171, 178);
 		Renderer.DrawRectangle({ 0.f, 0.f, LevelBorderWidth, LevelBorderHeight }, std::make_tuple(TileSize, TileSize));
-		
-		DrawShortcutsWindow();
-		DrawDebugTextWindow();
-		DrawRulesInformationWindow();
+
+		DrawToolsWindow();
 	}
 
 	void Level::GenerateLevel(float DeltaTime)
@@ -305,11 +304,11 @@ namespace LevelGeneration
 
 				if (Cell.GetType() == LevelGenerator::LowResCellType::Room || Cell.GetType() == LevelGenerator::LowResCellType::Entrance)
 				{
-					if (Cell.IsStartCell())
+					if (LowResLevelStateData.StartCell->GetPosition() == Cell.GetPosition())
 					{
 						Renderer.DrawTexture(Renderer.GetImage("resources/lowres-start.png"), TextureRect, 0);
 					}
-					else if (Cell.IsGoalCell())
+					else if (LowResLevelStateData.GoalCell->GetPosition() == Cell.GetPosition())
 					{
 						Renderer.DrawTexture(Renderer.GetImage("resources/lowres-goal.png"), TextureRect, 0);
 					}
@@ -335,12 +334,23 @@ namespace LevelGeneration
 	{
 		const int Width = HiResLevelStateData.GridWidth;
 		const int Height = HiResLevelStateData.GridWidth;
-
 		for (int X = 0; X < Width; X++)
 		{
 			for (int Y = 0; Y < Height; Y++)
 			{
-				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer, std::make_tuple(32.f, 32.f));
+				SDL_Color Color { 199, 220, 208, 255 };
+				const LevelGeneration::Room& CurrentRoom = HiResLevelStateData.HiResGrid[X][Y];
+
+				if (CurrentRoom == *HiResLevelStateData.StartRoom)
+				{
+					Color = { 205, 223, 108, 255 };
+				}
+				else if (CurrentRoom == *HiResLevelStateData.GoalRoom)
+				{
+					Color = { 246, 129, 129, 255 };
+				}
+
+				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer, HiResLevelStateData.RoomCellSize, Color);
 			}
 		}
 	}
@@ -371,94 +381,93 @@ namespace LevelGeneration
 		}
 	}
 
-	void Level::DrawShortcutsWindow()
+	void Level::DrawToolsWindow()
 	{
-		ImGui::SetNextWindowPos({ static_cast<float>(Configuration::WindowWidth - 176 - 16), static_cast<float>(Configuration::WindowHeight - 216 - 16) });
-		ImGui::SetNextWindowSize({ 176, 216 }, 0);
-		ImGui::Begin("Shortcuts");
+		ImGui::SetNextWindowPos({ 16, 16 });
+		ImGui::SetNextWindowSize({ 256, 688 }, 0);
+		ImGui::Begin("Tools");
 
-		ImGui::Text("%s - [Space]", bGenerateLevel ? "Pause" : "Play");
-		ImGui::Text("Restart - [R]");
-		ImGui::Text("Replay - [P]");
+		if (ImGui::CollapsingHeader("Main Rule", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Text("Name:");
+			ImGui::Text("%s", RuleLevelGenerator.MainRule.GetName().c_str());
+			ImGui::Text("Goal: %s", RuleLevelGenerator.MainRule.GetGoalTypeToString().c_str());
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Text("Undo - [Left]");
-		ImGui::Text("Redo - [Right]");
+			const auto [MinStepsOne, MaxStepsOne] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(0));
+			ImGui::Text("Insertion One");
+			ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(0).GetElementName().c_str());
+			ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
+			ImGui::Text("Steps: %d - %d", MinStepsOne, MaxStepsOne);
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Text("Shrink Grid - [-]");
-		ImGui::Text("Expand Grid - [+]");
+			const auto [MinStepsTwo, MaxStepsTwo] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(1));
+			ImGui::Text("Insertion Two");
+			ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(1).GetElementName().c_str());
+			ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
+			ImGui::Text("Steps: %d - %d", MinStepsTwo, MaxStepsTwo);
 
-		ImGui::Spacing();
-		ImGui::Spacing();
-		ImGui::Text("Step Duration: ");
-		ImGui::SliderFloat(" ", &WaitStepTimeSeconds, 0.f, 1.f);
+			ImGui::Spacing();
+			ImGui::Spacing();
+		}
 
-		ImGui::End();
-	}
+		if (ImGui::CollapsingHeader("Debug", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Text("Seed: %u", Utils::RandomGenerator::GetInstance().GetSeed());
 
-	void Level::DrawDebugTextWindow()
-	{
-		ImGui::SetNextWindowSize({ 208, 192 });
-		ImGui::SetNextWindowPos({ 232 + 32, static_cast<float>(Configuration::WindowHeight - 192 - 16) });
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Begin("Debug");
+			ImGui::Text("Done: %s", CurrentProcessState == LevelProcessState::Done ? "True" : "False");
+			ImGui::Text("Number Of Failures: %d", NumberOfFailedAttempts);
 
-		ImGui::Text("Seed: %u", Utils::RandomGenerator::GetInstance().GetSeed());
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+			ImGui::Text("Number Of Steps Taken: %d", RuleLevelGenerator.PathwayCalculationData.NumberOfStepsTaken);
+			ImGui::Text("Steps To Goal X: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalX);
+			ImGui::Text("Steps To Goal Y: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalY);
 
-		ImGui::Text("Done: %s", CurrentProcessState == LevelProcessState::Done ? "True" : "False");
-		ImGui::Text("Number Of Failures: %d", NumberOfFailedAttempts);
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+			ImGui::Text("Insertion One Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(0).size());
+			ImGui::Text("Insertion Two Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(1).size());
 
-		ImGui::Text("Number Of Steps Taken: %d", RuleLevelGenerator.PathwayCalculationData.NumberOfStepsTaken);
-		ImGui::Text("Steps To Goal X: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalX);
-		ImGui::Text("Steps To Goal Y: %d", RuleLevelGenerator.PathwayCalculationData.StepsToGoalY);
+			ImGui::Spacing();
+			ImGui::Spacing();
+		}
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+		if (ImGui::CollapsingHeader("Shortcuts", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::Text("%s - [Space]", bGenerateLevel ? "Pause" : "Play");
+			ImGui::Text("Restart - [R]");
+			ImGui::Text("Replay - [P]");
 
-		ImGui::Text("Insertion One Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(0).size());
-		ImGui::Text("Insertion Two Steps: %llu", RuleLevelGenerator.RuleLevelStateData.GetPathway(1).size());
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::End();
-	}
+			ImGui::Text("Undo - [Left]");
+			ImGui::Text("Redo - [Right]");
 
-	void Level::DrawRulesInformationWindow()
-	{
-		ImGui::SetNextWindowPos({ 16, static_cast<float>(Configuration::WindowHeight - 234 - 16) });
-		ImGui::SetNextWindowSize({ 232, 234 }, 0);
-		ImGui::Begin("Main Rule");
+			ImGui::Spacing();
+			ImGui::Spacing();
 
-		ImGui::Text("Name:");
-		ImGui::Text("%s", RuleLevelGenerator.MainRule.GetName().c_str());
-		ImGui::Text("Goal: %s", RuleLevelGenerator.MainRule.GetGoalTypeToString().c_str());
+			ImGui::Text("Shrink Grid - [-]");
+			ImGui::Text("Expand Grid - [+]");
 
-		ImGui::Spacing();
-		ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Spacing();
+			ImGui::Text("Step Duration: ");
+			ImGui::SliderFloat(" ", &WaitStepTimeSeconds, 0.f, 1.f);
 
-		const auto [MinStepsOne, MaxStepsOne] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(0));
-		ImGui::Text("Insertion One");
-		ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(0).GetElementName().c_str());
-		ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(0) == Cyclic::ArcType::Short ? "Short" : "Long");
-		ImGui::Text("Steps: %d - %d", MinStepsOne, MaxStepsOne);
-
-		ImGui::Spacing();
-		ImGui::Spacing();
-
-		const auto [MinStepsTwo, MaxStepsTwo] = RuleLevelGenerator.CalculateMinMaxSteps(RuleLevelGenerator.MainRule.GetArcType(1));
-		ImGui::Text("Insertion Two");
-		ImGui::Text("Element: %s", RuleLevelGenerator.MainRule.GetElement(1).GetElementName().c_str());
-		ImGui::Text("Path Length: %s", RuleLevelGenerator.MainRule.GetArcType(1) == Cyclic::ArcType::Short ? "Short" : "Long");
-		ImGui::Text("Steps: %d - %d", MinStepsTwo, MaxStepsTwo);
+			ImGui::Spacing();
+			ImGui::Spacing();
+		}
 
 		ImGui::End();
 	}

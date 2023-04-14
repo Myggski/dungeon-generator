@@ -4,31 +4,23 @@ namespace LevelGenerator
 {
 	LowResCell::LowResCell()
 		: Position(std::make_tuple(std::numeric_limits<int>::min(), std::numeric_limits<int>::min())),
-		Type(LowResCellType::None) {}
+		Type(LowResCellType::None),
+		EntranceFlag(DirectionType::None) {}
 
 	LowResCell::LowResCell(std::tuple<int, int> Position, LowResCellType Type, std::vector<std::shared_ptr<LevelElement::Element>> Elements)
 		: Position(Position),
 		Type(Type),
-		Elements(std::move(Elements)) {}
+		Elements(std::move(Elements)),
+		EntranceFlag(DirectionType::None) {}
 
-	void LowResCell::SetStartCell()
+	bool LowResCell::HasEntrance(DirectionType Direction) const
 	{
-		bIsStartCell = true;
+		return static_cast<bool>((EntranceFlag & Direction));
 	}
 
-	void LowResCell::SetGoalCell()
+	void LowResCell::SetEntrance(DirectionType EntranceFlag)
 	{
-		bIsGoalCell = true;
-	}
-
-	bool LowResCell::IsStartCell() const
-	{
-		return bIsStartCell;
-	}
-
-	bool LowResCell::IsGoalCell() const
-	{
-		return bIsGoalCell;
+		this->EntranceFlag = EntranceFlag;
 	}
 
 	std::tuple<int, int> LowResCell::GetPosition() const

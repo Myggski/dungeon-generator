@@ -27,6 +27,8 @@ namespace LevelGenerator
 		int GridWidth;
 		int GridHeight;
 		bool bHasGeneratedLevel;
+		LowResCell* StartCell;
+		LowResCell* GoalCell;
 		std::vector<std::vector<LowResCell>> LowResGrid;
 
 		friend class LevelGeneration::Level;

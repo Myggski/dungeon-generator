@@ -66,4 +66,27 @@ namespace Application
     {
         this->bMoveCamera = bMoveCamera;
     }
+
+    void Camera::Zoom(float ZoomValue)
+    {
+        int MousePositionX{ std::numeric_limits<int>::min() };
+        int MousePositionY{ std::numeric_limits<int>::min() };
+
+        SDL_GetMouseState(&MousePositionX, &MousePositionY);
+
+        float GameMouseX = (MousePositionX / this->ZoomValue) + PositionX;
+        float GameMouseY = (MousePositionY / this->ZoomValue) + PositionY;
+
+        this->ZoomValue += ZoomValue;
+        this->ZoomValue = std::max(0.1f, this->ZoomValue);
+
+        float NewGameMouseX = (MousePositionX / this->ZoomValue) + PositionX;
+        float NewGameMouseY = (MousePositionY / this->ZoomValue) + PositionY;
+
+        const float DiffX = NewGameMouseX - GameMouseX;
+        const float DiffY = NewGameMouseY - GameMouseY;
+
+        PositionX -= DiffX;
+        PositionY -= DiffY;
+    }
 }

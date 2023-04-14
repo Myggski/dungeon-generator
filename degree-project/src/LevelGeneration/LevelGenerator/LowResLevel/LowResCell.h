@@ -4,6 +4,7 @@
 #include <tuple>
 #include <vector>
 #include <memory>
+
 #include <LevelGeneration/LevelGenerator/RuleLevel/RuleLevelCell.h>
 
 namespace LevelGenerator
@@ -22,19 +23,16 @@ namespace LevelGenerator
 		LowResCell();
 		LowResCell(std::tuple<int, int> Position, LowResCellType Type, std::vector<std::shared_ptr<LevelElement::Element>> Elements = {});
 
-		void SetStartCell();
-		void SetGoalCell();
-		bool IsStartCell() const;
-		bool IsGoalCell() const;
+		void SetEntrance(DirectionType DirectionType);
+		bool HasEntrance(DirectionType Direction) const;
 		std::tuple<int, int> GetPosition() const;
 		const std::vector<std::shared_ptr<LevelElement::Element>>& GetElements() const;
 		LowResCellType GetType() const;
 
 	private:
-		bool bIsStartCell;
-		bool bIsGoalCell;
 		std::tuple<int, int> Position;
 		std::vector<std::shared_ptr<LevelElement::Element>> Elements;
+		DirectionType EntranceFlag;
 		LowResCellType Type;
 
 	};

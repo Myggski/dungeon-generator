@@ -24,32 +24,35 @@ namespace Command
 			for (int Y = 0; Y < RuleLevelStateData.GridHeight; Y++) {
 				const int PositionX = X * 2;
 				const int PositionY = Y * 2;
-				LevelGenerator::RuleLevelCell* Cell = &RuleLevelStateData.LevelGrid[X][Y];
-				LevelGenerator::LowResCellType CellType = LevelGenerator::LowResCellType::Room;
 
-				LevelData.LowResGrid[PositionX][PositionY] = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY), CellType, Cell->GetElements());
+				LevelGenerator::RuleLevelCell* CurrentRuleLevelCell = &RuleLevelStateData.LevelGrid[X][Y];
+				LevelGenerator::LowResCell* CurrentLowResCell = &LevelData.LowResGrid[PositionX][PositionY];
 
-				if (RuleLevelStateData.IsStartCell(Cell))
+				*CurrentLowResCell = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY), LevelGenerator::LowResCellType::Room, CurrentRuleLevelCell->GetElements());
+				CurrentLowResCell->SetEntrance(CurrentRuleLevelCell->GetEntranceFlag());
+
+				if (RuleLevelStateData.IsStartCell(CurrentRuleLevelCell))
 				{
-					LevelData.LowResGrid[PositionX][PositionY].SetStartCell();
+					LevelData.StartCell = CurrentLowResCell;
 				}
-				else if (RuleLevelStateData.IsGoalCell(Cell))
+				else if (RuleLevelStateData.IsGoalCell(CurrentRuleLevelCell))
 				{
-					LevelData.LowResGrid[PositionX][PositionY].SetGoalCell();
+					LevelData.GoalCell = CurrentLowResCell;
 				}
 
-				if (Cell->HasEntrance(DirectionType::East))
+				if (CurrentRuleLevelCell->HasEntrance(DirectionType::East))
 				{
 					LevelData.LowResGrid[PositionX + 1][PositionY] = LevelGenerator::LowResCell(std::make_tuple(PositionX + 1, PositionY), LevelGenerator::LowResCellType::Entrance);
 				}
 
-				if (Cell->HasEntrance(DirectionType::South))
+				if (CurrentRuleLevelCell->HasEntrance(DirectionType::South))
 				{
 					LevelData.LowResGrid[PositionX][PositionY + 1] = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY + 1), LevelGenerator::LowResCellType::Entrance);
 				}
 			}
 		}
 
+		CurrentProcessState = LevelProcessState::LowResLevel;
 		LevelData.bHasGeneratedLevel = true;
 	}
 

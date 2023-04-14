@@ -27,31 +27,44 @@ namespace Command
 			{
 				const float HiResX = X / 2.0;
 				const float HiResY = Y / 2.0;
-				LevelGenerator::LowResCellType CellType = LowResLevelStateData.LowResGrid[X][Y].GetType();
+				LevelGenerator::LowResCell* CurrentLowResCell = &LowResLevelStateData.LowResGrid[X][Y];
+				LevelGenerator::LowResCellType CellType = CurrentLowResCell->GetType();
 
 				if (CellType == LevelGenerator::LowResCellType::Room)
 				{
-					LevelData.HiResGrid[static_cast<int>(HiResX)][static_cast<int>(HiResY)] = LevelGeneration::Room(
+					LevelGeneration::Room* CurrentRoom = &LevelData.HiResGrid[static_cast<int>(HiResX)][static_cast<int>(HiResY)];
+					*CurrentRoom = LevelGeneration::Room(
 						SDL_FRect{ HiResX * RoomSize, HiResY * RoomSize, RoomSize, RoomSize }
 					);
 
-					if (X < LowResLevelStateData.GridWidth - 1)
+					if (LowResLevelStateData.StartCell == CurrentLowResCell)
 					{
-						const LevelGenerator::LowResCell& EastNeighbor = LowResLevelStateData.LowResGrid[X + 1][Y];
-						// Add Entrance
-						if (EastNeighbor.GetType() == LevelGenerator::LowResCellType::Entrance)
-						{
-
-						}
+						LevelData.StartRoom = CurrentRoom;
 					}
 
-					if (Y < LowResLevelStateData.GridHeight - 1)
+					if (LowResLevelStateData.GoalCell == CurrentLowResCell)
 					{
-						const LevelGenerator::LowResCell& SouthNeighbor = LowResLevelStateData.LowResGrid[X][Y + 1];
-						if (SouthNeighbor.GetType() == LevelGenerator::LowResCellType::Entrance)
-						{
+						LevelData.GoalRoom = CurrentRoom;
+					}
 
-						}
+					if (CurrentLowResCell->HasEntrance(DirectionType::East))
+					{
+
+					}
+
+					if (CurrentLowResCell->HasEntrance(DirectionType::West))
+					{
+
+					}
+
+					if (CurrentLowResCell->HasEntrance(DirectionType::North))
+					{
+
+					}
+
+					if (CurrentLowResCell->HasEntrance(DirectionType::South))
+					{
+
 					}
 				}
 			}

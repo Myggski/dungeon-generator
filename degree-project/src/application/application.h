@@ -31,5 +31,6 @@ namespace Application
 		EventCallback OnKeyReleased;
 		EventCallback OnMouseDown;
 		EventCallback OnMouseUp;
+		EventCallback OnMouseScroll;
 	};
 }

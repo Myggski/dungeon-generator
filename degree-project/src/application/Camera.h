@@ -14,6 +14,7 @@ namespace Application
 		
 		void Update();
 		void ToggleMobility(bool bMoveCamera);
+		void Zoom(float ZoomValue);
 		EventCallback UpdateMouseStatus(SDL_Event Event);
 
 	private:
@@ -24,6 +25,7 @@ namespace Application
 
 		bool bMoveCamera;
 
+		float ZoomValue = 1.f;
 		float MouseStartPositionX;
 		float MouseStartPositionY;
 

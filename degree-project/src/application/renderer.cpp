@@ -43,10 +43,10 @@ namespace Application
 			ImageRect.h / 2.f
 		};
 		const SDL_FRect DrawRect{
-			ImageRect.x * TILE_SIZE - Camera::GetInstance().PositionX,
-			ImageRect.y * TILE_SIZE - Camera::GetInstance().PositionY,
-			ImageRect.w * TILE_SIZE,
-			ImageRect.h * TILE_SIZE,
+			(ImageRect.x * TILE_SIZE - Camera::GetInstance().PositionX) * Camera::GetInstance().ZoomValue,
+			(ImageRect.y * TILE_SIZE - Camera::GetInstance().PositionY) * Camera::GetInstance().ZoomValue,
+			(ImageRect.w * TILE_SIZE) * Camera::GetInstance().ZoomValue,
+			(ImageRect.h * TILE_SIZE) * Camera::GetInstance().ZoomValue,
 		};
 
 		SDL_RenderCopyExF(SDLRenderer, Texture, nullptr, &DrawRect, Angle, &Center, SDL_FLIP_NONE);
@@ -79,10 +79,10 @@ namespace Application
 		auto [Width, Height] = TileSize;
 
 		SDL_FRect DrawRect{
-			Rect.x * Width - Camera::GetInstance().PositionX,
-			Rect.y * Height - Camera::GetInstance().PositionY,
-			Rect.w * Width,
-			Rect.h * Height,
+			(Rect.x * Width - Camera::GetInstance().PositionX) * Camera::GetInstance().ZoomValue,
+			(Rect.y * Height - Camera::GetInstance().PositionY) * Camera::GetInstance().ZoomValue,
+			(Rect.w * Width) * Camera::GetInstance().ZoomValue,
+			(Rect.h * Height) * Camera::GetInstance().ZoomValue,
 		};
 
 		SDL_RenderDrawRectF(SDLRenderer, &DrawRect);
@@ -93,10 +93,10 @@ namespace Application
 		auto [Width, Height] = TileSize;
 
 		SDL_FRect DrawRect{
-			Rect.x * Width - Camera::GetInstance().PositionX,
-			Rect.y * Height - Camera::GetInstance().PositionY,
-			Rect.w * Width,
-			Rect.h * Height,
+			(Rect.x * Width - Camera::GetInstance().PositionX) * Camera::GetInstance().ZoomValue,
+			(Rect.y * Height - Camera::GetInstance().PositionY) * Camera::GetInstance().ZoomValue,
+			(Rect.w * Width)* Camera::GetInstance().ZoomValue,
+			(Rect.h * Height)* Camera::GetInstance().ZoomValue,
 		};
 
 		SDL_RenderFillRectF(SDLRenderer, &DrawRect);

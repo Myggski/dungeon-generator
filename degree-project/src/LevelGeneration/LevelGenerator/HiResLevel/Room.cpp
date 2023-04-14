@@ -15,7 +15,12 @@ namespace LevelGeneration
 		Type(RoomType::None),
 		RoomRect(RoomRect) { }
 
-	void Room::Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize)
+	bool Room::operator==(const Room& Other) const
+	{
+		return RoomId == Other.RoomId;
+	}
+
+	void Room::Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize, SDL_Color Color)
 	{
 		for (int X = 0; X < RoomRect.w; X++)
 		{
@@ -26,11 +31,15 @@ namespace LevelGeneration
 				{
 					Renderer.SetDrawColor(49, 54, 56);
 				}
-				else {
-					Renderer.SetDrawColor(199, 220, 208);
+				else 
+				{
+					Renderer.SetDrawColor(Color.r, Color.g, Color.b);
 				}
 
 				Renderer.DrawFilledRectangle({ RoomRect.x + static_cast<float>(X), RoomRect.y + static_cast<float>(Y), 1, 1 }, CellSize);
+
+				Renderer.SetDrawColor(155, 171, 178);
+				Renderer.DrawRectangle({ RoomRect.x + static_cast<float>(X), RoomRect.y + static_cast<float>(Y), 1, 1 }, CellSize);
 			}
 		}
 	}

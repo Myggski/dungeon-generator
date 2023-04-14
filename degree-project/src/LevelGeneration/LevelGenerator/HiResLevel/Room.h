@@ -1,6 +1,8 @@
 #pragma once
 
 #include <vector>
+#include <string>
+#include <unordered_map>
 #include <SDL.h>
 
 #include "LevelGeneration/LevelElement/Element.h"
@@ -10,8 +12,15 @@ namespace Application
 	class Renderer;
 }
 
+namespace Command
+{
+	class CreateHiResLevelCommand;
+}
+
 namespace LevelGeneration
 {
+	class Level;
+
 	enum class RoomType : uint16_t
 	{
 		None = 0,
@@ -34,8 +43,9 @@ namespace LevelGeneration
 	public:
 		Room();
 		Room(SDL_FRect RoomRect);
+		bool operator==(const Room& Other) const;
 
-		void Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize);
+		void Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize, SDL_Color Color = { 199, 220, 208, 255 });
 
 	private:
 		size_t RoomId;
@@ -43,6 +53,10 @@ namespace LevelGeneration
 		
 		RoomType Type;
 		SDL_FRect RoomRect;
-		std::vector<std::vector<LevelElement::Element>> Elements;
+		// Spatial Hash | Elements
+		std::unordered_map<std::string, std::vector<LevelElement::Element>> Elements;
+
+		friend class LevelGeneration::Level;
+		friend class Command::CreateHiResLevelCommand;
 	};
 }

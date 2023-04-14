@@ -51,7 +51,12 @@ namespace Application
 			{
 				Camera::GetInstance().ToggleMobility(false);
 			}
-		}) { }
+		}),
+		OnMouseScroll([&](SDL_Event Event)
+		{
+			Camera::GetInstance().Zoom(Event.wheel.y > 0 ? 0.1f : -0.1f);
+		})
+	{ }
 
 	void Application::Init()
 	{
@@ -80,6 +85,7 @@ namespace Application
 		Events.AddListener(SDL_KEYUP, &OnKeyReleased);
 		Events.AddListener(SDL_MOUSEBUTTONDOWN, &OnMouseDown);
 		Events.AddListener(SDL_MOUSEBUTTONUP, &OnMouseUp);
+		Events.AddListener(SDL_MOUSEWHEEL, &OnMouseScroll);
 
 		Font::GetInstance().Load("Default", "resources/fonts/Silver.ttf", 32);
 	}
