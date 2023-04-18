@@ -30,13 +30,14 @@ namespace LevelGeneration
 		Room(SDL_FRect RoomRect);
 		bool operator==(const Room& Other) const;
 
-		void AdjustWidth(float GridWidthToAdjust);
-		void AdjustHeight(float GridHeightToAdjust);
+		void AdjustWidth(float GridWidthToAdjust, float MoveX = 0.f);
+		void AdjustHeight(float GridHeightToAdjust, float MoveY = 0.f);
 		void Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize, SDL_Color Color = { 199, 220, 208, 255 });
 
 	private:
 		void SetEntrance(DirectionType Entrance);
 		bool HasEntrance(DirectionType EntranceDirection) const;
+		LevelGenerator::RoomType GetType() const;
 		void SetType(LevelGenerator::RoomType Type);
 
 	private:

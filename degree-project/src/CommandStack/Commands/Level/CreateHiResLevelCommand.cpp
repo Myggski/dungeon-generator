@@ -47,7 +47,6 @@ namespace Command
 					);
 					
 					CurrentRoom->SetEntrance(CurrentLowResCell->GetEntrance());
-					CurrentRoom->Elements.insert(std::make_pair(CoordinatesToSpatialHash((RoomSize / 2) - 1, (RoomSize / 2) - 1), CurrentLowResCell->GetElements()));
 					CurrentRoom->SetType(CurrentLowResCell->GetRoomType());
 
 					if (LowResLevelStateData.StartCell == CurrentLowResCell)
@@ -59,27 +58,56 @@ namespace Command
 					{
 						LevelData.GoalRoom = CurrentRoom;
 					}
+				}
+			}
+		}
 
-					if (HiResX == 2 && HiResY == 1)
-					{
-						CurrentRoom->AdjustWidth(-1);
-					}
+		for (int X = 0; X < LevelData.GridWidth; X++)
+		{
+			for (int Y = 0; Y < LevelData.GridHeight; Y++)
+			{
+				LevelGeneration::Room* CurrentRoom = &LevelData.HiResGrid[static_cast<int>(X)][static_cast<int>(Y)];
+				if (CurrentRoom->GetType() == LevelGenerator::RoomType::Hub)
+				{
+					CurrentRoom->AdjustWidth(-2, X != LevelData.GridWidth - 1 ? 0 : 2);
 
-					if (HiResX == 3 && HiResY == 1)
+					if (X != LevelData.GridWidth - 1)
 					{
-						CurrentRoom->AdjustWidth(1);
-					}
-
-					if (HiResX == 0 && HiResY == 2)
+						LevelData.HiResGrid[static_cast<int>(X + 1)][static_cast<int>(Y)].AdjustWidth(2, -2);
+					} 
+					else 
 					{
-						CurrentRoom->AdjustHeight(-1);
-					}
-
-					if (HiResX == 0 && HiResY == 1)
-					{
-						CurrentRoom->AdjustHeight(1);
+						LevelData.HiResGrid[static_cast<int>(X - 1)][static_cast<int>(Y)].AdjustWidth(2);
 					}
 				}
+
+				if (CurrentRoom->GetType() == LevelGenerator::RoomType::Laundry || CurrentRoom->GetType() == LevelGenerator::RoomType::Communication)
+				{
+					CurrentRoom->AdjustWidth(-1, X != LevelData.GridWidth - 1 ? 0 : 1);
+					if (X != LevelData.GridWidth - 1)
+					{
+						LevelData.HiResGrid[static_cast<int>(X + 1)][static_cast<int>(Y)].AdjustWidth(1, -1);
+					}
+					else
+					{
+						LevelData.HiResGrid[static_cast<int>(X - 1)][static_cast<int>(Y)].AdjustWidth(1);
+					}
+				}
+
+				if (CurrentRoom->GetType() == LevelGenerator::RoomType::Bridge)
+				{
+					CurrentRoom->AdjustWidth(1, X != LevelData.GridWidth - 1 ? 0 : -1);
+					if (X != LevelData.GridWidth - 1)
+					{
+						LevelData.HiResGrid[static_cast<int>(X + 1)][static_cast<int>(Y)].AdjustWidth(-1, 1);
+					}
+					else
+					{
+						LevelData.HiResGrid[static_cast<int>(X - 1)][static_cast<int>(Y)].AdjustWidth(-1);
+					}
+				}
+
+				CurrentRoom->Elements.insert(std::make_pair(CoordinatesToSpatialHash((CurrentRoom->RoomRect.w / 2) - 1, (CurrentRoom->RoomRect.h / 2) - 1), LowResLevelStateData.LowResGrid[X * 2][Y * 2].GetElements()));
 			}
 		}
 

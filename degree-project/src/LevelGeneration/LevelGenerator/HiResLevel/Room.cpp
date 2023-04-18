@@ -95,21 +95,18 @@ namespace LevelGeneration
 			}
 		}
 
-		Application::Font::GetInstance().Draw("Default", LevelGenerator::RoomTypeToString(Type), RoomRect.x + 0.125, RoomRect.y + 4.025);
+		Application::Font::GetInstance().Draw("Default", LevelGenerator::RoomTypeToString(Type), RoomRect.x + 0.125, (RoomRect.h - 2 + RoomRect.y) + 0.125);
 	}
 
-	void Room::AdjustWidth(float GridWidthToAdjust)
+	void Room::AdjustWidth(float GridWidthToAdjust, float MoveX)
 	{
-		if (GridWidthToAdjust > 0)
-		{
-			RoomRect.x -= GridWidthToAdjust;
-		}
-
+		RoomRect.x += MoveX;
 		RoomRect.w += GridWidthToAdjust;
 	}
 
-	void Room::AdjustHeight(float GridHeightToAdjust)
+	void Room::AdjustHeight(float GridHeightToAdjust, float MoveY)
 	{
+		RoomRect.y += MoveY;
 		RoomRect.h += GridHeightToAdjust;
 	}
 
@@ -120,6 +117,11 @@ namespace LevelGeneration
 
 	bool Room::HasEntrance(DirectionType EntranceDirection) const {
 		return static_cast<bool>((EntranceFlag & EntranceDirection));
+	}
+
+	LevelGenerator::RoomType Room::GetType() const
+	{
+		return this->Type;
 	}
 
 	void Room::SetType(LevelGenerator::RoomType Type)
