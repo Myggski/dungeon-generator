@@ -6,6 +6,8 @@
 #include <SDL.h>
 
 #include "LevelGeneration/LevelElement/Element.h"
+#include "LevelGeneration/LevelGenerator/RuleLevel/DirectionType.h"
+#include "LevelGeneration/LevelGenerator/RoomType.h"
 
 namespace Application
 {
@@ -21,23 +23,6 @@ namespace LevelGeneration
 {
 	class Level;
 
-	enum class RoomType : uint16_t
-	{
-		None = 0,
-		Cargo = 1 << 1,
-		CrewQuarters = 1 << 2,
-		MedicalBay = 1 << 3,
-		Bridge = 1 << 4,
-		ScienceLab = 1 << 5,
-		Communication = 1 << 6,
-		Equipment = 1 << 7,
-		Laundry = 1 << 8,
-		Exercise = 1 << 9,
-		EscapePods = 1 << 10,
-		Workshop = 1 << 11,
-		Hub = 1 << 12
-	};
-
 	class Room
 	{
 	public:
@@ -45,16 +30,24 @@ namespace LevelGeneration
 		Room(SDL_FRect RoomRect);
 		bool operator==(const Room& Other) const;
 
+		void AdjustWidth(float GridWidthToAdjust);
+		void AdjustHeight(float GridHeightToAdjust);
 		void Draw(Application::Renderer& Renderer, const std::tuple<int, int>& CellSize, SDL_Color Color = { 199, 220, 208, 255 });
+
+	private:
+		void SetEntrance(DirectionType Entrance);
+		bool HasEntrance(DirectionType EntranceDirection) const;
+		void SetType(LevelGenerator::RoomType Type);
 
 	private:
 		size_t RoomId;
 		inline static size_t NextRoomId{ 0 };
 		
-		RoomType Type;
+		LevelGenerator::RoomType Type;
+		DirectionType EntranceFlag;
 		SDL_FRect RoomRect;
 		// Spatial Hash | Elements
-		std::unordered_map<std::string, std::vector<LevelElement::Element>> Elements;
+		std::unordered_map<std::string, std::vector<std::shared_ptr<LevelElement::Element>>> Elements;
 
 		friend class LevelGeneration::Level;
 		friend class Command::CreateHiResLevelCommand;

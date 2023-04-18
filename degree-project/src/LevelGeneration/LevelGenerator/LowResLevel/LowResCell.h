@@ -6,6 +6,7 @@
 #include <memory>
 
 #include <LevelGeneration/LevelGenerator/RuleLevel/RuleLevelCell.h>
+#include <LevelGeneration/LevelGenerator/RoomType.h>
 
 namespace LevelGenerator
 {
@@ -24,12 +25,18 @@ namespace LevelGenerator
 		LowResCell(std::tuple<int, int> Position, LowResCellType Type, std::vector<std::shared_ptr<LevelElement::Element>> Elements = {});
 
 		void SetEntrance(DirectionType DirectionType);
-		bool HasEntrance(DirectionType Direction) const;
+		void SetRoomType(RoomType RoomType);
+		void SetNumberOfEntrances(int NumberOfEntrances);
+		int GetNumberOfEntrances();
+		DirectionType GetEntrance() const;
 		std::tuple<int, int> GetPosition() const;
 		const std::vector<std::shared_ptr<LevelElement::Element>>& GetElements() const;
+		RoomType GetRoomType() const;
 		LowResCellType GetType() const;
 
 	private:
+		int NumberOfEntrances;
+		RoomType RoomType;
 		std::tuple<int, int> Position;
 		std::vector<std::shared_ptr<LevelElement::Element>> Elements;
 		DirectionType EntranceFlag;

@@ -6,6 +6,8 @@
 
 namespace Application
 {
+	class Font;
+
 	class Camera final
 	{
 	public:
@@ -33,5 +35,6 @@ namespace Application
 		float PositionY;
 
 		friend class Renderer;
+		friend class Font;
 	};
 }

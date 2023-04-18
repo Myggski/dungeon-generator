@@ -1,6 +1,7 @@
 #include "CreateLowResLevelCommand.h"
 #include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelCell.h"
 #include "LevelGeneration/LevelGenerator/RuleLevel/RuleLevelStateData.h"
+#include "LevelGeneration/LevelGenerator/LowResLevel/RoomTypeGenerator.h"
 
 namespace Command
 {
@@ -11,6 +12,7 @@ namespace Command
 
 	void CreateLowResLevelCommand::Execute()
 	{
+		std::unordered_map<LevelGenerator::RoomType, int> AlreadySelectedRooms{};
 		LevelData.GridWidth = (RuleLevelStateData.GridWidth * 2) - 1;
 		LevelData.GridHeight = (RuleLevelStateData.GridHeight * 2) - 1;
 		LevelData.LowResGrid.resize(LevelData.GridWidth);
@@ -30,6 +32,12 @@ namespace Command
 
 				*CurrentLowResCell = LevelGenerator::LowResCell(std::make_tuple(PositionX, PositionY), LevelGenerator::LowResCellType::Room, CurrentRuleLevelCell->GetElements());
 				CurrentLowResCell->SetEntrance(CurrentRuleLevelCell->GetEntranceFlag());
+				CurrentLowResCell->SetNumberOfEntrances(CurrentRuleLevelCell->GetNumberOfEntrances());
+
+				LevelGenerator::RoomType Room = LevelGenerator::RoomTypeGenerator::GetRoomType(X, Y, LevelData, AlreadySelectedRooms);
+				AlreadySelectedRooms[Room]++;
+
+				CurrentLowResCell->SetRoomType(Room);
 
 				if (RuleLevelStateData.IsStartCell(CurrentRuleLevelCell))
 				{

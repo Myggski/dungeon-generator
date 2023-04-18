@@ -1,5 +1,7 @@
 #include "CreateHiResLevelCommand.h"
 
+#include <sstream>
+
 #include "LevelGeneration/LevelGenerator/HiResLevel/Room.h"
 
 namespace Command
@@ -9,9 +11,16 @@ namespace Command
 		LevelData(LevelData),
 		LowResLevelStateData(LowResLevelStateData) {}
 
+	std::string CoordinatesToSpatialHash(int X, int Y)
+	{
+		std::stringstream SpatialHashStream;
+		SpatialHashStream << X << "." << Y;
+		return SpatialHashStream.str();
+	}
+
 	void CreateHiResLevelCommand::Execute()
 	{
-		const float RoomSize = 7.0f;
+		const float RoomSize = 6.0f;
 		LevelData.GridWidth = (LowResLevelStateData.GridWidth + 1) / 2;
 		LevelData.GridHeight = (LowResLevelStateData.GridHeight + 1) / 2;
 		LevelData.HiResGrid.resize(LevelData.GridWidth);
@@ -36,6 +45,10 @@ namespace Command
 					*CurrentRoom = LevelGeneration::Room(
 						SDL_FRect{ HiResX * RoomSize, HiResY * RoomSize, RoomSize, RoomSize }
 					);
+					
+					CurrentRoom->SetEntrance(CurrentLowResCell->GetEntrance());
+					CurrentRoom->Elements.insert(std::make_pair(CoordinatesToSpatialHash((RoomSize / 2) - 1, (RoomSize / 2) - 1), CurrentLowResCell->GetElements()));
+					CurrentRoom->SetType(CurrentLowResCell->GetRoomType());
 
 					if (LowResLevelStateData.StartCell == CurrentLowResCell)
 					{
@@ -47,24 +60,24 @@ namespace Command
 						LevelData.GoalRoom = CurrentRoom;
 					}
 
-					if (CurrentLowResCell->HasEntrance(DirectionType::East))
+					if (HiResX == 2 && HiResY == 1)
 					{
-
+						CurrentRoom->AdjustWidth(-1);
 					}
 
-					if (CurrentLowResCell->HasEntrance(DirectionType::West))
+					if (HiResX == 3 && HiResY == 1)
 					{
-
+						CurrentRoom->AdjustWidth(1);
 					}
 
-					if (CurrentLowResCell->HasEntrance(DirectionType::North))
+					if (HiResX == 0 && HiResY == 2)
 					{
-
+						CurrentRoom->AdjustHeight(-1);
 					}
 
-					if (CurrentLowResCell->HasEntrance(DirectionType::South))
+					if (HiResX == 0 && HiResY == 1)
 					{
-
+						CurrentRoom->AdjustHeight(1);
 					}
 				}
 			}

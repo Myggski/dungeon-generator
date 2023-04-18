@@ -44,8 +44,8 @@ namespace Command
 
 					if (SideRoomNeighborCell && SideRoomNeighborCell->GetNumberOfEntrances() < 3 && SideRoomNeighborCell != StateData.GoalCell && SideRoomNeighborCell != StateData.StartCell && SideRoomNeighborCell != Cell && std::ranges::find(StateData.GetCurrentPathway(), SideRoomNeighborCell) != StateData.GetCurrentPathway().end())
 					{
-						SideRoom->CarveEntrance(SideRoomNeighborCell->GetSpatialHash());
-						SideRoomNeighborCell->CarveEntrance(SideRoom->GetSpatialHash());
+						//SideRoom->CarveEntrance(SideRoomNeighborCell->GetSpatialHash());
+						//SideRoomNeighborCell->CarveEntrance(SideRoom->GetSpatialHash());
 						break;
 					}
 				}

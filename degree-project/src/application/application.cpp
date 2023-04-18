@@ -87,7 +87,7 @@ namespace Application
 		Events.AddListener(SDL_MOUSEBUTTONUP, &OnMouseUp);
 		Events.AddListener(SDL_MOUSEWHEEL, &OnMouseScroll);
 
-		Font::GetInstance().Load("Default", "resources/fonts/Silver.ttf", 32);
+		Font::GetInstance().Load("Default", "resources/fonts/Silver.ttf", 64);
 	}
 
 	void Application::Run()

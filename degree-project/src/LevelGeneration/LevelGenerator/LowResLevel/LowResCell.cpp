@@ -13,14 +13,29 @@ namespace LevelGenerator
 		Elements(std::move(Elements)),
 		EntranceFlag(DirectionType::None) {}
 
-	bool LowResCell::HasEntrance(DirectionType Direction) const
+	DirectionType LowResCell::GetEntrance() const
 	{
-		return static_cast<bool>((EntranceFlag & Direction));
+		return EntranceFlag;
 	}
 
 	void LowResCell::SetEntrance(DirectionType EntranceFlag)
 	{
 		this->EntranceFlag = EntranceFlag;
+	}
+
+	void LowResCell::SetRoomType(LevelGenerator::RoomType RoomType)
+	{
+		this->RoomType = RoomType;
+	}
+
+	void LowResCell::SetNumberOfEntrances(int NumberOfEntrances)
+	{
+		this->NumberOfEntrances = NumberOfEntrances;
+	}
+
+	int LowResCell::GetNumberOfEntrances()
+	{
+		return NumberOfEntrances;
 	}
 
 	std::tuple<int, int> LowResCell::GetPosition() const
@@ -31,6 +46,11 @@ namespace LevelGenerator
 	const std::vector<std::shared_ptr<LevelElement::Element>>& LowResCell::GetElements() const
 	{
 		return Elements;
+	}
+
+	RoomType LowResCell::GetRoomType() const
+	{
+		return RoomType;
 	}
 
 	LowResCellType LowResCell::GetType() const

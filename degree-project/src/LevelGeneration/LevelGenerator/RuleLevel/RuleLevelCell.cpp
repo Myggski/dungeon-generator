@@ -93,7 +93,6 @@ namespace LevelGenerator
 		return static_cast<int>(EntranceDirections.size());
 	}
 
-	
 	DirectionType RuleLevelCell::GetEntranceFlag() const
 	{
 		return EntranceFlag;

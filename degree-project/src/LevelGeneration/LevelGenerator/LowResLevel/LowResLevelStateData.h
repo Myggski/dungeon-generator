@@ -21,6 +21,32 @@ namespace LevelGenerator
 	public:
 		LowResLevelStateData();
 
+		inline int GetWidth() const
+		{
+			return GridWidth;
+		}
+
+		inline int GetHeight() const
+		{
+			return GridHeight;
+		}
+
+		inline bool IsStartCell(int X, int Y) const
+		{
+			if (StartCell == nullptr)
+			{
+				return false;
+			}
+
+			auto [CellX, CellY] = StartCell->GetPosition();
+			return X == CellX && Y == CellY;
+		}
+
+		inline LowResCell* GetCell(int X, int Y)
+		{
+			return &LowResGrid[X][Y];
+		}
+
 		bool HasGeneratedLevel() const;
 
 	private:

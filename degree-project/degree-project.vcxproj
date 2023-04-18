@@ -218,7 +218,9 @@
     <ClInclude Include="src\LevelGeneration\FragmentPosition.h" />
     <ClInclude Include="src\LevelGeneration\Level.h" />
     <ClInclude Include="src\LevelGeneration\LevelElement\TrapProperty.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\LowResLevel\RoomTypeGenerator.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\ProcessState.h" />
+    <ClInclude Include="src\LevelGeneration\LevelGenerator\RoomType.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\DirectionType.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelGenerator.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RuleLevel\RuleLevelCell.h" />

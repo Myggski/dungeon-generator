@@ -1,6 +1,7 @@
 
 #include "Font.h"
 #include <stdexcept>
+#include "Camera.h"
 
 namespace Application
 {
@@ -58,7 +59,15 @@ namespace Application
         int w, h;
         TTF_SizeText(font, Text.c_str(), &w, &h);
 
-        const SDL_FRect rect{ X, Y, static_cast<float>(w), static_cast<float>(h) };
+        w *= Camera::GetInstance().ZoomValue;
+        h *= Camera::GetInstance().ZoomValue;
+
+        const SDL_FRect rect{ 
+            (X * 64.f - Camera::GetInstance().PositionX) * Camera::GetInstance().ZoomValue,
+            (Y * 64.f - Camera::GetInstance().PositionY) * Camera::GetInstance().ZoomValue,
+            static_cast<float>(w), 
+            static_cast<float>(h) 
+        };
 
         SDL_RenderCopyF(Renderer.SDLRenderer, texture, nullptr, &rect);
         SDL_FreeSurface(surface);

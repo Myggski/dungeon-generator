@@ -28,7 +28,7 @@ namespace LevelGeneration
 		RuleLevelStateData(GridSizeX, GridSizeY),
 		NumberOfFailedAttempts(0),
 		RuleRepository(RuleRepository),
-		HiResLevelStateData(std::make_tuple(32.f, 32.f)),
+		HiResLevelStateData(std::make_tuple(64.f, 64.f)),
 		RuleLevelGenerator(RuleLevelStateData, RuleRepository.GetRandomRule()),
 		CurrentProcessState(LevelProcessState::RuleGridLevel)
 	{
@@ -44,8 +44,10 @@ namespace LevelGeneration
 
 	void Level::Draw(Application::Renderer& Renderer)
 	{
-		float LevelBorderWidth = 0;
-		float LevelBorderHeight = 0;
+		float BorderPositionX = 0.f;
+		float BorderPositionY = 0.f;
+		float LevelBorderWidth = 0.f;
+		float LevelBorderHeight = 0.f;
 		float TileSize = Renderer.GetTileSize();
 
 		if (CurrentProcessState == LevelProcessState::RuleGridLevel)
@@ -65,13 +67,14 @@ namespace LevelGeneration
 		else {
 			DrawHiResLevel(Renderer);
 
-			LevelBorderWidth = static_cast<float>(HiResLevelStateData.GridWidth * 7);
-			LevelBorderHeight = static_cast<float>(HiResLevelStateData.GridHeight * 7);
-			TileSize /= 2.f;
+			BorderPositionX = -1.f;
+			BorderPositionY = -1.f;
+			LevelBorderWidth = static_cast<float>(HiResLevelStateData.GridWidth * 6) + 1;
+			LevelBorderHeight = static_cast<float>(HiResLevelStateData.GridHeight * 6) + 1;
 		}
 
 		Renderer.SetDrawColor(155, 171, 178);
-		Renderer.DrawRectangle({ 0.f, 0.f, LevelBorderWidth, LevelBorderHeight }, std::make_tuple(TileSize, TileSize));
+		Renderer.DrawRectangle({ BorderPositionX, BorderPositionY, LevelBorderWidth, LevelBorderHeight }, std::make_tuple(TileSize, TileSize));
 
 		DrawToolsWindow();
 	}
@@ -351,6 +354,18 @@ namespace LevelGeneration
 				}
 
 				HiResLevelStateData.HiResGrid[X][Y].Draw(Renderer, HiResLevelStateData.RoomCellSize, Color);
+
+				Renderer.SetDrawColor(49, 54, 56);
+
+				if (X == 0)
+				{
+					Renderer.DrawFilledRectangle({ -1, CurrentRoom.RoomRect.y, 1, CurrentRoom.RoomRect.h });
+				}
+
+				if (Y == 0)
+				{
+					Renderer.DrawFilledRectangle({ CurrentRoom.RoomRect.x - 1, -1, CurrentRoom.RoomRect.w + 1, 1 });
+				}
 			}
 		}
 	}
