@@ -150,6 +150,12 @@
     <ClCompile Include="src\LevelGeneration\LevelGenerator\HiResLevel\Room.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelElement\SecretDocumentProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LevelGeneration\LevelElement\KillTargetProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application\Application.h">
@@ -308,6 +314,12 @@
     <ClInclude Include="src\LevelGeneration\LevelGenerator\RoomType.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelElement\SecretDocumentProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LevelGeneration\LevelElement\KillTargetProperty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Image Include="resources\0.png">
@@ -386,6 +398,12 @@
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="resources\trap.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\kill-target.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="resources\secret-document.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

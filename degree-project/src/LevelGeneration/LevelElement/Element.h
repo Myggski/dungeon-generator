@@ -13,6 +13,8 @@ namespace LevelElement
 		MiniBoss = 1 << 2,
 		Reward = 1 << 3,
 		Trap = 1 << 4,
+		KillTarget = 1 << 5,
+		SecretDocument = 1 << 6,
 	};
 
 	struct Element
@@ -20,6 +22,8 @@ namespace LevelElement
 	public:
 		Element(std::unique_ptr<ElementProperty> Property);
 		Element(const Element& Other);
+		Element& operator=(const Element& Other);
+		Element& operator=(Element&& other) noexcept;
 
 		void ConnectToRoom(int RoomId);
 		int GetRoomId() const;

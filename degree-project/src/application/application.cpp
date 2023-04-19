@@ -19,6 +19,8 @@
 #include "LevelGeneration/LevelElement/MiniBossProperty.h"
 #include "LevelGeneration/LevelElement/RewardProperty.h"
 #include "LevelGeneration/LevelElement/TrapProperty.h"
+#include <LevelGeneration/LevelElement/KillTargetProperty.h>
+#include <LevelGeneration/LevelElement/SecretDocumentProperty.h>
 
 namespace Application
 {
@@ -135,24 +137,6 @@ namespace Application
 			Cyclic::ArcType::Short
 		};
 
-		Cyclic::CyclicInsertionPoint ShortReward
-		{
-			{
-				std::make_unique<LevelElement::RewardProperty>(LevelElement::RewardType::Tech, 
-				LevelElement::RarityType::Epic)
-			},
-			Cyclic::ArcType::Short
-		};
-
-		Cyclic::CyclicInsertionPoint LongReward
-		{
-			{
-				std::make_unique<LevelElement::RewardProperty>(LevelElement::RewardType::Tech,
-				LevelElement::RarityType::Epic)
-			},
-			Cyclic::ArcType::Long
-		};
-
 		Cyclic::CyclicInsertionPoint LongMiniBoss
 		{
 			{
@@ -169,7 +153,7 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey)
 			},
-			Cyclic::GoalType::KillTarget
+			LevelElement::Element(std::make_unique<LevelElement::KillTargetProperty>())
 		});
 
 		RuleRepository.Add({
@@ -178,7 +162,7 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey)
 			},
-			Cyclic::GoalType::KillTarget | Cyclic::GoalType::SecretDocuments | Cyclic::GoalType::Treasure
+			LevelElement::Element(std::make_unique<LevelElement::RewardProperty>())
 		});
 
 		RuleRepository.Add({
@@ -187,25 +171,25 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey)
 			},
-			Cyclic::GoalType::SecretDocuments
+			LevelElement::Element(std::make_unique<LevelElement::SecretDocumentProperty>())
 		});
 
 		RuleRepository.Add({
 			"MiniBoss and Trap - ShortShort",
 			{
-				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortReward),
+				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortMiniBoss)
 			},
-			Cyclic::GoalType::Treasure | Cyclic::GoalType::SecretDocuments,
+			LevelElement::Element(std::make_unique<LevelElement::RewardProperty>())
 		});
 
 		RuleRepository.Add({
 			"Reward and Key - LongShort",
 			{
-				std::make_unique<Cyclic::CyclicInsertionPoint>(LongReward),
+				std::make_unique<Cyclic::CyclicInsertionPoint>(LongMiniBoss),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey)
 			},
-			Cyclic::GoalType::SecretDocuments,
+			LevelElement::Element(std::make_unique<LevelElement::SecretDocumentProperty>()),
 		});
 
 		RuleRepository.Add({
@@ -214,7 +198,7 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongMiniBoss),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongLockKey)
 			},
-			Cyclic::GoalType::KillTarget | Cyclic::GoalType::SecretDocuments,
+			LevelElement::Element(std::make_unique<LevelElement::SecretDocumentProperty>()),
 		});
 
 		RuleRepository.Add({
@@ -223,7 +207,7 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongMiniBoss),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortTrap)
 			},
-			Cyclic::GoalType::KillTarget,
+			LevelElement::Element(std::make_unique<LevelElement::KillTargetProperty>()),
 		});
 
 		RuleRepository.Add({
@@ -232,7 +216,7 @@ namespace Application
 				std::make_unique<Cyclic::CyclicInsertionPoint>(LongTrap),
 				std::make_unique<Cyclic::CyclicInsertionPoint>(ShortLockKey),
 			},
-			Cyclic::GoalType::KillTarget,
+			LevelElement::Element(std::make_unique<LevelElement::KillTargetProperty>()),
 		});
 
 		LevelGeneration::Level Level{

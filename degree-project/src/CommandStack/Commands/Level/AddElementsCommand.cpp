@@ -23,6 +23,8 @@ namespace Command
 		SecondPathway[SecondPathCellIndex]->AddElement(MainRule.GetElement(1));
 		SecondPathElementIndex = static_cast<int>(SecondPathway[SecondPathCellIndex]->GetElements().size() - 1);
 
+		RuleLevelStateData.GoalCell->AddElement(MainRule.GetGoalElement());
+
 		RuleLevelStateData.CurrentAction = LevelGenerator::GeneratorActionType::FillEmptySlots;
 	}
 

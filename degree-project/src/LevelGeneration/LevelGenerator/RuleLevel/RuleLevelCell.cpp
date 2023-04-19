@@ -49,7 +49,7 @@ namespace LevelGenerator
 		bHasBeenVisited = bVisited;
 	}
 
-	void RuleLevelCell::AddElement(LevelElement::Element& Element)
+	void RuleLevelCell::AddElement(const LevelElement::Element& Element)
 	{
 		Elements.push_back(std::make_shared<LevelElement::Element>(Element));
 	}

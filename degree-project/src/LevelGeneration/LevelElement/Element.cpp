@@ -4,6 +4,8 @@
 #include "MiniBossProperty.h"
 #include "RewardProperty.h"
 #include "TrapProperty.h"
+#include "KillTargetProperty.h"
+#include "SecretDocumentProperty.h"
 
 namespace LevelElement
 {
@@ -16,6 +18,24 @@ namespace LevelElement
 		: RoomId(Other.RoomId),
 		ElementType(Other.ElementType),
 		Property(Other.Property->Clone()) { }
+
+	Element& Element::operator=(const Element& Other)
+	{
+		RoomId = Other.RoomId;
+		ElementType = Other.ElementType;
+		Property = Other.Property->Clone();
+
+		return *this;
+	}
+
+	Element& Element::operator=(Element&& Other) noexcept
+	{
+		RoomId = Other.RoomId;
+		ElementType = Other.ElementType;
+		Property = std::move(Other.Property);
+
+		return *this;
+	}
 
 	void Element::ConnectToRoom(int RoomIdToConnect)
 	{
@@ -54,6 +74,16 @@ namespace LevelElement
 			return ElementType::Trap;
 		}
 
+		if (dynamic_cast<KillTargetProperty*>(&Property))
+		{
+			return ElementType::KillTarget;
+		}
+
+		if (dynamic_cast<SecretDocumentProperty*>(&Property))
+		{
+			return ElementType::SecretDocument;
+		}
+
 		return ElementType::None;
 	}
 
@@ -69,6 +99,10 @@ namespace LevelElement
 			return "Reward";
 		case ElementType::Trap:
 			return "Trap";
+		case ElementType::KillTarget:
+			return "Kill Target";
+		case ElementType::SecretDocument:
+			return "Secret Document";
 		case ElementType::None:
 		default:
 			return "";

@@ -43,7 +43,7 @@ namespace LevelGenerator
 		void CarveEntrance(const std::string& ConnectedToSpatialHash);
 		void CollapseEntrance(const SpatialHash& ConnectedTo);
 		void SetVisited(bool bVisited);
-		void AddElement(LevelElement::Element& Element);
+		void AddElement(const LevelElement::Element& Element);
 		void RemoveElement(int ElementIndex);
 		bool IsVisited() const;
 		DirectionType GetEntranceFlag() const;

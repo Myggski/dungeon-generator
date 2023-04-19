@@ -24,7 +24,7 @@ namespace LevelElement
 	struct RewardProperty : public ElementPropertyCRTP<RewardProperty>
 	{
 	public:
-		RewardProperty(RewardType RewardType, RarityType Rarity);
+		RewardProperty(RewardType RewardType = RewardType::Tech, RarityType Rarity = RarityType::Rare);
 		RewardType GetRewardType() const;
 		RarityType GetRarity() const;
 

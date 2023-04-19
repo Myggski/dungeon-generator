@@ -141,6 +141,8 @@
     <ClCompile Include="..\external\Imgui\imgui_draw.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_tables.cpp" />
     <ClCompile Include="..\external\Imgui\imgui_widgets.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\KillTargetProperty.cpp" />
+    <ClCompile Include="src\LevelGeneration\LevelElement\SecretDocumentProperty.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.cpp" />
     <ClCompile Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.cpp" />
     <ClCompile Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.cpp" />
@@ -188,6 +190,8 @@
     <ClInclude Include="..\external\Imgui\imstb_rectpack.h" />
     <ClInclude Include="..\external\Imgui\imstb_textedit.h" />
     <ClInclude Include="..\external\Imgui\imstb_truetype.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\KillTargetProperty.h" />
+    <ClInclude Include="src\LevelGeneration\LevelElement\SecretDocumentProperty.h" />
     <ClInclude Include="src\CommandStack\Commands\Level\CreateHiResLevelCommand.h" />
     <ClInclude Include="src\CommandStack\Commands\Level\CreateLowResLevelCommand.h" />
     <ClInclude Include="src\LevelGeneration\LevelGenerator\HiResLevel\HiResLevelStateData.h" />
@@ -253,10 +257,12 @@
     <Image Include="resources\door.png" />
     <Image Include="resources\goal.png" />
     <Image Include="resources\key.png" />
+    <Image Include="resources\kill-target.png" />
     <Image Include="resources\lowres-door.png" />
     <Image Include="resources\lowres-room.png" />
     <Image Include="resources\monster.png" />
     <Image Include="resources\reward.png" />
+    <Image Include="resources\secret-document.png" />
     <Image Include="resources\start.png" />
     <Image Include="resources\trap.png" />
     <Image Include="resources\visited.png" />

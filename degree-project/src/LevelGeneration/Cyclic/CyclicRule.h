@@ -33,7 +33,7 @@ namespace Cyclic
 	class CyclicRule
 	{
 	public:
-		CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, GoalType GoalType);
+		CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, LevelElement::Element);
 		CyclicRule(const CyclicRule& other);
 		CyclicRule(CyclicRule&& other) noexcept;
 		~CyclicRule();
@@ -41,17 +41,15 @@ namespace Cyclic
 		CyclicRule& operator=(CyclicRule&& other) noexcept;
 
 		void ReverseInsertionPoints();
-		bool HasGoalType(GoalType GoalTypeToCheck) const;
 		bool HasArcType(ArcType ArcTypeToCheck);
-		GoalType GetGoalType() const;
-		std::string GetGoalTypeToString() const;
 		std::string GetName() const;
 		ArcType GetArcType(int InsertionIndex) const;
 		LevelElement::Element& GetElement(int InsertionIndex) const;
+		const LevelElement::Element& GetGoalElement() const;
 
 	private:
 		std::string RuleName;
-		GoalType GoalType;
+		LevelElement::Element GoalElement;
 		std::optional<std::array<std::unique_ptr<CyclicInsertionPoint>, 2>> InsertionPoints;
 
 		friend class CyclicRuleRepository;

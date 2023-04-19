@@ -393,6 +393,16 @@ namespace LevelGeneration
 			{
 				Renderer.DrawTexture(Renderer.GetImage("resources/trap.png"), TextureRect, 0);
 			}
+
+			if (Element->GetElementType() == LevelElement::ElementType::KillTarget)
+			{
+				Renderer.DrawTexture(Renderer.GetImage("resources/kill-target.png"), TextureRect, 0);
+			}
+
+			if (Element->GetElementType() == LevelElement::ElementType::SecretDocument)
+			{
+				Renderer.DrawTexture(Renderer.GetImage("resources/secret-document.png"), TextureRect, 0);
+			}
 		}
 	}
 
@@ -406,7 +416,7 @@ namespace LevelGeneration
 		{
 			ImGui::Text("Name:");
 			ImGui::Text("%s", RuleLevelGenerator.MainRule.GetName().c_str());
-			ImGui::Text("Goal: %s", RuleLevelGenerator.MainRule.GetGoalTypeToString().c_str());
+			ImGui::Text("Goal: %s", RuleLevelGenerator.MainRule.GetGoalElement().GetElementName().c_str());
 
 			ImGui::Spacing();
 			ImGui::Spacing();

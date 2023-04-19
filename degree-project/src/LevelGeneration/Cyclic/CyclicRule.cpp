@@ -3,17 +3,19 @@
 #include <algorithm>
 #include <stdexcept>
 #include <utility>
+#include "LevelGeneration/LevelElement/KillTargetProperty.h"
 
 namespace Cyclic
 {
-	CyclicRule::CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, enum GoalType GoalType)
+
+	CyclicRule::CyclicRule(std::string RuleName, std::array<std::unique_ptr<CyclicInsertionPoint>, 2> InsertionPoints, LevelElement::Element GoalElement)
 		: RuleName(std::move(RuleName)),
-		GoalType(GoalType),
+		GoalElement(GoalElement),
 		InsertionPoints(std::make_optional(std::move(InsertionPoints))) { }
 
 	CyclicRule::CyclicRule(const CyclicRule& other)
 		: RuleName(other.RuleName),
-		GoalType(other.GoalType),
+		GoalElement(other.GoalElement),
 		InsertionPoints(std::nullopt)
 	{
 		if (other.InsertionPoints.has_value()) {
@@ -25,10 +27,10 @@ namespace Cyclic
 		}
 	}
 
-	CyclicRule::CyclicRule(CyclicRule&& other) noexcept
-		: RuleName(std::move(other.RuleName)),
-		GoalType(other.GoalType),
-		InsertionPoints(std::move(other.InsertionPoints)) { }
+	CyclicRule::CyclicRule(CyclicRule&& Other) noexcept
+		: RuleName(std::move(Other.RuleName)),
+		GoalElement(std::move(Other.GoalElement)),
+		InsertionPoints(std::move(Other.InsertionPoints)) { }
 
 	CyclicRule::~CyclicRule() = default;
 
@@ -39,7 +41,7 @@ namespace Cyclic
 		}
 
 		RuleName = Other.RuleName;
-		GoalType = Other.GoalType;
+		GoalElement = Other.GoalElement;
 		InsertionPoints = std::nullopt;
 
 		if (Other.InsertionPoints.has_value()) {
@@ -52,11 +54,11 @@ namespace Cyclic
 		return *this;
 	}
 
-	CyclicRule& CyclicRule::operator=(CyclicRule&& other) noexcept
+	CyclicRule& CyclicRule::operator=(CyclicRule&& Other) noexcept
 	{
-		RuleName = std::move(other.RuleName);
-		GoalType = other.GoalType;
-		InsertionPoints = std::move(other.InsertionPoints);
+		RuleName = std::move(Other.RuleName);
+		GoalElement = std::move(Other.GoalElement);
+		InsertionPoints = std::move(Other.InsertionPoints);
 		return *this;
 	}
 
@@ -71,11 +73,6 @@ namespace Cyclic
 		}
 	}
 
-	bool CyclicRule::HasGoalType(Cyclic::GoalType GoalTypeToCheck) const
-	{
-		return (GoalType & GoalTypeToCheck) == GoalTypeToCheck;
-	}
-
 	bool CyclicRule::HasArcType(ArcType ArcTypeToCheck)
 	{
 		if (!InsertionPoints.has_value())
@@ -84,25 +81,6 @@ namespace Cyclic
 		}
 
 		return std::ranges::any_of(InsertionPoints.value(), [&](const auto& InsertionPoint) { return InsertionPoint->ArcType == ArcTypeToCheck; });
-	}
-
-	GoalType CyclicRule::GetGoalType() const
-	{
-		return GoalType;
-	}
-
-	std::string CyclicRule::GetGoalTypeToString() const
-	{
-		switch (GoalType)
-		{
-		case GoalType::Treasure:
-			return "Treasure";
-		case GoalType::SecretDocuments:
-			return "Secret Document";
-		case GoalType::KillTarget:
-		default:
-			return "Kill Target";
-		}
 	}
 
 	ArcType CyclicRule::GetArcType(int InsertionIndex) const
@@ -128,5 +106,10 @@ namespace Cyclic
 		}
 
 		return InsertionPoints.value()[InsertionIndex]->GetElement();
+	}
+
+	const LevelElement::Element& CyclicRule::GetGoalElement() const
+	{
+		return GoalElement;
 	}
 }
